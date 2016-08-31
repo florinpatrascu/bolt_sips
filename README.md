@@ -17,7 +17,7 @@ Documentation: http://hexdocs.pm/bolt_sips/
 
 ### Installation
 
-If [available in Hex](https://hex.pm/docs/publish), edit the `mix.ex` file and add the `bolt_sips` dependency to the `deps/1 `function. This will add `bolt_sips` to your list of dependencies in `mix.exs`
+If [available in Hex](https://hex.pm/packages/bolt_sips), edit the `mix.ex` file and add the `bolt_sips` dependency to the `deps/1 `function. This will add `bolt_sips` to your list of dependencies in `mix.exs`
 
 ```elixir
 def deps do
