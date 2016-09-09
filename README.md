@@ -21,28 +21,32 @@ If [available in Hex](https://hex.pm/packages/bolt_sips), edit the `mix.ex` file
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 0.1.0"}]
+  [{:bolt_sips, "~> 0.1"}]
 end
 ```
 or from Github:
 
-    defp deps do
-      [{:bolt_sips, github: "florinpatrascu/bolt_sips"}]
-    end
+```elixir
+defp deps do
+  [{:bolt_sips, github: "florinpatrascu/bolt_sips"}]
+end
+```
 
 If you're using a local development copy (example):
 
-    defp deps do
-      [{:bolt_sips, path: "../bolt_sips"}]
-    end
+```elixir
+defp deps do
+  [{:bolt_sips, path: "../bolt_sips"}]
+end
+```
 
 Add the `bolt_sips` dependency the applications list:
 
-    def application do
-      [applications: [:logger, :bolt_sips],
-       mod: {Bolt.Sips.Application, []}]
-    end
-
+```elixir
+def application do
+  [applications: [:logger, :bolt_sips], mod: {Bolt.Sips.Application, []}]
+end
+```
 
 ### Usage
 
