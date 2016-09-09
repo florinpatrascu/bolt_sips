@@ -109,7 +109,7 @@ defmodule Bolt.Sips.Types do
     defp draw_path(n, r, s, i, [h|t]=rel_index, acc, ln, nn) do
       next_node = Enum.at(n, Enum.at(s, 2 * i + 1))
       urel=
-      if h > 0 do
+      if h > 0 && h < 255 do
         # rel: rels[rel_index - 1], start/end: (ln.id, next_node.id)
         rel = Enum.at(r, h - 1)
         unbound_relationship = [:id, :type, :properties, :start, :end]
@@ -117,7 +117,9 @@ defmodule Bolt.Sips.Types do
         struct(UnboundRelationship, unbound_relationship)
       else
         # rel: rels[-rel_index - 1], start/end: (next_node.id, ln.id)
-        rel = Enum.at(r, -h - 1)
+        # Neo4j sends: -1, and Boltex returns 255 instead? Investigating, meanwhile ugly path:
+        haha = if h==255, do: -1, else: h # oh dear ...
+        rel = Enum.at(r, -haha - 1)
         unbound_relationship = [:id, :type, :properties, :start, :end]
         |> Enum.zip([rel.id, rel.type, rel.properties, next_node.id, ln.id])
         struct(UnboundRelationship, unbound_relationship)
