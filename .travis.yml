@@ -1,0 +1,12 @@
+sudo: required
+services: docker
+language: elixir
+elixir:
+  - 1.3
+
+before_install:
+  - docker run --name neo4j -d -p 7687:7687 -e 'NEO4J_AUTH=none' neo4j:3.0.6
+  - docker logs -f neo4j | sed /Bolt\ enabled/q
+
+script:
+  - mix test
