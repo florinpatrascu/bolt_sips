@@ -49,7 +49,7 @@ defmodule Bolt.Sips.Connection do
   def handle_call(data, _from, opts) do
     # IO.puts(inspect(__MODULE__ )<> " handle_call: #{inspect data}, opts: #{inspect opts}")
     {s, query, params} = data
-    result = Boltex.Bolt.run_statement(:gen_tcp, s, query, params)
+    result = Boltex.Bolt.run_statement(:gen_tcp, s, query, params) |> ack_failure(:gen_tcp, s)
     log("#{inspect s} - cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect result}")
 
     # :random.seed(:os.timestamp)
@@ -76,14 +76,28 @@ defmodule Bolt.Sips.Connection do
     )
   end
 
-   @doc false
-   def terminate(_reason, _state) do
-     :ok
-   end
+  defp ack_failure(response = {:failure, _}, transport, port) do
+    # TODO: Use Boltex.Bolt.ack_failure when mschae/boltex#7 gets merged.
+    sig_ack_failure = 0x0E
+    Boltex.Bolt.send_messages transport, port, [
+      {[nil], sig_ack_failure}
+    ]
 
-   def init(state) do
-     {:ok, state}
-   end
+    with {:ignored, []} <- Boltex.Bolt.receive_data(transport, port),
+         {:success, %{}} <- Boltex.Bolt.receive_data(transport, port),
+      do: response
+  end
+  defp ack_failure(non_failure, _, _), do: non_failure
+
+  @doc false
+  def terminate(_reason, _state) do
+    :ok
+  end
+
+  def init(state) do
+    {:ok, state}
+  end
+
 
   @doc """
   Logs the given message in debug mode.
