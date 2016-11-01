@@ -180,6 +180,12 @@ defmodule Query.Test do
     refute r.plan == nil
     assert List.first(r.plan["children"])["operatorType"] == "CartesianProduct"
   end
+
+  test "can execute a query after a failure", context do
+    conn = context[:conn]
+    assert {:error, _} = Bolt.Sips.query(conn, "INVALID CYPHER")
+    assert {:ok, [%{"n" => 22}]} = Bolt.Sips.query(conn, "RETURN 22 as n")
+  end
 end
 
 
