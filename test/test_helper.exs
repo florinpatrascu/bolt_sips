@@ -26,9 +26,6 @@ defmodule Bolt.Sips.TestHelper do
   defp file_error_description(reason), do: "due to #{reason}."
 end
 
-opts = Application.get_env(:bolt_sips, Bolt)
-{:ok, _pid} = Bolt.Sips.start_link(opts)
-
 # I am using the test db for debugging and the line below will clear *everything*
 # Bolt.Sips.query(Bolt.Sips.conn, "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r")
 #

@@ -87,9 +87,17 @@ Available command line options:
 
 ### Testing
 
-    mix test
+Tests run against a running instance of Neo4J. Please verify that you do not store critical data on this server!
 
-This runs the test suite against a test instance of Neo4j. Please verify that you do not store critical data on this server!
+If you have docker available on your system, you can start an instance before running the test suite:
+
+```shell
+docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=none' neo4j:3.0.6
+```
+
+```shell
+mix test
+```
 
 ### Special thanks
 
