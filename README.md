@@ -17,40 +17,26 @@ Documentation: http://hexdocs.pm/bolt_sips/
 
 ### Installation
 
-If [available in Hex](https://hex.pm/packages/bolt_sips), edit the `mix.ex` file and add the `bolt_sips` dependency to the `deps/1 `function. This will add `bolt_sips` to your list of dependencies in `mix.exs`
+[Available in Hex](https://hex.pm/packages/bolt_sips), the package can be installed as:
+
+  1. Add bolt_sips to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
   [{:bolt_sips, "~> 0.1"}]
 end
 ```
-or from Github:
-
-```elixir
-defp deps do
-  [{:bolt_sips, github: "florinpatrascu/bolt_sips"}]
-end
-```
-
-If you're using a local development copy (example):
-
-```elixir
-defp deps do
-  [{:bolt_sips, path: "../bolt_sips"}]
-end
-```
-
-Add the `bolt_sips` dependency the applications list:
+  2. Ensure bolt_sips is started before your application:
 
 ```elixir
 def application do
-  [applications: [:logger, :bolt_sips], mod: {Bolt.Sips.Application, []}]
+  [applications: [:bolt_sips]]
 end
 ```
 
 ### Usage
 
-Edit the `config/config.exs` and describe a Bolt server endpoint, your logging preferences, etc. Example:
+Edit your `config/config.exs` and set Bolt connection, for example:
 
 ```elixir
 config :bolt_sips, Bolt,
@@ -59,36 +45,12 @@ config :bolt_sips, Bolt,
   port: 7687,
   pool_size: 5,
   max_overflow: 1
-
-level = if System.get_env("DEBUG") do
-  :debug
-else
-  :info
-end
-
-config :logger, :console,
-  level: level,
-  format: "$date $time [$level] $metadata$message\n"
-
-config :mix_test_watch,
-  clear: true
 ```
 
 *Please observe this issue: [#7773](https://github.com/neo4j/neo4j/issues/7773) if your server requires basic authentication and have issues changing the `username`*
 
-Run `mix do deps.get, deps.compile`
-
-Also, ensure `bolt_sips` is started before your application:
-
-```elixir
-def application do
-  [applications: [:bolt_sips]]
-end
-```
-
 With a minimalist setup configured as above, and a Neo4j 3.x server running, you can connect to the server and run some queries using Elixir’s interactive shell ([IEx](http://elixir-lang.org/docs/stable/iex/IEx.html)):
 
-    iex> {:ok, _p} = Bolt.Sips.start_link(host: "localhost")    
     iex> conn = Bolt.Sips.conn
     iex> Bolt.Sips.query!(conn, "CREATE (a:Person {name:'Bob'})")
     %{stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1}, type: "w"}
@@ -125,9 +87,17 @@ Available command line options:
 
 ### Testing
 
-    mix test
+Tests run against a running instance of Neo4J. Please verify that you do not store critical data on this server!
 
-This runs the test suite against a test instance of Neo4j. Please verify that you do not store critical data on this server!
+If you have docker available on your system, you can start an instance before running the test suite:
+
+```shell
+docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=none' neo4j:3.0.6
+```
+
+```shell
+mix test
+```
 
 ### Special thanks
 
