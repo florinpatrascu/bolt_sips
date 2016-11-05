@@ -4,6 +4,8 @@ Neo4j driver for Elixir wrapped around the Bolt protocol.
 
 Documentation: http://hexdocs.pm/bolt_sips/
 
+![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)
+
 ## Disclaimer
 
 `Bolt.Sips` is currently on `0.x` beta releases but it is heading towards a stable release. Please check the issues tracker for more information and outstanding issues.
