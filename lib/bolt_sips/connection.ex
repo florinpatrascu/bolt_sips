@@ -76,16 +76,9 @@ defmodule Bolt.Sips.Connection do
     )
   end
 
-  defp ack_failure(response = {:failure, _}, transport, port) do
-    # TODO: Use Boltex.Bolt.ack_failure when mschae/boltex#7 gets merged.
-    sig_ack_failure = 0x0E
-    Boltex.Bolt.send_messages transport, port, [
-      {[nil], sig_ack_failure}
-    ]
-
-    with {:ignored, []} <- Boltex.Bolt.receive_data(transport, port),
-         {:success, %{}} <- Boltex.Bolt.receive_data(transport, port),
-      do: response
+  defp ack_failure(response = {:failure, failure}, transport, port) do
+    Boltex.Bolt.ack_failure(transport, port)
+    {:failure, failure}
   end
   defp ack_failure(non_failure, _, _), do: non_failure
 

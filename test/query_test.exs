@@ -66,8 +66,7 @@ defmodule Query.Test do
     assert length(r) == 3, "you're missing some characters from the 'The Name of the Wind' db"
 
     if row = List.first(r) do
-      assert row["p"].properties["name"] == "Patrick Rothfuss",
-             "missing 'The Name of the Wind' database, or data incomplete"
+      assert row["p"].properties["name"] == "Patrick Rothfuss"
       assert is_map(row["p"]), "was expecting a map `p`"
       assert row["person"]["label"] == "Person"
       assert row["NAME"] == "PATRICK ROTHFUSS"

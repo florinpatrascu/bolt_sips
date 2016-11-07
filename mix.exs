@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.1.1"
+  @version "0.1.2"
 
   def project do
     [
@@ -26,7 +26,7 @@ defmodule BoltSips.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poolboy, :con_cache, :boltex],
+    [applications: [:logger, :poolboy, :con_cache],
      mod: {Bolt.Sips.Application, []}]
   end
 
@@ -41,9 +41,8 @@ defmodule BoltSips.Mixfile do
     [
       {:poolboy, "~> 1.5"},
       {:con_cache, "~> 0.11"},
-      {:ex_doc, "~> 0.13.0", only: [:dev]},
-      {:mix_test_watch, "~> 0.2", only: [:dev, :test]},
-      {:boltex, github: "florinpatrascu/boltex"}
+      {:ex_doc, "~> 0.14", only: [:dev]},
+      {:mix_test_watch, "~> 0.2", only: [:dev, :test]}
     ]
   end
 end
