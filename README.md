@@ -2,9 +2,10 @@
 
 Neo4j driver for Elixir wrapped around the Bolt protocol.
 
+![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)
+
 Documentation: http://hexdocs.pm/bolt_sips/
 
-![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)
 
 ## Disclaimer
 
@@ -21,14 +22,14 @@ Documentation: http://hexdocs.pm/bolt_sips/
 
 [Available in Hex](https://hex.pm/packages/bolt_sips), the package can be installed as:
 
-  1. Add bolt_sips to your list of dependencies in `mix.exs`:
+#### 1. Add bolt_sips to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 0.1"}]
+  [{:bolt_sips, "~> 0.2"}]
 end
 ```
-  2. Ensure bolt_sips is started before your application:
+#### 2. Ensure bolt_sips is started before your application:
 
 ```elixir
 def application do
@@ -105,7 +106,11 @@ mix test
 
 - Michael Schaefermeyer (@mschae), for implementing the Bolt protocol in Elixir. 
 
-`Bolt.Sips` is using a fork of the [Boltex](https://github.com/mschae/boltex) repository, for the low level communication with the Neo4j server.
+`Bolt.Sips` incorporates the Bolt protocol code originally created at [mschae/boltex](https://github.com/mschae/boltex, for the low level communication with the Neo4j server.  
+
+### Contributors
+
+- Victor Hugo Borja (@vic)
 
 ### Contributing
 
