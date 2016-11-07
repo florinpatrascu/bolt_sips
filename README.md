@@ -26,7 +26,7 @@ Documentation: http://hexdocs.pm/bolt_sips/
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 0.2"}]
+  [{:bolt_sips, "~> 0.1"}]
 end
 ```
 #### 2. Ensure bolt_sips is started before your application:
