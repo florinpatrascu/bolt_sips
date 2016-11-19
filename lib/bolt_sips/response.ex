@@ -91,8 +91,8 @@ defmodule Bolt.Sips.Response do
 
   defp extract_types([]), do: []
   defp extract_types([sig: @node, fields: fields]) do
-    node = [:id, :labels, :properties] |> Enum.zip(fields)
-    struct(Node, node)
+    n = [:id, :labels, :properties] |> Enum.zip(fields)
+    struct(Node, n)
   end
 
   defp extract_types([sig: @relationship, fields: fields]) do

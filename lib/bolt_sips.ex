@@ -48,18 +48,18 @@ defmodule Bolt.Sips do
   """
   @spec start_link(Keyword.t) :: {:ok, pid} | {:error, Bolt.Sips.Error.t}
   def start_link(opts) do
-    config = Utils.default_config(opts)
+    cnf = Utils.default_config(opts)
     ConCache.start_link([], name: :bolt_sips_cache)
 
-    ConCache.put(:bolt_sips_cache, :config, config)
+    ConCache.put(:bolt_sips_cache, :config, cnf)
     poolboy_config = [
       name: {:local, @pool_name},
       worker_module: Bolt.Sips.Connection,
-      size: Keyword.get(config, :pool_size),
-      max_overflow: Keyword.get(config, :max_overflow)
+      size: Keyword.get(cnf, :pool_size),
+      max_overflow: Keyword.get(cnf, :max_overflow)
     ]
 
-    children = [:poolboy.child_spec(@pool_name, poolboy_config, config)]
+    children = [:poolboy.child_spec(@pool_name, poolboy_config, cnf)]
     options = [strategy: :one_for_one, name: __MODULE__]
 
     Supervisor.start_link(children, options)
