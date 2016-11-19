@@ -35,7 +35,6 @@ defmodule Bolt.Sips.Connection do
       else
         nil
       end
-    # timeout    = opts[:timeout]
 
     {:ok, p} = :gen_tcp.connect(host, port, [active: false, mode: :binary, packet: :raw])
     :ok        = Boltex.Bolt.handshake(:gen_tcp, p)
@@ -65,9 +64,9 @@ defmodule Bolt.Sips.Connection do
   end
 
   @doc false
-  def send(conn, query), do: send(conn, query, %{})
+  def send(cn, query), do: send(cn, query, %{})
   # def send(conn, query, params), do: Boltex.Bolt.run_statement(:gen_tcp, conn, query, params)
-  def send(conn, query, params), do: pool_server(conn, query, params)
+  def send(cn, query, params), do: pool_server(cn, query, params)
 
   defp pool_server(connection, query, params) do
     :poolboy.transaction(

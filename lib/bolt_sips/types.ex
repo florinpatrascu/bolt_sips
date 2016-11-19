@@ -12,7 +12,7 @@ defmodule Bolt.Sips.Types do
   """
 
   defmodule Entity do
-    @doc """
+    @moduledoc """
       base structure for Node and Relationship
     """
     @base_fields [id: nil, properties: nil]
@@ -105,10 +105,11 @@ defmodule Bolt.Sips.Types do
     end
 
     # todo: clean up the code
+    @lint false
     defp draw_path(n, r, s, i, [], acc, ln, nn), do: acc
-    defp draw_path(n, r, s, i, [h|t]=rel_index, acc, ln, nn) do
+    defp draw_path(n, r, s, i, [h|t] = rel_index, acc, ln, nn) do
       next_node = Enum.at(n, Enum.at(s, 2 * i + 1))
-      urel=
+      urel =
       if h > 0 && h < 255 do
         # rel: rels[rel_index - 1], start/end: (ln.id, next_node.id)
         rel = Enum.at(r, h - 1)
@@ -118,14 +119,14 @@ defmodule Bolt.Sips.Types do
       else
         # rel: rels[-rel_index - 1], start/end: (next_node.id, ln.id)
         # Neo4j sends: -1, and Boltex returns 255 instead? Investigating, meanwhile ugly path:
-        haha = if h==255, do: -1, else: h # oh dear ...
+        haha = if h == 255, do: -1, else: h # oh dear ...
         rel = Enum.at(r, -haha - 1)
         unbound_relationship = [:id, :type, :properties, :start, :end]
         |> Enum.zip([rel.id, rel.type, rel.properties, next_node.id, ln.id])
         struct(UnboundRelationship, unbound_relationship)
       end
 
-      draw_path(n, r, s, i+1, t, (acc ++ [urel]) ++ [next_node], next_node, ln)
+      draw_path(n, r, s, i + 1, t, (acc ++ [urel]) ++ [next_node], next_node, ln)
     end
   end
 
