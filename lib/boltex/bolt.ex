@@ -2,10 +2,9 @@ defmodule Boltex.Bolt do
   alias Boltex.{Utils, PackStream}
   require Logger
 
-  @recv_timeout    1_000
   @max_chunk_size  65_535
 
-  @user_agent      "Boltex/1.0"
+  @user_agent      "Bolt(ex).Sips/1.0"
   @hs_magic        << 0x60, 0x60, 0xB0, 0x17 >>
   @hs_version      << 1 :: 32, 0 :: 32, 0 :: 32, 0 :: 32 >>
 
@@ -36,7 +35,7 @@ defmodule Boltex.Bolt do
   @doc "Does the handshake"
   def handshake(transport, port) do
     transport.send port, @hs_magic <> @hs_version
-    case transport.recv(port, 4, @recv_timeout) do
+    case transport.recv(port, 4, Bolt.Sips.config(:timeout)) do
       {:ok, << 1 :: 32 >>} ->
         :ok
 
@@ -208,13 +207,13 @@ defmodule Boltex.Bolt do
   end
 
   defp do_receive_data(transport, port) do
-    with {:ok, <<chunk_size :: 16>>} <- transport.recv(port, 2, @recv_timeout),
+    with {:ok, <<chunk_size :: 16>>} <- transport.recv(port, 2, Bolt.Sips.config(:timeout)),
     do:  do_receive_data(transport, port, chunk_size)
   end
   defp do_receive_data(transport, port, chunk_size) do
-    with {:ok, data} <- transport.recv(port, chunk_size, @recv_timeout)
+    with {:ok, data} <- transport.recv(port, chunk_size, Bolt.Sips.config(:timeout))
     do
-      case transport.recv(port, 2, @recv_timeout) do
+      case transport.recv(port, 2, Bolt.Sips.config(:timeout)) do
         {:ok, @zero_chunk} ->
           data
         {:ok, <<chunk_size :: 16>>} ->
