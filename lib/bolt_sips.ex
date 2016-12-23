@@ -138,7 +138,13 @@ defmodule Bolt.Sips do
   def config(key), do: Keyword.get(config, key)
 
   @doc false
-  def config(key, default), do: Keyword.get(config, key, default)
+  def config(key, default) do
+    try do
+      Keyword.get(config, key, default)
+    rescue
+      _ -> default
+    end
+  end
 
   @doc false
   def pool_name, do: @pool_name

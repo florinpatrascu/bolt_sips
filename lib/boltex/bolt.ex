@@ -3,6 +3,7 @@ defmodule Boltex.Bolt do
   require Logger
 
   @max_chunk_size  65_535
+  @timeout         15_000
 
   @user_agent      "Bolt(ex).Sips/1.0"
   @hs_magic        << 0x60, 0x60, 0xB0, 0x17 >>
@@ -35,12 +36,12 @@ defmodule Boltex.Bolt do
   @doc "Does the handshake"
   def handshake(transport, port) do
     transport.send port, @hs_magic <> @hs_version
-    case transport.recv(port, 4, Bolt.Sips.config(:timeout)) do
+    case transport.recv(port, 4, Bolt.Sips.config(:timeout, @timeout)) do
       {:ok, << 1 :: 32 >>} ->
         :ok
 
       response ->
-        Logger.error "Handshake failed. Received: #{Utils.hex_encode response})"
+        Logger.error "Handshake failed. #{log_error_response(response)})"
         {:error, :handshake_failed}
     end
   end
@@ -68,8 +69,15 @@ defmodule Boltex.Bolt do
         :ok
 
       response ->
-        Logger.error "Init failed. Received: #{Utils.hex_encode response})"
+        Logger.error "Init failed. #{log_error_response(response)}"
         {:error, :init_failed}
+    end
+  end
+
+  defp log_error_response(r) do
+    case r do
+     {:failure, %{"code" => code, "message" => message}}  -> "Failure: #{message} (#{code})"
+      err -> Utils.hex_encode err
     end
   end
 
@@ -207,13 +215,13 @@ defmodule Boltex.Bolt do
   end
 
   defp do_receive_data(transport, port) do
-    with {:ok, <<chunk_size :: 16>>} <- transport.recv(port, 2, Bolt.Sips.config(:timeout)),
+    with {:ok, <<chunk_size :: 16>>} <- transport.recv(port, 2, Bolt.Sips.config(:timeout, @timeout)),
     do:  do_receive_data(transport, port, chunk_size)
   end
   defp do_receive_data(transport, port, chunk_size) do
-    with {:ok, data} <- transport.recv(port, chunk_size, Bolt.Sips.config(:timeout))
+    with {:ok, data} <- transport.recv(port, chunk_size, Bolt.Sips.config(:timeout, @timeout))
     do
-      case transport.recv(port, 2, Bolt.Sips.config(:timeout)) do
+      case transport.recv(port, 2, Bolt.Sips.config(:timeout, @timeout)) do
         {:ok, @zero_chunk} ->
           data
         {:ok, <<chunk_size :: 16>>} ->

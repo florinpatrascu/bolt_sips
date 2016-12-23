@@ -51,19 +51,24 @@ defmodule Mix.Tasks.Bolt.Cypher do
     {:ok, p}   = :gen_tcp.connect options[:host], options[:port],
                       [active: false, mode: :binary, packet: :raw]
     :ok        = Bolt.handshake :gen_tcp, p
-    :ok        = Bolt.init :gen_tcp, p, {options[:username], options[:password]}
+    :ok        =
 
-    # display the cypher command
-    log_cypher(cypher)
+    case Bolt.init :gen_tcp, p, {options[:username], options[:password]} do
+     :ok ->
+        # display the cypher command
+        log_cypher(cypher)
 
-    # and echo the server response too
-    Bolt.run_statement(:gen_tcp, p, cypher)
-    |> Response.transform
-    |> log_response
+        # and echo the server response too
+        Bolt.run_statement(:gen_tcp, p, cypher)
+        |> Response.transform
+        |> log_response
 
+      {:error, code} -> log_error("Cannot execute the command, see error above")
+    end
   end
 
   defp log_cypher(msg), do: Mix.shell.info [:green, "#{inspect(msg)}"]
   defp log_response(msg), do: Mix.shell.info [:yellow, "#{inspect msg}"]
+  defp log_error(msg), do: Mix.shell.info [:white, "#{msg}"]
 
 end
