@@ -51,7 +51,6 @@ defmodule Mix.Tasks.Bolt.Cypher do
     {:ok, p}   = :gen_tcp.connect options[:host], options[:port],
                       [active: false, mode: :binary, packet: :raw]
     :ok        = Bolt.handshake :gen_tcp, p
-    :ok        =
 
     case Bolt.init :gen_tcp, p, {options[:username], options[:password]} do
      :ok ->

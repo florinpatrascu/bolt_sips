@@ -77,6 +77,7 @@ defmodule Boltex.Bolt do
   defp log_error_response(r) do
     case r do
      {:failure, %{"code" => code, "message" => message}}  -> "Failure: #{message} (#{code})"
+     {:error, error} -> "Error #{error} encountered"
       err -> Utils.hex_encode err
     end
   end
@@ -231,7 +232,7 @@ defmodule Boltex.Bolt do
       {:error, :timeout} ->
         {:error, :no_more_data_received}
       other ->
-        raise "receive failed"
+        raise "receive failed; #{inspect other}"
     end
   end
 

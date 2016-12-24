@@ -17,7 +17,10 @@ defmodule Bolt.Sips.Utils do
     |> Keyword.put_new(:pool_size, 5)
     |> Keyword.put_new(:max_overflow, 2)
     |> Keyword.put_new(:timeout, 15_000)
+    |> Keyword.put_new(:secure, false)
+    |> Keyword.put_new(:socket, :gen_tcp)
     |> Enum.reject(fn {_k, v} -> is_nil(v) end)
+
   end
 
 

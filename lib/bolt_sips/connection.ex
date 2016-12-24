@@ -36,11 +36,10 @@ defmodule Bolt.Sips.Connection do
         nil
       end
 
-    {:ok, p} = :gen_tcp.connect(host, port, [active: false, mode: :binary, packet: :raw])
-    :ok        = Boltex.Bolt.handshake(:gen_tcp, p)
-    :ok        = Boltex.Bolt.init(:gen_tcp, p, auth)
+    {:ok, p} = Bolt.Sips.config(:socket).connect(host, port, [active: false, mode: :binary, packet: :raw])
+    :ok      = Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p)
+    :ok      = Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth)
 
-    # todo: add error support
     {:reply, p, opts}
   end
 
@@ -48,7 +47,10 @@ defmodule Bolt.Sips.Connection do
   def handle_call(data, _from, opts) do
     # IO.puts(inspect(__MODULE__ )<> " handle_call: #{inspect data}, opts: #{inspect opts}")
     {s, query, params} = data
-    result = Boltex.Bolt.run_statement(:gen_tcp, s, query, params) |> ack_failure(:gen_tcp, s)
+
+    result = Boltex.Bolt.run_statement(Bolt.Sips.config(:socket), s, query, params)
+    |> ack_failure( Bolt.Sips.config(:socket), s)
+
     log("#{inspect s} - cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect result}")
 
     # :random.seed(:os.timestamp)
