@@ -51,7 +51,7 @@ defmodule Bolt.Sips do
     ConCache.start_link([], name: :bolt_sips_cache)
 
     cnf = Utils.default_config(opts)
-    cnf = cnf |> Keyword.put(:socket, (if Keyword.get(cnf, :secure), do: :etls, else: :gen_tcp))
+    cnf = cnf |> Keyword.put(:socket, (if Keyword.get(cnf, :ssl), do: :etls, else: :gen_tcp))
 
     ConCache.put(:bolt_sips_cache, :config, cnf)
 

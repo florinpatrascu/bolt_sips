@@ -10,12 +10,12 @@ config :bolt_sips, Bolt,
   basic_auth: [username: "wow", password: "of_course_this_is_the_password"],
   port: 24786,
   pool_size: 5,
-  secure: true,
+  ssl: true,
   max_overflow: 1
 
 ```
 
-Observe the new flag: `secure: true`
+Observe the new flag: `ssl: true`
 
 Please note this is work in progress
 
