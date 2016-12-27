@@ -112,7 +112,7 @@ mix test
 
 ### Contributors
 
-- Victor Hugo Borja ([@vic](https://github.com/vic))
+As reported by Github: [contributions to master, excluding merge commits](https://github.com/florinpatrascu/bolt_sips/graphs/contributors)
 
 ### Contributing
 
