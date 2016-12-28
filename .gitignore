@@ -121,3 +121,5 @@ atlassian-ide-plugin.xml
 ebin
 rel/example_project
 .concrete/DEV_MODE
+
+logs/

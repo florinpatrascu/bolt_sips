@@ -48,10 +48,13 @@ defmodule Bolt.Sips do
   """
   @spec start_link(Keyword.t) :: {:ok, pid} | {:error, Bolt.Sips.Error.t}
   def start_link(opts) do
-    cnf = Utils.default_config(opts)
     ConCache.start_link([], name: :bolt_sips_cache)
 
+    cnf = Utils.default_config(opts)
+    cnf = cnf |> Keyword.put(:socket, (if Keyword.get(cnf, :ssl), do: :etls, else: :gen_tcp))
+
     ConCache.put(:bolt_sips_cache, :config, cnf)
+
     poolboy_config = [
       name: {:local, @pool_name},
       worker_module: Bolt.Sips.Connection,
@@ -138,7 +141,13 @@ defmodule Bolt.Sips do
   def config(key), do: Keyword.get(config, key)
 
   @doc false
-  def config(key, default), do: Keyword.get(config, key, default)
+  def config(key, default) do
+    try do
+      Keyword.get(config, key, default)
+    rescue
+      _ -> default
+    end
+  end
 
   @doc false
   def pool_name, do: @pool_name

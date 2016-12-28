@@ -5,6 +5,7 @@
   "credo": {:hex, :credo, "0.5.3", "0c405b36e7651245a8ed63c09e2d52c2e2b89b6d02b1570c4d611e0fcbecf4a2", [:mix], [{:bunt, "~> 0.1.6", [hex: :bunt, optional: false]}]},
   "db_connection": {:hex, :db_connection, "1.0.0", "63c03e520d54886a66104d34e32397ba960db6e74b596ce221592c07d6a40d8d", [:mix], [{:connection, "~> 1.0.2", [hex: :connection, optional: false]}, {:poolboy, "~> 1.5", [hex: :poolboy, optional: true]}, {:sbroker, "~> 1.0", [hex: :sbroker, optional: true]}]},
   "earmark": {:hex, :earmark, "1.0.3", "89bdbaf2aca8bbb5c97d8b3b55c5dd0cff517ecc78d417e87f1d0982e514557b", [:mix], []},
+  "etls": {:hex, :etls, "1.1.2", "141972c23274f4135e6354dc973114ae6cccd60788bb3c793e3672040a7915ec", [:make, :rebar, :rebar3], []},
   "ex_doc": {:hex, :ex_doc, "0.14.3", "e61cec6cf9731d7d23d254266ab06ac1decbb7651c3d1568402ec535d387b6f7", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
   "exactor": {:hex, :exactor, "2.2.1", "89bc6798f7ed5b5a090f8e4a0b6997478a3266e831d2ff31677ac764ffa75973", [:mix], []},
   "fs": {:hex, :fs, "0.9.2", "ed17036c26c3f70ac49781ed9220a50c36775c6ca2cf8182d123b6566e49ec59", [:rebar], []},

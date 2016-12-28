@@ -4,11 +4,18 @@ defmodule Boltex.Test do
 
   setup do
     config = Application.get_env(:bolt_sips, Bolt)
+    auth =
+      if basic_auth = config[:basic_auth] do
+        {basic_auth[:username], basic_auth[:password]}
+      else
+        nil
+      end
+
     {:ok, p} = :gen_tcp.connect(config[:hostname], config[:port],
                           [active: false, mode: :binary, packet: :raw])
 
     :ok      = Boltex.Bolt.handshake :gen_tcp, p
-    :ok      = Boltex.Bolt.init :gen_tcp, p
+    :ok      = Boltex.Bolt.init :gen_tcp, p, auth
     {:ok, [pid: p]}
   end
 
