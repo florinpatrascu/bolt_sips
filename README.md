@@ -18,7 +18,7 @@ Documentation: http://hexdocs.pm/bolt_sips/
   * It is using: Bolt. Neo4j's newest network protocol, designed for high-performance
   * Supports transactions, simple and complex Cypher queries with or w/o parameters
   * Connection pool implementation using: "A hunky Erlang worker pool factory", aka: [Poolboy](http://github.com/devinus/poolboy) :)
-  * Supports Neo4j 3.0.x
+  * Supports Neo4j 3.0.x/3.1.x
 
 ### Installation
 
