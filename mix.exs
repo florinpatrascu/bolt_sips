@@ -42,6 +42,7 @@ defmodule BoltSips.Mixfile do
       {:poolboy, "~> 1.5"},
       {:con_cache, "~> 0.11"},
       {:etls, "~> 1.1"},
+      {:fuzzyurl, "~> 0.9.0"},
       {:ex_doc, "~> 0.14", only: [:dev]},
       {:mix_test_watch, "~> 0.2", only: [:dev, :test]},
       {:credo, "~> 0.5", only: [:dev, :test]}
