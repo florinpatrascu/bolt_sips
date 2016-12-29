@@ -185,15 +185,6 @@ defmodule Query.Test do
     assert {:error, _} = Bolt.Sips.query(conn, "INVALID CYPHER")
     assert {:ok, [%{"n" => 22}]} = Bolt.Sips.query(conn, "RETURN 22 as n")
   end
-
-  test "values from an object literal get transformed to their type", context do
-    conn = context[:conn]
-    obj = Bolt.Sips.query!(conn, "MATCH (d:Deamon) RETURN {x: count(d), y: d} as obj")
-    |> List.first
-    |> Map.get("obj")
-    assert obj["x"] == 1
-    assert obj["y"].labels == ["Deamon"]
-    assert obj["y"].properties["name"] == "Chandrian"
-  end
 end
+
 
