@@ -125,6 +125,10 @@ defmodule Bolt.Sips.Response do
     struct(UnboundRelationship, rel)
   end
 
+  defp extract_types(map) when is_map(map) do
+    for {k, v} <- map, do: {k, extract_types(v)}, into: %{}
+  end
+
   defp extract_types(r), do: extract_any(r, [])
 
   defp extract_any([], acc), do: Enum.reverse(acc)
