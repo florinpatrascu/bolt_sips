@@ -52,24 +52,57 @@ config :bolt_sips, Bolt,
   max_overflow: 1
 ```
 
-*Please observe this issue: [#7773](https://github.com/neo4j/neo4j/issues/7773) if your server requires basic authentication and have issues changing the `username`*
+A new parameter: `url`, can be used for reducing the verbosity of the config files; available starting with  version `0.1.5`. For example:
 
-With a minimalist setup configured as above, and a Neo4j 3.x server running, you can connect to the server and run some queries using Elixir’s interactive shell ([IEx](http://elixir-lang.org/docs/stable/iex/IEx.html)):
+```elixir
+config :bolt_sips, Bolt,
+  url: 'localhost:7687',
+  pool_size: 5,
+  max_overflow: 1
+```
 
-    iex> conn = Bolt.Sips.conn
-    iex> Bolt.Sips.query!(conn, "CREATE (a:Person {name:'Bob'})")
-    %{stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1}, type: "w"}
-    
-    iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name") |> Enum.map(&(&1["name"]))
-    
-    ["Bob"]
-    
-    iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name:'Bob'}) DELETE a")
-    %{stats: %{"nodes-deleted" => 1}, type: "w"}
+And if you are using any remote instances of hosted Neo4j servers, such as the ones available (also for free) at [GrapheneDB.com](http://www.graphenedb.com), configuring the driver is a matter of a simple copy and paste:
+
+```elixir
+config :bolt_sips, Bolt,
+  url: "bolt://hobby-happyHoHoHo.dbs.graphenedb.com:24786",
+  basic_auth: [username: "demo", password: "demo"]
+  ssl: true
+```
+
+or even simpler:
+
+```elixir
+config :bolt_sips, Bolt,
+  url: "bolt://demo:demo@hobby-happyHoHoHo.dbs.graphenedb.com:24786",
+  ssl: true
+```
+
+With a minimalist setup configured as above, and a Neo4j 3.x server running, you can connect to the server and run some queries using Elixir’s interactive shell ([IEx](http://elixir-lang.org/docs/stable/iex/IEx.html)). Example:
+
+```elixir
+$ MIX_ENV=test iex -S mix
+Erlang/OTP 19 [erts-8.2] [source] [64-bit] [smp: ....
+
+Interactive Elixir (1.3.4) - press Ctrl+C to exit (type h() ENTER for help)
+
+iex> conn = Bolt.Sips.conn
+#Port<0.5312>
+
+iex> Bolt.Sips.query!(conn, "CREATE (a:Person {name:'Bob'})")
+%{stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1}, type: "w"}
+
+iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name") |> Enum.map(&(&1["name"]))
+
+["Bob"]
+
+iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name:'Bob'}) DELETE a")
+%{stats: %{"nodes-deleted" => 1}, type: "w"}
+```
 
 ### Command line
 
-You can also run Cypher commands from a mix task:
+Run simple Cypher commands from a mix task, for quick testing Cypher results or the connection with your server:
 
     mix bolt.cypher "MATCH (people:Person) RETURN people.name LIMIT 5"
 

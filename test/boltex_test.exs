@@ -2,8 +2,10 @@ defmodule Boltex.Test do
   use ExUnit.Case
   doctest Bolt.Sips
 
+  alias Bolt.Sips.Utils
+
   setup do
-    config = Application.get_env(:bolt_sips, Bolt)
+    config = Utils.default_config
     auth =
       if basic_auth = config[:basic_auth] do
         {basic_auth[:username], basic_auth[:password]}

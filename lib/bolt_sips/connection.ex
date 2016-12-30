@@ -31,7 +31,7 @@ defmodule Bolt.Sips.Connection do
     auth =
       if basic_auth = opts[:basic_auth] do
         {basic_auth[:username], basic_auth[:password]}
-        # todo: token = Base.encode64("#{username}:#{password}")
+        # future?: token = Base.encode64("#{username}:#{password}")
       else
         nil
       end
@@ -49,7 +49,7 @@ defmodule Bolt.Sips.Connection do
     {s, query, params} = data
 
     result = Boltex.Bolt.run_statement(Bolt.Sips.config(:socket), s, query, params)
-    |> ack_failure( Bolt.Sips.config(:socket), s)
+    |> ack_failure(Bolt.Sips.config(:socket), s)
 
     log("#{inspect s} - cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect result}")
 
