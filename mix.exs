@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.1.4"
+  @version "0.1.5"
 
   def project do
     [
@@ -10,7 +10,7 @@ defmodule BoltSips.Mixfile do
       elixir: "~> 1.3",
       deps: deps(),
       package: package(),
-      description: "Neo4j driver for Elixir wrapped around the Bolt protocol",
+      description: "Neo4j driver for Elixir wrapped around the fast Bolt protocol",
       name: "Bolt.Sips",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
