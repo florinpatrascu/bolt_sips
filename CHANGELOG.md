@@ -1,7 +1,14 @@
 # Changelog
 
 ## v0.1.5 (2016-12-30)
-- as requested by many users, this version is introducing the optional `url` configuration parameter. If present, it will be used for extracting the host name, the port and the authentication details. Please see the README, for a couple of examples.
+- as requested by many users, this version is introducing the optional `url` configuration parameter. If present, it will be used for extracting the host name, the port and the authentication details. Please see the README, for a couple of examples. For brevity:
+
+```elixir
+
+config :bolt_sips, Bolt,
+  url: 'bolt://demo:demo@hobby-wowsoeasy.dbs.graphenedb.com',
+  ssl: true,
+```
 
 ## v0.1.4 (Merry Christmas)
 - add support for connecting to Neo4j servers on encrypted sockets. Currently only TLSv1.2 is supported, using the default [BoringSSL](https://boringssl.googlesource.com/boringssl/) cipher; via [:etls](https://github.com/kzemek/etls). To connect securely to a remote Neo4j server, such as the ones provided by graphenedb.com, modify your Bolt.Sips config file like this (example):
