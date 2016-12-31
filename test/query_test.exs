@@ -35,14 +35,25 @@ defmodule Query.Test do
   end
 
   test "a simple query that should work" do
-    {:ok, row} = Bolt.Sips.query(Bolt.Sips.conn, "match (n:Person {bolt_sips: true}) return n.name as Name limit 5")
+    cyp = """
+      MATCH (n:Person {bolt_sips: true})
+      RETURN n.name AS Name
+      ORDER BY Name DESC
+      LIMIT 5
+    """
+    {:ok, row} = Bolt.Sips.query(Bolt.Sips.conn, cyp)
     assert List.first(row)["Name"] == "Patrick Rothfuss",
            "missing 'The Name of the Wind' database, or data incomplete"
   end
 
   test "executing a Cypher query, with parameters", context do
     conn = context[:conn]
-    cypher = "match (n:Person {bolt_sips: true}) where n.name = {name} return n.name as name"
+
+    cypher = """
+      MATCH (n:Person {bolt_sips: true})
+      WHERE n.name = {name}
+      RETURN n.name AS name
+    """
     case Bolt.Sips.query(conn, cypher, %{name: "Kote"}) do
       {:ok, rows} ->
         refute length(rows) == 0, "Did you initialize the 'The Name of the Wind' database?"
@@ -60,6 +71,7 @@ defmodule Query.Test do
       RETURN p, p.name AS name, upper(p.name) as NAME,
              coalesce(p.nickname,"n/a") AS nickname,
              { name: p.name, label:head(labels(p))} AS person
+      ORDER BY name DESC
     """
     {:ok, r} = Bolt.Sips.query(conn, cypher)
 
@@ -79,7 +91,11 @@ defmodule Query.Test do
 
   test "if Patrick Rothfuss wrote The Name of the Wind", context do
     conn = context[:conn]
-    cypher = "MATCH (p:Person)-[r:WROTE]->(b:Book {title: 'The Name of the Wind'}) RETURN p"
+    cypher = """
+      MATCH (p:Person)-[r:WROTE]->(b:Book {title: 'The Name of the Wind'})
+      RETURN p
+    """
+
     rows = Bolt.Sips.query!(conn, cypher)
     assert List.first(rows)["p"].properties["name"] == "Patrick Rothfuss"
   end
@@ -98,7 +114,11 @@ defmodule Query.Test do
 
   test "path from: MERGE p=({name:'Alice'})-[:KNOWS]-> ...", context do
     conn = context[:conn]
-    path = Bolt.Sips.query!(conn, "MERGE p=({name:'Alice', bolt_sips: true})-[:KNOWS]->({name:'Bob', bolt_sips: true}) RETURN p")
+    cypher = """
+    MERGE p = ({name:'Alice', bolt_sips: true})-[:KNOWS]->({name:'Bob', bolt_sips: true})
+    RETURN p
+    """
+    path = Bolt.Sips.query!(conn, cypher)
     |> List.first
     |> Map.get("p")
 
@@ -158,7 +178,10 @@ defmodule Query.Test do
     %{stats: stats} = Bolt.Sips.query!(conn, "CREATE (a:Person {name:'Bob'})")
     assert stats == %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1}
 
-    bob = Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name") |> Enum.map(&(&1["name"]))
+    bob =
+      Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name")
+      |> Enum.map(&(&1["name"]))
+
     assert bob == ["Bob"]
 
     %{stats: stats} = Bolt.Sips.query!(conn, "MATCH (a:Person {name:'Bob'}) DELETE a")
