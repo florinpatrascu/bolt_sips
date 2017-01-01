@@ -1,13 +1,27 @@
 # Changelog
 
+## v0.1.6 (2017-01-01)
+- we're already using configurable timeouts, when executing requests from the connection pool. But with Bolt, the initial handshake sequence (happening before sending any commands to the server) is represented by two important calls, executed in sequence: `handshake` and `init`, and they must both succeed, before sending any (Cypher) requests. You can see the details in the [Bolt protocol](http://boltprotocol.org/v1/#handshake) specs. This sequence is also sensitive to latencies, such as: network latencies, busy servers, etc., and because of that we're introducing a simple support for retrying the handshake (and the subsequent requests) with a linear backoff, and try the handshake sequence (or the request) a couple of times before giving up - all these as part of the exiting pool management, of course. This retry is configurable via a new configuration parameter, the: `:retry_linear_backoff`, respectively. For example:
+
+```elixir
+config :bolt_sips, Bolt,
+  url: "bolt://Bilbo:Baggins@hobby-hobbits.dbs.graphenedb.com:24786",
+  ssl: true,
+  timeout: 15_000,
+  retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
+```
+
+In the example above the retry will linearly increase the delay from 150ms following a Fibonacci pattern, cap the delay at 15 seconds (the value defined by the `:timeout` parameter) and giving up after 3 attempts. The same retry mechanism (and configuration parameters) is also honored when we send requests to the neo4j server.
+
+
 ## v0.1.5 (2016-12-30)
 - as requested by many users, this version is introducing the optional `url` configuration parameter. If present, it will be used for extracting the host name, the port and the authentication details. Please see the README, for a couple of examples. For brevity:
 
 ```elixir
 
 config :bolt_sips, Bolt,
-  url: 'bolt://demo:demo@hobby-wowsoeasy.dbs.graphenedb.com',
-  ssl: true,
+  url: 'bolt://demo:demo@hobby-wowsoeasy.dbs.graphenedb.com:24786',
+  ssl: true
 ```
 
 ## v0.1.4 (Merry Christmas)

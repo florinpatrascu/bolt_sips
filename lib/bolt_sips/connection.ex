@@ -14,6 +14,7 @@ defmodule Bolt.Sips.Connection do
 
   import Kernel, except: [send: 2]
 
+  use Retry
   require Logger
 
   @doc false
@@ -36,22 +37,31 @@ defmodule Bolt.Sips.Connection do
         nil
       end
 
-    {:ok, p} = Bolt.Sips.config(:socket).connect(host, port, [active: false, mode: :binary, packet: :raw])
-    :ok      = Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p)
-    :ok      = Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth)
+    # Doubles the delay with each retry, starting with 150 milliseconds,
+    # cap the delay at `Bolt.Sips.config(:timeout)` second(s) and give up after 3 tries.
+    [delay: delay, factor: factor, tries: tries] = Bolt.Sips.config(:retry_linear_backoff)
+    p = retry with: lin_backoff(delay, factor) |> cap(Bolt.Sips.config(:timeout)) |> Stream.take(tries) do
+      {:ok, p} = Bolt.Sips.config(:socket).connect(host, port, [active: false, mode: :binary, packet: :raw])
+      :ok      = Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p)
+      :ok      = Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth)
+      p
+    end
 
     {:reply, p, opts}
   end
 
   @doc false
   def handle_call(data, _from, opts) do
-    # IO.puts(inspect(__MODULE__ )<> " handle_call: #{inspect data}, opts: #{inspect opts}")
     {s, query, params} = data
 
-    result = Boltex.Bolt.run_statement(Bolt.Sips.config(:socket), s, query, params)
-    |> ack_failure(Bolt.Sips.config(:socket), s)
+    [delay: delay, factor: factor, tries: tries] = Bolt.Sips.config(:retry_linear_backoff)
+    result =
+      retry with: lin_backoff(delay, factor) |> cap(Bolt.Sips.config(:timeout)) |> Stream.take(tries) do
+        Boltex.Bolt.run_statement(Bolt.Sips.config(:socket), s, query, params)
+      end
+      |> ack_failure(Bolt.Sips.config(:socket), s)
 
-    log("#{inspect s} - cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect result}")
+    log("cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect result}")
 
     # :random.seed(:os.timestamp)
     # timeout = opts[:timeout] || 5000
@@ -77,7 +87,7 @@ defmodule Bolt.Sips.Connection do
     )
   end
 
-  defp ack_failure(response = {:failure, failure}, transport, port) do
+  defp ack_failure(_response = {:failure, failure}, transport, port) do
     Boltex.Bolt.ack_failure(transport, port)
     {:failure, failure}
   end
