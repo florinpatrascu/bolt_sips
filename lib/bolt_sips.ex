@@ -13,7 +13,7 @@ defmodule Bolt.Sips do
   Start the connection process and connect to Neo4j
 
   ## Options:
-
+    - `:url` - If present, it will be used for extracting the host name, the port and the authentication details and will override the: hostname, port, username and the password, if these were already defined! Since this driver is devoted to the Bolt protocol only, the protocol if present in the url will be ignored and considered by default `bolt://`
     - `:hostname` - Server hostname (default: NEO4J_HOST env variable, then localhost);
     - `:port` - Server port (default: NEO4J_PORT env variable, then 7687);
     - `:username` - Username;
@@ -23,9 +23,22 @@ defmodule Bolt.Sips do
     - `:timeout` - Connect timeout in milliseconds (default: `#{@timeout}`)
        Poolboy will block the current process and wait for an available worker,
        failing after a timeout, when the pool is full;
+    - `:retry_linear_backoff` -  with Bolt, the initial handshake sequence (happening before sending any commands to the server) is represented by two important calls, executed in sequence: `handshake` and `init`, and they must both succeed, before sending any (Cypher) requests. You can see the details in the [Bolt protocol](http://boltprotocol.org/v1/#handshake) specs. This sequence is also sensitive to latencies, such as: network latencies, busy servers, etc., and because of that we're introducing a simple support for retrying the handshake (and the subsequent requests) with a linear backoff, and try the handshake sequence (or the request) a couple of times before giving up. See examples below.
 
 
   ## Example of valid configurations (i.e. defined in config/dev.exs) and usage:
+
+      config :bolt_sips, Bolt,
+        url: 'bolt://demo:demo@hobby-wowsoeasy.dbs.graphenedb.com:24786',
+        ssl: true
+
+
+      config :bolt_sips, Bolt,
+        url: "bolt://Bilbo:Baggins@hobby-hobbits.dbs.graphenedb.com:24786",
+        ssl: true,
+        timeout: 15_000,
+        retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
+
 
       config :bolt_sips, Bolt,
         hostname: 'localhost',
