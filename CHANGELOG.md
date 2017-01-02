@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.7 (2017-01-02)
+- Connection code refactored for capturing the errors when the remote server is not responding on the first request, or if the driver is misconfigured i.e. wrong port number, bad hostname ... 
+- updated the test configuration file with detailed info about the newly introduced option: `:retry_linear_backoff`, mostly as a reminder
+
 ## v0.1.6 (2017-01-01)
 - we're already using configurable timeouts, when executing requests from the connection pool. But with Bolt, the initial handshake sequence (happening before sending any commands to the server) is represented by two important calls, executed in sequence: `handshake` and `init`, and they must both succeed, before sending any (Cypher) requests. You can see the details in the [Bolt protocol](http://boltprotocol.org/v1/#handshake) specs. This sequence is also sensitive to latencies, such as: network latencies, busy servers, etc., and because of that we're introducing a simple support for retrying the handshake (and the subsequent requests) with a linear backoff, and try the handshake sequence (or the request) a couple of times before giving up - all these as part of the exiting pool management, of course. This retry is configurable via a new configuration parameter, the: `:retry_linear_backoff`, respectively. For example:
 
