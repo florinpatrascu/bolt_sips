@@ -19,35 +19,31 @@ defmodule Bolt.Sips.Connection do
 
   @doc false
   def start_link(opts) do
-    # IO.puts(inspect(__MODULE__ ) <> " start_link: #{inspect opts}")
     GenServer.start_link(__MODULE__, opts, [])
   end
 
   @doc false
   def handle_call(:connect, _from, opts) do
-    # IO.puts(inspect(__MODULE__ ) <> " handle_call: :connect, from: #{inspect from}, opts: #{inspect opts}")
+    host  = Keyword.fetch!(opts, :hostname) |> to_char_list
+    port  = opts[:port]
+    auth  = opts[:auth]
 
-    host       = Keyword.fetch!(opts, :hostname) |> to_char_list
-    port       = opts[:port]
-    auth =
-      if basic_auth = opts[:basic_auth] do
-        {basic_auth[:username], basic_auth[:password]}
-        # future?: token = Base.encode64("#{username}:#{password}")
-      else
-        nil
-      end
-
-    # Doubles the delay with each retry, starting with 150 milliseconds,
-    # cap the delay at `Bolt.Sips.config(:timeout)` second(s) and give up after 3 tries.
     [delay: delay, factor: factor, tries: tries] = Bolt.Sips.config(:retry_linear_backoff)
+
     p = retry with: lin_backoff(delay, factor) |> cap(Bolt.Sips.config(:timeout)) |> Stream.take(tries) do
-      {:ok, p} = Bolt.Sips.config(:socket).connect(host, port, [active: false, mode: :binary, packet: :raw])
-      :ok      = Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p)
-      :ok      = Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth)
-      p
+      case Bolt.Sips.config(:socket).connect(host, port, [active: false, mode: :binary, packet: :raw]) do
+         {:ok, p} ->
+            with :ok <- Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p),
+                 :ok <- Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth),
+                 do: p
+        _ -> :error
+      end
     end
 
-    {:reply, p, opts}
+    case p do
+      :error -> {:noreply, p, opts}
+      _ -> {:reply, p, opts}
+    end
   end
 
   @doc false
@@ -55,13 +51,14 @@ defmodule Bolt.Sips.Connection do
     {s, query, params} = data
 
     [delay: delay, factor: factor, tries: tries] = Bolt.Sips.config(:retry_linear_backoff)
+
     result =
       retry with: lin_backoff(delay, factor) |> cap(Bolt.Sips.config(:timeout)) |> Stream.take(tries) do
         Boltex.Bolt.run_statement(Bolt.Sips.config(:socket), s, query, params)
       end
       |> ack_failure(Bolt.Sips.config(:socket), s)
 
-    log("cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect result}")
+    log("[#{inspect s}] cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect result}")
 
     # :random.seed(:os.timestamp)
     # timeout = opts[:timeout] || 5000
@@ -99,7 +96,15 @@ defmodule Bolt.Sips.Connection do
   end
 
   def init(state) do
-    {:ok, state}
+    auth =
+      if basic_auth = state[:basic_auth] do
+        {basic_auth[:username], basic_auth[:password]}
+        # future?: token = Base.encode64("#{username}:#{password}")
+      else
+        nil
+      end
+
+    {:ok, state |> Keyword.put(:auth, auth) }
   end
 
 
