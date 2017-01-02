@@ -70,15 +70,26 @@ config :bolt_sips, Bolt,
   ssl: true
 ```
 
-or even simpler:
+We’re also retrying sending the requests to the Neo4j server, with a linear backoff, and try them a couple of times before giving up - all these as part of the exiting pool management, of course. Example
 
 ```elixir
 config :bolt_sips, Bolt,
-  url: "bolt://demo:demo@hobby-happyHoHoHo.dbs.graphenedb.com:24786",
-  ssl: true
+  url: "bolt://Bilbo:Baggins@hobby-hobbits.dbs.graphenedb.com:24786",
+  ssl: true,
+  timeout: 15_000,
+  retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
 ```
 
-With a minimalist setup configured as above, and a Neo4j 3.x server running, you can connect to the server and run some queries using Elixir’s interactive shell ([IEx](http://elixir-lang.org/docs/stable/iex/IEx.html)). Example:
+In the configuration above, the retry will linearly increase the delay from `150ms` following a Fibonacci pattern, cap the delay at `15 seconds` (the value defined by the `:timeout` parameter) and giving up after `3` attempts.
+
+But you can reduce the configuration even further, and rely on the driver's default values. For example: given you're running a Neo4j server on your local machine and Bolt is enabled on **7687**, this is the simplest configuration you need, in order to get you started:
+
+```elixir
+config :bolt_sips, Bolt,
+  url: "localhost:7687"
+```
+
+With a minimalist setup configured as above, and the Neo4j 3.x server running, you can connect to the server and run some queries using Elixir’s interactive shell ([IEx](http://elixir-lang.org/docs/stable/iex/IEx.html)). Example:
 
 ```elixir
 $ MIX_ENV=test iex -S mix
@@ -163,7 +174,7 @@ Florin T.PATRASCU (Github: @florinpatrascu, Twitter: @florin)
 ### License
 
 ```
-Copyright 2016 Florin T. PATRASCU
+Copyright 2016-2017 Florin T.PATRASCU
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
