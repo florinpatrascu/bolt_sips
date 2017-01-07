@@ -5,7 +5,7 @@ defmodule Bolt.Sips do
 
   @pool_name :bolt_sips_pool
   @timeout   15_000
-  @max_rows     500
+  # @max_rows     500
 
   alias Bolt.Sips.{Query, Transaction, Connection, Utils}
 
@@ -148,15 +148,15 @@ defmodule Bolt.Sips do
   @doc """
   returns an environment specific Bolt.Sips configuration.
   """
-  def config, do: ConCache.get(:bolt_sips_cache, :config)
+  def config(), do: ConCache.get(:bolt_sips_cache, :config)
 
   @doc false
-  def config(key), do: Keyword.get(config, key)
+  def config(key), do: Keyword.get(config(), key)
 
   @doc false
   def config(key, default) do
     try do
-      Keyword.get(config, key, default)
+      Keyword.get(config(), key, default)
     rescue
       _ -> default
     end

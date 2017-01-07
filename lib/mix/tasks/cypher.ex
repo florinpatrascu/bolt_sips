@@ -62,7 +62,7 @@ defmodule Mix.Tasks.Bolt.Cypher do
         |> Response.transform
         |> log_response
 
-      {:error, code} -> log_error("Cannot execute the command, see error above")
+      {:error, code} -> log_error("Cannot execute the command, see error above; #{inspect(code)}")
     end
   end
 

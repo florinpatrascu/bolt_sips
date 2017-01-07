@@ -92,22 +92,22 @@ defmodule Bolt.Sips.Types do
     @spec graph(Path.t) :: List.t | nil
     def graph(path) do
       entities = [List.first(path.nodes)]
-      graph = draw_path(
-                path.nodes,
-                path.relationships,
-                path.sequence,
-                0,
-                Enum.take_every(path.sequence, 2),
-                entities,
-                List.first(path.nodes), #last node
-                nil # next node
-                )
+      draw_path(
+        path.nodes,
+        path.relationships,
+        path.sequence,
+        0,
+        Enum.take_every(path.sequence, 2),
+        entities,
+        List.first(path.nodes), #last node
+        nil # next node
+      )
     end
 
     # todo: clean up the code
-    @lint false
-    defp draw_path(n, r, s, i, [], acc, ln, nn), do: acc
-    defp draw_path(n, r, s, i, [h|t] = rel_index, acc, ln, nn) do
+    # @lint false
+    defp draw_path(_n, _r, _s, _i, [], acc, _ln, _nn), do: acc
+    defp draw_path(n, r, s, i, [h|t] = _rel_index, acc, ln, _nn) do
       next_node = Enum.at(n, Enum.at(s, 2 * i + 1))
       urel =
       if h > 0 && h < 255 do

@@ -18,7 +18,7 @@ defmodule Bolt.Sips.Transaction do
   ```
   """
 
-  alias Bolt.Sips.{Success, Connection}
+  alias Bolt.Sips.Connection
 
   @doc """
   begin a new transaction.

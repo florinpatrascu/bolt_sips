@@ -8,8 +8,8 @@ defmodule Bolt.Sips.Error do
   defstruct [:code, :message]
 
   # todo: more work to be done here
-  def new({:ignored, f} = r), do: new({:failure, f})
-  def new({:failure, %{"code" => code, "message" => message}} = r) do
+  def new({:ignored, f} = _r), do: new({:failure, f})
+  def new({:failure, %{"code" => code, "message" => message}} = _r) do
     {:error, struct(Error, %{code: code, message: message})}
   end
 
