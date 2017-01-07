@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.1.7"
+  @version "0.1.8"
 
   def project do
     [

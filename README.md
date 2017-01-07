@@ -5,6 +5,8 @@ Neo4j driver for Elixir wrapped around the Bolt protocol.
 ![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)
 [![Deps Status](https://beta.hexfaktor.org/badge/all/github/florinpatrascu/bolt_sips.svg)](https://beta.hexfaktor.org/github/florinpatrascu/bolt_sips)
 [![Ebert](https://ebertapp.io/github/florinpatrascu/bolt_sips.svg)](https://ebertapp.io/github/florinpatrascu/bolt_sips)
+[![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
+[![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/bolt_sips)
 
 Documentation: http://hexdocs.pm/bolt_sips/
 
@@ -38,6 +40,34 @@ def application do
   [applications: [:bolt_sips]]
 end
 ```
+
+#### 2. Verify you have the dependencies required for building the [etls] TCP/TLS layer:
+
+`Bolt.Sips` is using [etls], for encrypted communications. [etls] is a NIF-based implementation of the whole TLS stack, built on top of [Asio] and [BoringSSL]. It manages its own native threads to asynchronously handle socket operations. 
+
+To successfully compile [etls], you will need the following:
+
+- cmake >= 3.1.0
+- erlang >= 17.0
+- g++ >= 4.9.0 (or clang)
+- git
+- perl
+- golang
+- make
+- ninja-build
+- openssl
+
+Currently only `TLSv1.2` is supported, and default [BoringSSL] cipher is used.
+
+[etls] is very fast!
+
+| OTP version | transport | bandwidth |
+|:------------|:----------|:----------|
+| 18.3        | ssl       | 70 MB/s   |
+| 19.0-rc1    | ssl       | 111 MB/s  |
+| 19.0-rc1    | etls      | 833 MB/s  |
+
+*(data extracted from [etls]'s own project page)*
 
 ### Usage
 
