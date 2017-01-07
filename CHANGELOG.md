@@ -3,7 +3,7 @@
 ## v0.1.8 (2017-01-07)
 - using Elixir 1.4
 - add more details to the README, about the components required to build ETLS, the TCP/TLS layer
-- added newer Elixirs and OTP to the Travis CI configuration file
+- added newer Elixirs to the Travis CI configuration file
 - minor code cleanups
 
 ## v0.1.7 (2017-01-02)
