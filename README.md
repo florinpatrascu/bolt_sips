@@ -41,11 +41,11 @@ def application do
 end
 ```
 
-#### 2. Verify you have the dependencies required for building the [etls] TCP/TLS layer:
+#### 2. Verify you have the dependencies required for building the [etls](https://github.com/kzemek/etls) TCP/TLS layer:
 
-`Bolt.Sips` is using [etls], for encrypted communications. [etls] is a NIF-based implementation of the whole TLS stack, built on top of [Asio] and [BoringSSL]. It manages its own native threads to asynchronously handle socket operations. 
+`Bolt.Sips` is using [etls](https://github.com/kzemek/etls), for encrypted communications. [etls](https://github.com/kzemek/etls) is a NIF-based implementation of the whole TLS stack, built on top of [Asio](http://think-async.com/) and [BoringSSL](https://boringssl.googlesource.com/boringssl). It manages its own native threads to asynchronously handle socket operations. 
 
-To successfully compile [etls], you will need the following:
+To successfully compile [etls](https://github.com/kzemek/etls), you will need the following:
 
 - cmake >= 3.1.0
 - erlang >= 17.0
@@ -57,9 +57,9 @@ To successfully compile [etls], you will need the following:
 - ninja-build
 - openssl
 
-Currently only `TLSv1.2` is supported, and default [BoringSSL] cipher is used.
+Currently only `TLSv1.2` is supported, and default [BoringSSL](https://boringssl.googlesource.com/boringssl) cipher is used.
 
-[etls] is very fast!
+**`etls`** is very fast!
 
 | OTP version | transport | bandwidth |
 |:------------|:----------|:----------|
@@ -67,7 +67,7 @@ Currently only `TLSv1.2` is supported, and default [BoringSSL] cipher is used.
 | 19.0-rc1    | ssl       | 111 MB/s  |
 | 19.0-rc1    | etls      | 833 MB/s  |
 
-*(data extracted from [etls]'s own project page)*
+*(data extracted from [etls](https://github.com/kzemek/etls/blob/master/README.md)'s own project page)*
 
 ### Usage
 
@@ -199,7 +199,7 @@ As reported by Github: [contributions to master, excluding merge commits](https:
 
 ### Author
 
-Florin T.PATRASCU (Github: @florinpatrascu, Twitter: @florin)
+Florin T.PATRASCU (@florin, on Twitter)
 
 ### License
 
