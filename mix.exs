@@ -7,7 +7,7 @@ defmodule BoltSips.Mixfile do
     [
       app: :bolt_sips,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.3",
       deps: deps(),
       package: package(),
       description: "Neo4j driver for Elixir wrapped around the fast Bolt protocol",
