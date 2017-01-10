@@ -33,6 +33,7 @@ def deps do
   [{:bolt_sips, "~> 0.1"}]
 end
 ```
+
 #### 2. Ensure bolt_sips is started before your application:
 
 ```elixir
@@ -41,7 +42,7 @@ def application do
 end
 ```
 
-#### 2. Verify you have the dependencies required for building the [etls](https://github.com/kzemek/etls) TCP/TLS layer:
+#### 3 Verify you have the dependencies required for building the [etls](https://github.com/kzemek/etls) TCP/TLS layer:
 
 `Bolt.Sips` is using [etls](https://github.com/kzemek/etls), for encrypted communications. [etls](https://github.com/kzemek/etls) is a NIF-based implementation of the whole TLS stack, built on top of [Asio](http://think-async.com/) and [BoringSSL](https://boringssl.googlesource.com/boringssl). It manages its own native threads to asynchronously handle socket operations. 
 
