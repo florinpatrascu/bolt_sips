@@ -103,7 +103,7 @@ defmodule Bolt.Sips do
   defdelegate query(conn, statement), to: Query
 
   @doc """
-  The same as query/2 but raises a Bolt.Sips.Error if it fails.
+  The same as query/2 but raises a Bolt.Sips.Exception if it fails.
   Returns the server response otherwise.
   """
   @spec query!(Bolt.Sips.Connection, String.t) :: Bolt.Sips.Response | Bolt.Sips.Exception
@@ -116,7 +116,7 @@ defmodule Bolt.Sips do
   defdelegate query(conn, statement, params), to: Query
 
   @doc """
-  The same as query/3 but raises a Bolt.Sips.Error if it fails.
+  The same as query/3 but raises a Bolt.Sips.Exception if it fails.
   """
   @spec query!(Bolt.Sips.Connection, String.t, Map.t) :: Bolt.Sips.Response | Bolt.Sips.Exception
   defdelegate query!(conn, statement, params), to: Query
