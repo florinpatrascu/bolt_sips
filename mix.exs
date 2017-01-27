@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.1.8"
+  @version "0.1.9"
 
   def project do
     [
@@ -26,7 +26,7 @@ defmodule BoltSips.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poolboy, :con_cache, :etls],
+    [applications: [:logger, :poolboy, :con_cache] ++ opt_etls,
      mod: {Bolt.Sips.Application, []}]
   end
 
@@ -37,16 +37,24 @@ defmodule BoltSips.Mixfile do
   end
 
   # Type "mix help deps" for more examples and options
-  defp deps do
+  defp deps() do
     [
       {:poolboy, "~> 1.5"},
       {:con_cache, "~> 0.11"},
-      {:etls, "~> 1.1"},
       {:fuzzyurl, "~> 0.9.0"},
       {:retry, "~> 0.6.0"},
       {:ex_doc, "~> 0.14", only: [:dev]},
       {:mix_test_watch, "~> 0.2", only: [:dev, :test]},
       {:credo, "~> 0.5", only: [:dev, :test]}
-    ]
+    ] ++ env_specific_deps()
+  end
+
+  defp env_specific_deps do
+    if System.get_env("BOLT_WITH_ETLS"), do: [{:etls, "~> 1.1"}], else: []
+  end
+
+  # when using Elixir < 1.4
+  defp opt_etls() do
+    if System.get_env("BOLT_WITH_ETLS"), do: [:etls], else: []
   end
 end

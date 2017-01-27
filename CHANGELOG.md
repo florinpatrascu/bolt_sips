@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.1.9 (2017-01-27)
+Some of the users are encountering difficulties when trying to compile bolt_sips on Windows. This release is addressing their concern.
+
+`Bolt.Sips` will use the optional System variable: `BOLT_WITH_ETLS`, for depending on the [ETLS](https://hex.pm/packages/etls) package. If that variable is not defined, then `Bolt.Sips` will use the standard Erlang [`:ssl` module](http://erlang.org/doc/man/ssl.html), for the SSL/TLS protocol; the default behavior, starting with this version.
+
+Therefore, if you want the **much** faster ssl/tls support offered by ETLS, then use this: `export BOLT_WITH_ETLS=true` on Linux/OSX, for example. Then:
+
+```elixir
+ mix deps.get
+ mix test
+```
+ and so on.
+
+ (Don't forget to `mix deps.unlock --all`, if you plan to plan to further debugging/developing w/ or w/o the `BOLT_WITH_ETLS` support)
+
+Many thanks to: [Ben Wilson](https://elixir-lang.slack.com/team/benwilson512), for advices.
+
 ## v0.1.8 (2017-01-07)
 - using Elixir 1.4
 - add more details to the README, about the components required to build ETLS, the TCP/TLS layer
@@ -64,3 +81,4 @@ Please note this is work in progress
 ## v0.1.0 (2016-08-31)
 
 First release!
+~~~~
