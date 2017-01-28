@@ -40,7 +40,7 @@ defmodule BoltSips.Mixfile do
   defp deps() do
     [
       {:poolboy, "~> 1.5"},
-      {:con_cache, "~> 0.11"},
+      {:con_cache, "~> 0.11.1"},
       {:fuzzyurl, "~> 0.9.0"},
       {:retry, "~> 0.6.0"},
       {:ex_doc, "~> 0.14", only: [:dev]},

@@ -1,5 +1,5 @@
 %{"bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], []},
-  "con_cache": {:hex, :con_cache, "0.12.0", "2d961aec219aa5a914473873f348f5a6088292dc69d5192a9d25f8a1e13e9905", [:mix], [{:exactor, "~> 2.2.0", [hex: :exactor, optional: false]}]},
+  "con_cache": {:hex, :con_cache, "0.11.1", "acbe5a1d10c47faba30d9629c9121e1ef9bca0aa5eddbb86f4e777bd9f9f9b6f", [:mix], [{:exactor, "~> 2.2.0", [hex: :exactor, optional: false]}]},
   "credo": {:hex, :credo, "0.6.0", "44a82f82b94eeb4ba6092c89b8a6730ca1a3291c7940739d5acc8806d25ac991", [:mix], [{:bunt, "~> 0.2.0", [hex: :bunt, optional: false]}]},
   "earmark": {:hex, :earmark, "1.1.0", "8c2bf85d725050a92042bc1edf362621004d43ca6241c756f39612084e95487f", [:mix], []},
   "ex_doc": {:hex, :ex_doc, "0.14.5", "c0433c8117e948404d93ca69411dd575ec6be39b47802e81ca8d91017a0cf83c", [:mix], [{:earmark, "~> 1.0", [hex: :earmark, optional: false]}]},
