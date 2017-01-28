@@ -44,7 +44,7 @@ end
 
 #### (Optional) 3. Use [etls](https://github.com/kzemek/etls) TCP/TLS layer:
 
-`Bolt.Sips` is working very well with [etls](https://github.com/kzemek/etls), for encrypted communications; the preferred method. However, many users complained about the difficulty they encountered while building this dependency on some systems; especially on Windows. To use it, you must define the environment variable: `BOLT_WITH_ETLS`, and compile the project again. If the `BOLT_WITH_ETLS` is not defined, then `Bolt.Sips` will use the standard Erlang [`:ssl` module](http://erlang.org/doc/man/ssl.html), for the SSL/TLS protocol; this is the default behavior, starting with this version.
+`Bolt.Sips` is working **very well** with [etls](https://github.com/kzemek/etls), for encrypted communications; the preferred method. However, many users complained about the difficulty they encountered while building this dependency on some systems; especially on Windows. To use **etls**, you must define the environment variable: `BOLT_WITH_ETLS`, and compile the project again. If the `BOLT_WITH_ETLS` is not defined, then `Bolt.Sips` will use the standard Erlang [`:ssl` module](http://erlang.org/doc/man/ssl.html), for the SSL/TLS protocol; this is the default behavior, starting with this version.
 
 Therefore, if you want the **much** faster ssl/tls support offered by ETLS, then use this: `export BOLT_WITH_ETLS=true` on Linux/OSX, for example. [etls](https://github.com/kzemek/etls) is a NIF-based implementation of the whole TLS stack, built on top of [Asio](http://think-async.com/) and [BoringSSL](https://boringssl.googlesource.com/boringssl). It manages its own native threads to asynchronously handle socket operations. 
 
