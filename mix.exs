@@ -26,7 +26,7 @@ defmodule BoltSips.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poolboy, :con_cache] ++ opt_etls,
+    [applications: [:logger, :poolboy, :con_cache] ++ opt_etls(),
      mod: {Bolt.Sips.Application, []}]
   end
 
