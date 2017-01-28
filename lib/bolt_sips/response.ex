@@ -30,7 +30,7 @@ defmodule Bolt.Sips.Response do
   @type t :: __MODULE__
 
   alias Bolt.Sips.Types.{Node, Relationship, UnboundRelationship, Path}
-  alias Bolt.Sips.{Success, Error, Utils}
+  alias Bolt.Sips.{Success}
 
   require Logger
   require Integer
@@ -45,7 +45,7 @@ defmodule Bolt.Sips.Response do
 
   todo: is this the best place for hooking in the stats, if any?
   """
-  def transform(raw, stats \\ :no) do
+  def transform(raw, _stats \\ :no) do
     # IO.puts("bolt raw response: #{inspect Success.new(raw)}")
     case Success.new(raw) do
 
