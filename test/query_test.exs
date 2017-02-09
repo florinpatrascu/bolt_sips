@@ -1,5 +1,10 @@
 defmodule Query.Test do
   use ExUnit.Case, async: true
+  alias Query.Test
+
+  defmodule TestUser do
+    defstruct name: "", bolt_sips: true
+  end
 
   setup_all do
     # reuse the same connection for all the tests in the suite
@@ -61,6 +66,26 @@ defmodule Query.Test do
         assert List.first(rows)["name"] == "Kote", "expecting to find Kote"
       {:error, reason} -> IO.puts "Error: #{reason["message"]}"
     end
+  end
+
+  test "executing a Cpyher query, with struct parameters", context do
+    conn = context[:conn]
+
+    cypher = """
+      CREATE(n:Person {props})
+    """
+
+    assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %Test.TestUser{name: "Strut"}})
+  end
+
+  test "executing a Cpyher query, with map parameters", context do
+    conn = context[:conn]
+
+    cypher = """
+      CREATE(n:Person {props})
+    """
+
+    assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %{name: "Mep"}})
   end
 
   test "executing a raw Cypher query with alias, and no parameters", context do
@@ -209,5 +234,3 @@ defmodule Query.Test do
     assert {:ok, [%{"n" => 22}]} = Bolt.Sips.query(conn, "RETURN 22 as n")
   end
 end
-
-

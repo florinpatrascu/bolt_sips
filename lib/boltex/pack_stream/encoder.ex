@@ -1,4 +1,5 @@
 defprotocol Boltex.PackStream.Encoder do
+  @fallback_to_any true
   @doc "Encodes an item to its binary PackStream Representation"
   def encode(entitiy)
 end
@@ -116,9 +117,9 @@ defimpl Boltex.PackStream.Encoder, for: Map do
 end
 
 defimpl Boltex.PackStream.Encoder, for: Any do
-  def encode(item) if is_map(item) do
+  def encode(item) when is_map(item) do
     item
     |> Map.from_struct
-    |> Bolter.PackStream.Encoder.encode 
+    |> Boltex.PackStream.Encoder.encode
   end
 end
