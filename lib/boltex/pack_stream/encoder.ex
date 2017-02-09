@@ -114,3 +114,11 @@ defimpl Boltex.PackStream.Encoder, for: Map do
     Boltex.PackStream.Encoder.encode(value)
   end
 end
+
+defimpl Boltex.PackStream.Encoder, for: Any do
+  def encode(item) if is_map(item) do
+    item
+    |> Map.from_struct
+    |> Bolter.PackStream.Encoder.encode 
+  end
+end
