@@ -72,7 +72,7 @@ defmodule Query.Test do
     conn = context[:conn]
 
     cypher = """
-      CREATE(n:Person {props})
+      CREATE(n:User {props})
     """
 
     assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %Test.TestUser{name: "Strut"}})
@@ -82,7 +82,7 @@ defmodule Query.Test do
     conn = context[:conn]
 
     cypher = """
-      CREATE(n:Person {props})
+      CREATE(n:User {props})
     """
 
     assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %{name: "Mep"}})
