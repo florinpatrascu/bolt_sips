@@ -75,7 +75,7 @@ defmodule Query.Test do
       CREATE(n:User {props})
     """
 
-    assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %Test.TestUser{name: "Strut"}})
+    assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %Test.TestUser{name: "Strut", bolt_sips: true}})
   end
 
   test "executing a Cpyher query, with map parameters", context do
@@ -85,7 +85,7 @@ defmodule Query.Test do
       CREATE(n:User {props})
     """
 
-    assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %{name: "Mep"}})
+    assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %{name: "Mep", bolt_sips: true}})
   end
 
   test "executing a raw Cypher query with alias, and no parameters", context do
