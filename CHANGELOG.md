@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.10 (2017-02-11)
+
+- accept Map and Struct for query parameters, transparently. Thank you [@wli0503], for the PR.
+
 ## v0.1.9 (2017-01-27)
 Some of the users are encountering difficulties when trying to compile bolt_sips on Windows. This release is addressing their concern.
 
