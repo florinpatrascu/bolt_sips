@@ -67,7 +67,6 @@ defmodule Bolt.Sips.Query do
     end
   end
 
-  defp query_commit(conn, statement), do: query_commit(conn, statement, %{})
   defp query_commit(conn, statement, params) do
     statements =
     String.split(statement, @cypher_seps, trim: true)
