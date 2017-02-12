@@ -127,15 +127,15 @@ defmodule Boltex.Bolt do
 
     generate_chunks messages, chunks, current_chunk
   end
-  defp generate_chunks([chunk | chunks], chunks, current_chunk) do
-    oversized_chunk = current_chunk <> chunk
+  defp generate_chunks([message | messages], chunks, current_chunk) do
+    oversized_chunk = current_chunk <> message
     {first, rest}   = binary_part oversized_chunk, 0, @max_chunk_size
     first_size      = byte_size first
     rest_size       = byte_size rest
     current_chunk   = current_chunk <> << first_size :: 16 >> <> first
     new_chunk       = << rest_size :: 16 >> <> rest
 
-    generate_chunks chunks, [current_chunk | chunks], new_chunk
+    generate_chunks messages, [current_chunk | chunks], new_chunk
   end
 
   @doc """
@@ -174,8 +174,8 @@ defmodule Boltex.Bolt do
       {[nil], @sig_ack_failure}
     ]
 
-    with {:ignored, []} <- receive_data(transport, port),
-        {:success, %{}} <- receive_data(transport, port),
+    with {:ignored, []}  <- receive_data(transport, port),
+         {:success, %{}} <- receive_data(transport, port),
     do: :ok
   end
 

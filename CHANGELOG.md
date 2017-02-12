@@ -1,7 +1,9 @@
 # Changelog
 
-## v0.1.10 (2017-02-11)
+## v0.1.11 (2017-02-12)
+- With a larger amount of parameters it seems like generating chunks isn't working correctly. This is a patch imported from Boltex, see: https://github.com/mschae/boltex/issues/13, for more info
 
+## v0.1.10 (2017-02-11)
 - accept Map and Struct for query parameters, transparently. Thank you [@wli0503], for the PR.
 
 ## v0.1.9 (2017-01-27)
