@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.1.11"
+  @version "0.2.0"
 
   def project do
     [
@@ -40,12 +40,12 @@ defmodule BoltSips.Mixfile do
   defp deps() do
     [
       {:poolboy, "~> 1.5"},
-      {:con_cache, "~> 0.11.1"},
+      {:con_cache, "~> 0.12.0"},
       {:fuzzyurl, "~> 0.9.0"},
       {:retry, "~> 0.6.0"},
-      {:ex_doc, "~> 0.14", only: [:dev]},
-      {:mix_test_watch, "~> 0.2", only: [:dev, :test]},
-      {:credo, "~> 0.5", only: [:dev, :test]}
+      {:ex_doc, "~> 0.14.5", only: [:dev]},
+      {:mix_test_watch, "~> 0.3.3", only: [:dev, :test]},
+      {:credo, "~> 0.6.1", only: [:dev, :test]}
     ] ++ env_specific_deps()
   end
 

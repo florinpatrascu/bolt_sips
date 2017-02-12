@@ -104,7 +104,7 @@ defmodule Bolt.Sips.Connection do
         nil
       end
 
-    {:ok, state |> Keyword.put(:auth, auth) }
+    {:ok, state |> Keyword.put(:auth, auth)}
   end
 
 

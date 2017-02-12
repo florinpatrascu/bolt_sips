@@ -1,6 +1,10 @@
 # Changelog
 
-## v0.1.11 (2017-02-12)
+### v0.2.0 Breaking changes
+
+- Elixir 1.4 is now required.
+
+## v0.1.11
 - With a larger amount of parameters it seems like generating chunks isn't working correctly. This is a patch imported from Boltex, see: https://github.com/mschae/boltex/issues/13, for more info
 
 ## v0.1.10 (2017-02-11)
