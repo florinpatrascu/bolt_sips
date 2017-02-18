@@ -30,7 +30,7 @@ defmodule BoltSips.Mixfile do
      mod: {Bolt.Sips.Application, []}]
   end
 
-  defp package do
+  defp package() do
     %{licenses: ["Apache 2.0"],
       maintainers: ["Florin T.PATRASCU"],
       links: %{"Github" => "https://github.com/florinpatrascu/bolt_sips"}}
@@ -45,6 +45,7 @@ defmodule BoltSips.Mixfile do
       {:retry, "~> 0.6.0"},
       {:ex_doc, "~> 0.14.5", only: [:dev]},
       {:mix_test_watch, "~> 0.3.3", only: [:dev, :test]},
+      {:boltex, "~> 0.2.0"},
       {:credo, "~> 0.6.1", only: [:dev, :test]}
     ] ++ env_specific_deps()
   end

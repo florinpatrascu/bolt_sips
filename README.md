@@ -183,9 +183,7 @@ mix test
 
 ### Special thanks
 
-- Michael Schaefermeyer (@mschae), for implementing the Bolt protocol in Elixir. 
-
-`Bolt.Sips` incorporates the Bolt protocol code originally created at [mschae/boltex](https://github.com/mschae/boltex), for the low level communication with the Neo4j server.  
+- Michael Schaefermeyer (@mschae), for implementing the Bolt protocol in Elixir: [mschae/boltex](https://github.com/mschae/boltex)
 
 ### Contributors
 

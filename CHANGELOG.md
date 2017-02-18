@@ -3,6 +3,8 @@
 ### v0.2.0 Breaking changes
 
 - Elixir 1.4 is now required.
+- Using Boltex 0.2.0
+- bugfix: invalid Cypher statements will now be properly handled when the request is retried automatically 
 
 ## v0.1.11
 - With a larger amount of parameters it seems like generating chunks isn't working correctly. This is a patch imported from Boltex, see: https://github.com/mschae/boltex/issues/13, for more info

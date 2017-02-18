@@ -19,7 +19,6 @@ defmodule Bolt.Sips.Success do
   def new(r) do
     case Error.new(r) do
       {:error, error} -> {:error, error}
-      {:ignored, ignored} -> {:ok, ignored} #todo: implement the :ignore case
       _ ->
         case Keyword.has_key?(r, :success) && Keyword.get_values(r, :success) do
           [f|t] ->

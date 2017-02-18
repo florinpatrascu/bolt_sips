@@ -1,4 +1,5 @@
-%{"bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], []},
+%{"boltex": {:hex, :boltex, "0.2.0", "cb69685eeae69a0174092966a29fb022e5f6916a628591d722ee0d45ed276ec9", [:hex], []},
+  "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], []},
   "con_cache": {:hex, :con_cache, "0.12.0", "2d961aec219aa5a914473873f348f5a6088292dc69d5192a9d25f8a1e13e9905", [:mix], [{:exactor, "~> 2.2.0", [hex: :exactor, optional: false]}]},
   "credo": {:hex, :credo, "0.6.1", "a941e2591bd2bd2055dc92b810c174650b40b8290459c89a835af9d59ac4a5f8", [:mix], [{:bunt, "~> 0.2.0", [hex: :bunt, optional: false]}]},
   "earmark": {:hex, :earmark, "1.1.1", "433136b7f2e99cde88b745b3a0cfc3fbc81fe58b918a09b40fce7f00db4d8187", [:mix], []},
