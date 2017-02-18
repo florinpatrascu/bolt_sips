@@ -11,7 +11,7 @@ defmodule Boltex.Test do
       if basic_auth = config[:basic_auth] do
         {basic_auth[:username], basic_auth[:password]}
       else
-        nil
+        {}
       end
 
     {:ok, p} = @socket.connect(config[:hostname], config[:port],
@@ -32,7 +32,7 @@ defmodule Boltex.Test do
 
   test "numeric values in the response", context do
     r = Boltex.Bolt.run_statement(@socket, context[:pid], "RETURN 10 as num")
-    assert r == [{:success, %{"fields" => ["num"]}}, {:record, [10]}, {:success, %{"type" => "r"}}]
+    assert Enum.member?(r, {:record, [10]})
   end
 
 end
