@@ -72,7 +72,8 @@ defmodule Bolt.Sips do
       name: {:local, @pool_name},
       worker_module: Bolt.Sips.Connection,
       size: Keyword.get(cnf, :pool_size),
-      max_overflow: Keyword.get(cnf, :max_overflow)
+      max_overflow: Keyword.get(cnf, :max_overflow),
+      strategy: :fifo
     ]
 
     children = [:poolboy.child_spec(@pool_name, poolboy_config, cnf)]

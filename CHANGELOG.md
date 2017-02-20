@@ -1,7 +1,12 @@
 # Changelog
 
-### v0.2.0 Breaking changes
+## v0.2.1 (2017-02-20)
+- stop retrying a request if the failure is an internal one (driver, or driver dependencies related).
+- update the Boltex driver containing two important bug fixes: one where Boltex will fail when receiving too much data (florinpatrascu/bolt_sips/issues/16) and the other one, an improvement, make Boltex.Error.get_id/1 more resilient for new transports (details here: mschae/boltex/issues/14)
+- changed the pool strategy to :fifo, and its timeout to :infinity, and let the (:gen_server) call timeout expire according to the user's :timeout configuration parameter
+- added a test unit provided by @adri (thank you), for executing a Cypher query, with large set of parameters
 
+## v0.2.0 Breaking changes
 - Elixir 1.4 is now required.
 - Using Boltex 0.2.0
 - bugfix: invalid Cypher statements will now be properly handled when the request is retried automatically 

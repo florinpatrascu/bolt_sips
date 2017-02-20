@@ -1,6 +1,6 @@
 defmodule Bolt.Sips.Error do
   @moduledoc """
-  represents an error message received from the Bolt driver
+  represents an error message
   """
   alias __MODULE__
   @type t :: %__MODULE__{}
@@ -15,6 +15,5 @@ defmodule Bolt.Sips.Error do
   def new({:failure, %{"code" => code, "message" => message}} = _r) do
     {:error, struct(Error, %{code: code, message: message})}
   end
-
   def new(r), do: r
 end

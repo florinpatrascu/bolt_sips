@@ -19,6 +19,7 @@ defmodule Bolt.Sips.Success do
   def new(r) do
     case Error.new(r) do
       {:error, error} -> {:error, error}
+      {:failure, failure} -> {:failure, failure}
       _ ->
         case Keyword.has_key?(r, :success) && Keyword.get_values(r, :success) do
           [f|t] ->

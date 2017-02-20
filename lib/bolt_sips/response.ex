@@ -133,7 +133,7 @@ defmodule Bolt.Sips.Response do
   end
   defp extract_any(r, acc) do
     if length(acc) > 0 do
-      IO.puts("w⦿‿⦿t! Error: extract_any(#{inspect r}, #{inspect acc})")
+      Logger.error("w⦿‿⦿t! Error: extract_any(#{inspect r}, #{inspect acc})")
     end
     r
   end

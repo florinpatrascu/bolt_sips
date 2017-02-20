@@ -32,10 +32,10 @@ defmodule Bolt.Sips.Connection do
 
     p = retry with: lin_backoff(delay, factor) |> cap(Bolt.Sips.config(:timeout)) |> Stream.take(tries) do
       case Bolt.Sips.config(:socket).connect(host, port, [active: false, mode: :binary, packet: :raw]) do
-         {:ok, p} ->
-            with :ok <- Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p, boltex_opts()),
-                 :ok <- Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth, boltex_opts()),
-                 do: p
+        {:ok, p} ->
+          with :ok <- Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p, boltex_opts()),
+               :ok <- Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth, boltex_opts()),
+               do: p
         _ -> :error
       end
     end
@@ -51,13 +51,19 @@ defmodule Bolt.Sips.Connection do
     {s, query, params} = data
 
     [delay: delay, factor: factor, tries: tries] = Bolt.Sips.config(:retry_linear_backoff)
-    # IO.puts("--------------- #{inspect s}")
     result =
       retry with: lin_backoff(delay, factor) |> cap(Bolt.Sips.config(:timeout)) |> Stream.take(tries) do
-        r = Boltex.Bolt.run_statement(Bolt.Sips.config(:socket), s, query, params, boltex_opts())
-        |> ack_failure(Bolt.Sips.config(:socket), s)
-        log("[#{inspect s}] cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect r}")
-        r
+        try do
+          r =
+            Boltex.Bolt.run_statement(Bolt.Sips.config(:socket), s, query, params, boltex_opts())
+            |> ack_failure(Bolt.Sips.config(:socket), s)
+            log("[#{inspect s}] cypher: #{inspect query} - params: #{inspect params} - bolt: #{inspect r}")
+          r
+        rescue e ->
+          Boltex.Bolt.ack_failure(Bolt.Sips.config(:socket), s, boltex_opts())
+          log("Error: #{e.message}. Stacktrace: #{inspect System.stacktrace}")
+          {:failure, %{"code" => :failure, "message" => e.message}}
+        end
       end
 
     # :random.seed(:os.timestamp)
@@ -67,8 +73,8 @@ defmodule Bolt.Sips.Connection do
 
   def conn() do
     :poolboy.transaction(
-       Bolt.Sips.pool_name, &(:gen_server.call(&1, :connect)),
-       Bolt.Sips.config(:timeout)
+      Bolt.Sips.pool_name, &(:gen_server.call(&1, :connect, Bolt.Sips.config(:timeout))),
+      :infinity
     )
   end
 
@@ -80,7 +86,8 @@ defmodule Bolt.Sips.Connection do
   defp pool_server(connection, query, params) do
     :poolboy.transaction(
       Bolt.Sips.pool_name,
-      &(:gen_server.call(&1, {connection, query, params})), Bolt.Sips.config(:timeout)
+      &(:gen_server.call(&1, {connection, query, params}, Bolt.Sips.config(:timeout))),
+      :infinity
     )
   end
 

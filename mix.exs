@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.2.0"
+  @version "0.2.1"
 
   def project do
     [
@@ -45,13 +45,13 @@ defmodule BoltSips.Mixfile do
       {:retry, "~> 0.6.0"},
       {:ex_doc, "~> 0.14.5", only: [:dev]},
       {:mix_test_watch, "~> 0.3.3", only: [:dev, :test]},
-      {:boltex, "~> 0.2.0"},
+      {:boltex, "~> 0.2.1"},
       {:credo, "~> 0.6.1", only: [:dev, :test]}
     ] ++ env_specific_deps()
   end
 
   defp env_specific_deps do
-    if System.get_env("BOLT_WITH_ETLS"), do: [{:etls, "~> 1.1"}], else: []
+    if System.get_env("BOLT_WITH_ETLS"), do: [{:etls, "~> 1.2"}], else: []
   end
 
   # when using Elixir < 1.4
