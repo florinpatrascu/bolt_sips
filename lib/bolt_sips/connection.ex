@@ -61,8 +61,15 @@ defmodule Bolt.Sips.Connection do
           r
         rescue e ->
           Boltex.Bolt.ack_failure(Bolt.Sips.config(:socket), s, boltex_opts())
-          log("Error: #{e.message}. Stacktrace: #{inspect System.stacktrace}")
-          {:failure, %{"code" => :failure, "message" => e.message}}
+          # temporary solution until we integrate with the newer Boltex
+          msg =
+            if e.message == nil do
+              "#{inspect e}"
+            else
+              e.message
+            end
+          log("Error: #{msg}. Stacktrace: #{inspect System.stacktrace}")
+          {:failure, %{"code" => :failure, "message" => msg}}
         end
       end
 
