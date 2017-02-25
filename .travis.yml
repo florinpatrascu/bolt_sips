@@ -13,17 +13,18 @@ cache:
   directories:
     - $HOME/cmake
 env:
+  - NEO4J_VERSION=3.1
   global:
     - PATH=$HOME/cmake/bin:$PATH
     - CXX=g++-6
     - CC=gcc-6
 
 elixir:
-  - 1.4.0
+  - 1.4
 
 before_install:
   - if [ ! -d "$HOME/cmake/bin" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh && sh cmake-3.5.2-Linux-x86_64.sh --prefix=$HOME/cmake --exclude-subdir; fi
-  - docker run --name neo4j -d -p 7687:7687 -e 'NEO4J_AUTH=none' neo4j:3.0.6
+  - docker run --name neo4j -d -p 7687:7687 -e 'NEO4J_AUTH=none' neo4j:$NEO4J_VERSION
   - docker logs -f neo4j | sed /Bolt\ enabled/q
 
 script:
