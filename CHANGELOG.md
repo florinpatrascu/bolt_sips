@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.2 (2017-02-24)
+- PR #18; Bring up `:boltex` and `:retry` in `applications`, for Elixir < 1.4 (from: @wli0503, thank you!)
+
 ## v0.2.1 (2017-02-20)
 - stop retrying a request if the failure is an internal one (driver, or driver dependencies related).
 - update the Boltex driver containing two important bug fixes: one where Boltex will fail when receiving too much data (florinpatrascu/bolt_sips/issues/16) and the other one, an improvement, make Boltex.Error.get_id/1 more resilient for new transports (details here: mschae/boltex/issues/14)
