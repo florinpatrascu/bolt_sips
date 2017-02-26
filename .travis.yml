@@ -13,7 +13,7 @@ cache:
   directories:
     - $HOME/cmake
 env:
-  - NEO4J_VERSION=3.1
+  NEO4J_VERSION=3.1
   global:
     - PATH=$HOME/cmake/bin:$PATH
     - CXX=g++-6
