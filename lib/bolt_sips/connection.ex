@@ -61,20 +61,17 @@ defmodule Bolt.Sips.Connection do
           r
         rescue e ->
           Boltex.Bolt.ack_failure(Bolt.Sips.config(:socket), s, boltex_opts())
-          # temporary solution until we integrate with the newer Boltex
           msg =
-            if e.message == nil do
-              "#{inspect e}"
-            else
-              e.message
+            case e do
+              %Boltex.PackStream.EncodeError{} -> "unable to encode value: #{inspect e.item}"
+              %Boltex.Error{} -> "#{e.message}, type: #{e.type}"
+              _err -> e.message
             end
-          log("Error: #{msg}. Stacktrace: #{inspect System.stacktrace}")
+          log("[#{inspect s}] cypher: #{inspect query} - params: #{inspect params} - Error: '#{msg}'. Stacktrace: #{inspect System.stacktrace}")
           {:failure, %{"code" => :failure, "message" => msg}}
         end
       end
 
-    # :random.seed(:os.timestamp)
-    # timeout = opts[:timeout] || 5000
     {:reply, result, opts}
   end
 

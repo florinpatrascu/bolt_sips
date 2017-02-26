@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.3 (2017-02-26)
+- improved connection handling
+
 ## v0.2.2 (2017-02-24)
 - PR #18; Bring up `:boltex` and `:retry` in `applications`, for Elixir < 1.4 (from: @wli0503, thank you!)
 - PR #19; test for error message on invalid parameter types (from: @vic, thank you!).
