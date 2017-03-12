@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.4 (2017-02-26)
+- add the fuzzyurl to the list of apps, for project using Elixir < 1.4 (thank you, @dnesteryuk!)
+
 ## v0.2.3 (2017-02-26)
 - improved connection handling
 
