@@ -48,7 +48,7 @@ defmodule Bolt.Sips.Query do
   """
   alias Bolt.Sips.{Connection, Response, Transaction}
 
-  @cypher_seps ~r/;/
+  @cypher_seps ~r/;(.){0,1}\n/
 
   def query!(conn, statement),  do: query!(conn,statement, %{})
   def query!(conn, statement, params) when is_map(params) do

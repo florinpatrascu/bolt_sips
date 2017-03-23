@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.2.5 (2017-03-22)
+- split multi-line Cypher statements containing semicolons only if the `;` character is at the end of the line, followed by \r\n on Windows and \n on Unix like system, otherwise it may break the Cypher statement when the semicolon appears somewhere else
+
 ## v0.2.4 (2017-02-26)
 - add the fuzzyurl to the list of apps, for project using Elixir < 1.4 (thank you, @dnesteryuk!)
 
