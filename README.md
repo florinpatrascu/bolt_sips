@@ -48,7 +48,7 @@ You can also specify custom configuration settings in you app's mix config file.
 
 ```elixir
 def application do
-  [extra_applications: [:logger], mod: 
+  [extra_applications: [:logger], mod:
     {Bolt.Sips.Application, [url: 'localhost', pool_size: 15]}
   ]
 end
@@ -205,7 +205,7 @@ Output sample:
 
     "MATCH (people:Person) RETURN people.name as name LIMIT 5"
 
-```elixir    
+```elixir
 [%{"name" => "Keanu Reeves"}, %{"name" => "Carrie-Anne Moss"},
  %{"name" => "Andy Wachowski"}, %{"name" => "Lana Wachowski"},
  %{"name" => "Joel Silver"}]

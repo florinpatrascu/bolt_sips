@@ -3,11 +3,16 @@ defmodule Bolt.Sips do
   A Neo4j Elixir driver wrapped around the Bolt protocol.
   """
 
+  use Supervisor
+
   @pool_name :bolt_sips_pool
   @timeout   15_000
   # @max_rows     500
 
-  alias Bolt.Sips.{Query, Transaction, Connection, Utils}
+  alias Bolt.Sips.{Query, Transaction, Utils}
+
+  @type conn :: DBConnection.conn
+  @type transaction :: DBConnection.t
 
   @doc """
   Start the connection process and connect to Neo4j
@@ -50,48 +55,38 @@ defmodule Bolt.Sips do
   Sample code:
 
       opts = Application.get_env(:bolt_sips, Bolt)
-      {:ok, _pid} = Bolt.Sips.start_link(opts)
+      {:ok, pid} = Bolt.Sips.start_link(opts)
 
-      conn = Bolt.Sips.conn
-      Bolt.Sips.query!(conn, "CREATE (a:Person {name:'Bob'})")
-      Bolt.Sips.query!(conn, "MATCH (a:Person) RETURN a.name AS name")
+      Bolt.Sips.query!(pid, "CREATE (a:Person {name:'Bob'})")
+      Bolt.Sips.query!(pid, "MATCH (a:Person) RETURN a.name AS name")
       |> Enum.map(&(&1["name"]))
-
-  In the future we may use the `DBConnection` framework.
   """
-  @spec start_link(Keyword.t) :: {:ok, pid} | {:error, Bolt.Sips.Error.t}
+  @spec start_link(Keyword.t) :: Supervisor.on_start
   def start_link(opts) do
-    ssl = if System.get_env("BOLT_WITH_ETLS"), do: :etls, else: :ssl
-    cnf = Utils.default_config(opts)
-    cnf = Keyword.put(cnf, :socket, (if Keyword.get(cnf, :ssl), do: ssl, else: :gen_tcp))
-
-    poolboy_config = [
-      name: {:local, @pool_name},
-      worker_module: Bolt.Sips.Connection,
-      size: Keyword.get(cnf, :pool_size),
-      max_overflow: Keyword.get(cnf, :max_overflow),
-      strategy: :fifo
-    ]
-
-    children = [
-      {Bolt.Sips.ConfigAgent, cnf},
-      :poolboy.child_spec(@pool_name, poolboy_config, cnf)
-    ]
-    options = [strategy: :one_for_one, name: __MODULE__]
-
-    Supervisor.start_link(children, options)
+    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
   @doc false
-  def child_spec(opts) do
-    Supervisor.Spec.worker(__MODULE__, [opts])
+  def init(opts) do
+    ssl = if System.get_env("BOLT_WITH_ETLS"), do: :etls, else: :ssl
+    cnf = Utils.default_config(opts)
+    cnf = cnf |> Keyword.put(
+      :socket,
+      (if Keyword.get(cnf, :ssl), do: ssl, else: Keyword.get(cnf, :socket))
+    )
+
+    children = [
+      {Bolt.Sips.ConfigAgent, cnf},
+      DBConnection.child_spec(Bolt.Sips.Protocol, pool_config(cnf))
+    ]
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 
-
   @doc """
-  returns a Bolt.Sips.Connection
+  Returns a pool name which can be used to acquire a connection.
   """
-  defdelegate conn(), to: Connection
+  def conn, do: pool_name()
 
   ## Query
   ########################
@@ -100,28 +95,31 @@ defmodule Bolt.Sips do
   sends the query (and its parameters) to the server and returns `{:ok, Bolt.Sips.Response}` or
   `{:error, error}` otherwise
   """
-  @spec query(Bolt.Sips.Connection, String.t) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
+  @spec query(conn, String.t) ::
+    {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
   defdelegate query(conn, statement), to: Query
 
   @doc """
   The same as query/2 but raises a Bolt.Sips.Exception if it fails.
   Returns the server response otherwise.
   """
-  @spec query!(Bolt.Sips.Connection, String.t) :: Bolt.Sips.Response | Bolt.Sips.Exception
+  @spec query!(conn, String.t) ::
+    Bolt.Sips.Response | Bolt.Sips.Exception
   defdelegate query!(conn, statement), to: Query
 
   @doc """
   send a query and an associated map of parameters. Returns the server response or an error
   """
-  @spec query(Bolt.Sips.Connection, String.t, Map.t) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
+  @spec query(conn, String.t, Map.t) ::
+    {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
   defdelegate query(conn, statement, params), to: Query
 
   @doc """
   The same as query/3 but raises a Bolt.Sips.Exception if it fails.
   """
-  @spec query!(Bolt.Sips.Connection, String.t, Map.t) :: Bolt.Sips.Response | Bolt.Sips.Exception
+  @spec query!(conn, String.t, Map.t) ::
+    Bolt.Sips.Response | Bolt.Sips.Exception
   defdelegate query!(conn, statement, params), to: Query
-
 
   ## Transaction
   ########################
@@ -129,21 +127,21 @@ defmodule Bolt.Sips do
   @doc """
   begin a new transaction.
   """
-  @spec begin(Bolt.Sips.Connection) :: Bolt.Sips.Connection
+  @spec begin(conn) :: transaction | {:error, Exception.t}
   defdelegate begin(conn), to: Transaction
 
   @doc """
   given you have an open transaction, you can use this to send a commit request
   """
-  @spec commit(Bolt.Sips.Connection) :: Bolt.Sips.Response
-  defdelegate commit(conn), to: Transaction
+  @spec commit(transaction) :: Transaction.result
+  defdelegate commit(transaction), to: Transaction
 
   @doc """
   given that you have an open transaction, you can send a rollback request.
   The server will rollback the transaction. Any further statements trying to run
   in this transaction will fail immediately.
   """
-  @spec rollback(Bolt.Sips.Connection) :: Bolt.Sips.Connection
+  @spec rollback(transaction) :: Transaction.result
   defdelegate rollback(conn), to: Transaction
 
   @doc """
@@ -166,15 +164,19 @@ defmodule Bolt.Sips do
   @doc false
   def pool_name, do: @pool_name
 
-  @doc false
-  def init(opts) do
-    {:ok, opts}
-  end
-
   ## Helpers
   ######################
 
   # defp defaults(opts) do
   #   Keyword.put_new(opts, :timeout, @timeout)
   # end
+
+  defp pool_config(cnf) do
+    [
+      name: {:local, pool_name()},
+      pool: Keyword.get(cnf, :pool),
+      pool_size: Keyword.get(cnf, :pool_size),
+      pool_overflow: Keyword.get(cnf, :max_overflow)
+    ]
+  end
 end

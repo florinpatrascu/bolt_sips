@@ -39,14 +39,16 @@ defmodule Query.Test do
     {:ok, [conn: conn]}
   end
 
-  test "a simple query that should work" do
+  test "a simple query that should work", context do
+    conn = context[:conn]
+
     cyp = """
       MATCH (n:Person {bolt_sips: true})
       RETURN n.name AS Name
       ORDER BY Name DESC
       LIMIT 5
     """
-    {:ok, row} = Bolt.Sips.query(Bolt.Sips.conn, cyp)
+    {:ok, row} = Bolt.Sips.query(conn, cyp)
     assert List.first(row)["Name"] == "Patrick Rothfuss",
            "missing 'The Name of the Wind' database, or data incomplete"
   end

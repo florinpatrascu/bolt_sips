@@ -1,5 +1,5 @@
 # Logger.configure(level: :info)
-ExUnit.start()
+ExUnit.start(exclude: [:skip])
 
 defmodule Bolt.Sips.TestHelper do
 
@@ -26,7 +26,9 @@ defmodule Bolt.Sips.TestHelper do
   defp file_error_description(reason), do: "due to #{reason}."
 end
 
-{:ok, _pid} = Bolt.Sips.start_link(Application.get_env(:bolt_sips, Bolt) )
+if Process.whereis(Bolt.Sips.pool_name) == nil do
+  {:ok, _pid} = Bolt.Sips.start_link(Application.get_env(:bolt_sips, Bolt) )
+end
 
 # I am using the test db for debugging and the line below will clear *everything*
 # Bolt.Sips.query(Bolt.Sips.conn, "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r")

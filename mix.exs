@@ -26,7 +26,7 @@ defmodule BoltSips.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poolboy, :retry, :boltex, :fuzzyurl] ++ opt_etls(),
+    [applications: [:logger, :poolboy, :db_connection, :retry, :boltex, :fuzzyurl] ++ opt_etls(),
      #mod: {Bolt.Sips.Application, [foo: "bar"]}
     ]
   end
@@ -41,6 +41,7 @@ defmodule BoltSips.Mixfile do
   defp deps() do
     [
       {:poolboy, "~> 1.5.1"},
+      {:db_connection, github: 'elixir-ecto/db_connection'},
       {:fuzzyurl, "~> 0.9.0"},
       {:retry, "~> 0.8.1"},
       {:ex_doc, "~> 0.18.1", only: [:dev]},

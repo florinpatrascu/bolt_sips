@@ -4,7 +4,7 @@ defmodule Bolt.Sips.Query do
 
   You can run simple Cypher queries with or w/o parameters, for example:
 
-      {:ok, row} = Bolt.Sips.query(Bolt.Sips.conn, "match (n:Person {bolt_sips: true}) return n.name as Name limit 5")
+      {:ok, row} = Bolt.Sips.query(conn, "match (n:Person {bolt_sips: true}) return n.name as Name limit 5")
       assert List.first(row)["Name"] == "Patrick Rothfuss"
 
   Or more complex ones:
@@ -46,7 +46,7 @@ defmodule Bolt.Sips.Query do
   See the various tests, or more examples and implementation details.
 
   """
-  alias Bolt.Sips.{Connection, Response, Transaction}
+  alias Bolt.Sips.{QueryStatement, Response}
 
   @cypher_seps ~r/;(.){0,1}\n/
 
@@ -77,28 +77,41 @@ defmodule Bolt.Sips.Query do
   end
 
   defp tx(conn, statements, params) when length(statements) == 1 do
-    Response.transform(Connection.send(conn, hd(statements), params))
+    exec = fn(conn) ->
+      q = %QueryStatement{statement: hd(statements)}
+
+      case DBConnection.execute(conn, q, params) do
+        {:ok, resp} -> resp
+        other -> other
+      end
+    end
+
+    Response.transform(DBConnection.run(conn, exec, run_opts()))
   end
 
   defp tx(conn, statements, params) do
     try do
-      Transaction.begin(conn)
-      responses = Enum.reduce(statements, [], &(send!(conn, &1, params, &2)))
-      Transaction.commit(conn)
-      responses
+      exec = fn(conn) ->
+        Enum.reduce(statements, [], &(send!(conn, &1, params, &2)))
+      end
+
+      DBConnection.run(conn, exec, run_opts())
     rescue
       e in RuntimeError ->
-        Transaction.rollback(conn)
         {:error, e}
     end
   end
 
   defp send!(conn, statement, params, acc) do
-    r = Connection.send(conn, statement, params)
-    # IO.puts("\n#{inspect __MODULE__}.send!/4:\nC: #{inspect statement}\nS: #{inspect r}")
-    case r do
+    q = %QueryStatement{statement: statement}
+
+    case DBConnection.execute(conn, q, params) do
+      {:ok, resp} -> acc ++ [Response.transform(resp)]
       {:error, error} -> raise RuntimeError, error
-      _ -> acc ++ [Response.transform(r)]
     end
+  end
+
+  defp run_opts do
+    [pool: Bolt.Sips.config(:pool)]
   end
 end

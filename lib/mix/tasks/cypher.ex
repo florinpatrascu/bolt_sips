@@ -41,12 +41,12 @@ defmodule Mix.Tasks.Bolt.Cypher do
 
     cypher = args |> List.first
 
-    {:ok, _pid} = Bolt.Sips.start_link(options)
+    {:ok, pid} = Bolt.Sips.start_link(options)
 
     # display the cypher command
     log_cypher(cypher)
 
-    case Neo4j.query(Neo4j.conn, cypher) do
+    case Neo4j.query(pid, cypher) do
       {:ok, row} ->
         row |> log_response
       {:error, code} ->

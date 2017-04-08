@@ -12,21 +12,25 @@ defmodule Bolt.Sips.Transaction do
     assert %{"b" => g_o_t} = book
     assert g_o_t.properties["title"] == "The Game Of Trolls"
     Bolt.Sips.rollback(conn)
-    books = Bolt.Sips.query!(conn, "MATCH (b:Book {title: \"The Game Of Trolls\"}) return b")
+    books = Bolt.Sips.query!(Bolt.Sips.conn, "MATCH (b:Book {title: \"The Game Of Trolls\"}) return b")
     assert length(books) == 0
   end
   ```
   """
 
-  alias Bolt.Sips.Connection
+  @type result :: {:ok, result :: any} | {:error, Exception.t}
 
   @doc """
   begin a new transaction.
   """
-  @spec begin(Bolt.Sips.Connection) :: []
+  @spec begin(DBConnection.conn) :: DBConnection.t | {:error, Exception.t}
   def begin(conn) do
-    Connection.send(conn, "BEGIN")
-    conn
+    case DBConnection.begin(conn, [pool: Bolt.Sips.config(:pool)]) do
+      {:ok, conn, _} ->
+        conn
+      other ->
+        other
+    end
   end
 
   @doc """
@@ -34,16 +38,12 @@ defmodule Bolt.Sips.Transaction do
   The server will rollback the transaction. Any further statements trying to run
   in this transaction will fail immediately.
   """
-  @spec rollback(Bolt.Sips.Connection) :: []
-  def rollback(conn) do
-    Connection.send(conn, "ROLLBACK")
-  end
+  @spec rollback(DBConnection.t) :: result
+  defdelegate rollback(conn), to: DBConnection
 
   @doc """
   given you have an open transaction, you can use this to send a commit request
   """
-  @spec commit(Bolt.Sips.Connection) :: []
-  def commit(conn) do
-    Connection.send(conn, "COMMIT")
-  end
+  @spec commit(DBConnection.t) :: result
+  defdelegate commit(conn), to: DBConnection
 end
