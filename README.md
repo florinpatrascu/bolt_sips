@@ -46,7 +46,7 @@ end
 
 `Bolt.Sips` is working **very well** with [etls](https://github.com/kzemek/etls), for encrypted communications; the preferred method. However, many users complained about the difficulty they encountered while building this dependency on some systems; especially on Windows. To use **etls**, you must define the environment variable: `BOLT_WITH_ETLS`, and compile the project again. If the `BOLT_WITH_ETLS` is not defined, then `Bolt.Sips` will use the standard Erlang [`:ssl` module](http://erlang.org/doc/man/ssl.html), for the SSL/TLS protocol; this is the default behavior, starting with this version.
 
-Therefore, if you want the **much** faster ssl/tls support offered by ETLS, then use this: `export BOLT_WITH_ETLS=true` on Linux/OSX, for example. [etls](https://github.com/kzemek/etls) is a NIF-based implementation of the whole TLS stack, built on top of [Asio](http://think-async.com/) and [BoringSSL](https://boringssl.googlesource.com/boringssl). It manages its own native threads to asynchronously handle socket operations. 
+Therefore, if you want the **much** faster ssl/tls support offered by ETLS, then use this: `export BOLT_WITH_ETLS=true` on Linux/OSX, for example. [etls](https://github.com/kzemek/etls) is a NIF-based implementation of the whole TLS stack, built on top of [Asio](http://think-async.com/) and [BoringSSL](https://boringssl.googlesource.com/boringssl). It manages its own native threads to asynchronously handle socket operations.
 
 To successfully compile [etls](https://github.com/kzemek/etls), you will need the following:
 
@@ -103,7 +103,7 @@ config :bolt_sips, Bolt,
   ssl: true
 ```
 
-We’re also retrying sending the requests to the Neo4j server, with a linear backoff, and try them a couple of times before giving up - all these as part of the exiting pool management, of course. Example
+We’re also retrying sending the requests to the Neo4j server, with a linear backoff, and try them a couple of times before giving up - all these as part of the existing pool management, of course. Example
 
 ```elixir
 config :bolt_sips, Bolt,
