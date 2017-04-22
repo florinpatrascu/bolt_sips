@@ -91,8 +91,6 @@ cscope.po.out
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
-*.iml
-
 ## Directory-based project format:
 .idea/
 
@@ -116,7 +114,6 @@ atlassian-ide-plugin.xml
 
 ### Erlang template
 .eunit
-*.o
 *.plt
 ebin
 rel/example_project

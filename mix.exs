@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.2.5"
+  @version "0.2.6"
 
   def project do
     [
@@ -39,10 +39,10 @@ defmodule BoltSips.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps() do
     [
-      {:poolboy, "~> 1.5"},
+      {:poolboy, "~> 1.5.1"},
       {:con_cache, "~> 0.12.0"},
       {:fuzzyurl, "~> 0.9.0"},
-      {:retry, "~> 0.6.0"},
+      {:retry, "~> 0.6.1"},
       {:ex_doc, "~> 0.15.0", only: [:dev]},
       {:mix_test_watch, "~> 0.3.3", only: [:dev, :test]},
       {:boltex, "~> 0.3"},
