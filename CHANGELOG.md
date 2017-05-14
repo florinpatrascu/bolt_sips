@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.3.1 Breaking changes
+- rollback/refactor to optionally allow external configuration options to be defined at runtime. You must start the Bolt.Sips manually, when needed, i.e. `Bolt.Sips.start_link(url: "localhost")`, or by changing your app's mix config file, i.e.
+
+```elixir
+def application do
+  [applications: [:logger, :bolt_sips],
+   mod: {Bolt.Sips.Application, []}]
+end
+```
+
+You can also specify custom configuration settings in you app's mix config file. These may overwrite your config file:
+
+```elixir
+def application do
+  [extra_applications: [:logger], mod: 
+    {Bolt.Sips.Application, [url: 'localhost', pool_size: 15]}
+  ]
+end
+```
+
+- code cleanup
+
 ## v0.2.6 (2017-04-21)
 - cleanup, and minor dependencies update
 

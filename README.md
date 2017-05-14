@@ -13,7 +13,7 @@ Documentation: http://hexdocs.pm/bolt_sips/
 
 ## Disclaimer
 
-`Bolt.Sips` is currently on `0.2.x` beta releases but considered **stable** starting from version: `0.1.6`. Please check the issues tracker for more information and outstanding issues. Also, please note the following **breaking change**: `Elixir 1.4 is now required`.
+`Bolt.Sips` is currently on `0.3.x` beta releases but considered **stable** starting from version: `0.1.6`. Please check the issues tracker for more information and outstanding issues. Also, please note the following **breaking change**: `Elixir 1.4 is now required`.
 
 ## Features
 
@@ -30,7 +30,7 @@ Documentation: http://hexdocs.pm/bolt_sips/
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 0.2"}]
+  [{:bolt_sips, "~> 0.3"}]
 end
 ```
 
@@ -38,7 +38,17 @@ end
 
 ```elixir
 def application do
-  [applications: [:bolt_sips]]
+  [applications: [:bolt_sips], mod: {Bolt.Sips.Application, []}]
+end
+```
+
+You can also specify custom configuration settings in you app's mix config file. These may overwrite your config file:
+
+```elixir
+def application do
+  [extra_applications: [:logger], mod: 
+    {Bolt.Sips.Application, [url: 'localhost', pool_size: 15]}
+  ]
 end
 ```
 
@@ -129,6 +139,9 @@ $ MIX_ENV=test iex -S mix
 Erlang/OTP 19 [erts-8.2] [source] [64-bit] [smp: ....
 
 Interactive Elixir (1.3.4) - press Ctrl+C to exit (type h() ENTER for help)
+
+iex> {:ok, pid} = Bolt.Sips.start_link(url: "localhost")
+{:ok, #PID<0.181.0>}
 
 iex> conn = Bolt.Sips.conn
 #Port<0.5312>

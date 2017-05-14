@@ -42,8 +42,6 @@ defmodule Bolt.Sips.Response do
 
   @doc """
   transform a raw Bolt response to a list of Responses
-
-  todo: is this the best place for hooking in the stats, if any?
   """
   def transform(raw, _stats \\ :no) do
     # IO.puts("bolt raw response: #{inspect Success.new(raw)}")
