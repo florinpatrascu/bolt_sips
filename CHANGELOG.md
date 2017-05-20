@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.3.2
+- using the project's own config for bolt.cypher task. Fixes issue #20
+
 ## v0.3.1 Breaking changes
 - rollback/refactor to optionally allow external configuration options to be defined at runtime. You must start the Bolt.Sips manually, when needed, i.e. `Bolt.Sips.start_link(url: "localhost")`, or by changing your app's mix config file, i.e.
 

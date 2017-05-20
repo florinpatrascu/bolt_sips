@@ -3,24 +3,21 @@ defmodule Mix.Tasks.Bolt.Cypher do
 
   @shortdoc "Execute a Cypher command"
   @recursive true
-  @defaults [host: 'localhost', port: 7687]
 
   @moduledoc """
   Quickly run Cypher commands from a mix task
 
   ## Command line options
 
-    - `--host`, `-h` - server host
-    - `--port`, `-P` - server port
-    - `--username`, `-u` - the user name (optional)
-    - `--password`, `-p` - password
+    - `--url`, `-u` - Neo4j server URL
+    - `--ssl`, `-s` - use ssl
 
   The command line options have lower precedence than the options
   specified in your `mix.exs` file, if defined.
 
   Examples:
 
-      mix bolt.cypher "MATCH (people:Person) RETURN people.name LIMIT 5"
+      MIX_ENV=test mix bolt.cypher "MATCH (people:Person) RETURN people.name LIMIT 5"
 
       Output sample:
 
@@ -29,41 +26,40 @@ defmodule Mix.Tasks.Bolt.Cypher do
        %{"name" => "Andy Wachowski"}, %{"name" => "Lana Wachowski"},
        %{"name" => "Joel Silver"}]
   """
-  ## TODO: use the project's own config file
 
-  alias Bolt.Sips.Response
-  alias Boltex.Bolt
+  alias Bolt.Sips, as: Neo4j
 
 
   @doc false
   def run(args) do
-    {cli_opts, args, _} = OptionParser.parse(args,
-                            aliases: [h: :host, P: :port, u: :username,
-                                      p: :password])
+    Application.ensure_all_started(:bolt_sips)
+
+    {cli_opts, args, _} = OptionParser.parse(args, aliases: [u: :url, s: :ssl])
+    options = run_options(cli_opts, Application.get_env(:bolt_sips, Bolt))
 
     if args == [], do: Mix.raise "Try entering a Cypher command"
 
     cypher = args |> List.first
 
-    options = Keyword.merge(cli_opts, @defaults)
+    {:ok, _pid} = Bolt.Sips.start_link(options)
 
+    # display the cypher command
+    log_cypher(cypher)
 
-    {:ok, p}   = :gen_tcp.connect options[:host], options[:port],
-                      [active: false, mode: :binary, packet: :raw]
-    :ok        = Bolt.handshake :gen_tcp, p
-
-    case Bolt.init :gen_tcp, p, {options[:username], options[:password]} do
-     :ok ->
-        # display the cypher command
-        log_cypher(cypher)
-
-        # and echo the server response too
-        Bolt.run_statement(:gen_tcp, p, cypher)
-        |> Response.transform
-        |> log_response
-
-      {:error, code} -> log_error("Cannot execute the command, see error above; #{inspect(code)}")
+    case Neo4j.query(Neo4j.conn, cypher) do
+      {:ok, row} ->
+        row |> log_response
+      {:error, code} ->
+        log_error("Cannot execute the command, see error above; #{inspect(code)}")
     end
+  end
+
+  defp run_options(_, nil) do
+    Mix.raise "can't find a valid configuration file, use: MIX_ENV=test mix bolt.cypher \"MATCH...\", for example"
+  end
+
+  defp run_options(args, config) do
+    Keyword.merge(config, args)
   end
 
   defp log_cypher(msg), do: Mix.shell.info [:green, "#{inspect(msg)}"]
