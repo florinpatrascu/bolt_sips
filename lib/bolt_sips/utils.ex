@@ -19,6 +19,7 @@ defmodule Bolt.Sips.Utils do
     |> Keyword.put_new(:timeout, 15_000)
     |> Keyword.put_new(:ssl, false)
     |> Keyword.put_new(:socket, :gen_tcp)
+    |> Keyword.put_new(:with_etls, false)
     |> Keyword.put_new(:retry_linear_backoff, [delay: 150, factor: 2, tries: 3])
     |> or_use_url_if_present
     |> Enum.reject(fn {_k, v} -> is_nil(v) end)

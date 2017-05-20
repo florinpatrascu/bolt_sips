@@ -50,7 +50,7 @@ defmodule Bolt.Sips.Query do
 
   @cypher_seps ~r/;(.){0,1}\n/
 
-  def query!(conn, statement),  do: query!(conn,statement, %{})
+  def query!(conn, statement),  do: query!(conn, statement, %{})
   def query!(conn, statement, params) when is_map(params) do
     case query_commit(conn, statement, params) do
       {:error, f} ->

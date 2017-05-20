@@ -3,14 +3,11 @@ defmodule Bolt.Sips.Application do
 
   use Application
 
-  def start(_type, _args) do
-    import Supervisor.Spec, warn: false
+  def start(_, start_args) do
+    Bolt.Sips.start_link(start_args)
+  end
 
-    children = [
-      worker(Bolt.Sips, [Application.get_env(:bolt_sips, Bolt)])
-    ]
-
-    opts = [strategy: :one_for_one, name: Bolt.Sips.Supervisor]
-    Supervisor.start_link(children, opts)
+  def stop(_state) do
+    :ok
   end
 end

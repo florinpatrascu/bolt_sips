@@ -7,7 +7,6 @@ defmodule Bolt.Sips.Error do
 
   defstruct [:code, :message]
 
-  # todo: more work to be done here
   def new(%Boltex.Error{code: code, connection_id: cid, function: f, message: message, type: t}) do
     {:error, struct(Error, %{code: code, message: "Details: #{message}; connection_id: #{inspect cid}, function: #{inspect f}, type: #{inspect t}"})}
   end
