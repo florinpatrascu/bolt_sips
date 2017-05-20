@@ -20,7 +20,7 @@ Documentation: http://hexdocs.pm/bolt_sips/
   * It is using: Bolt. Neo4j's newest network protocol, designed for high-performance
   * Supports transactions, simple and complex Cypher queries with or w/o parameters
   * Connection pool implementation using: "A hunky Erlang worker pool factory", aka: [Poolboy](http://github.com/devinus/poolboy) :)
-  * Supports Neo4j 3.0.x/3.1.x
+  * Supports Neo4j 3.0.x/3.1.x/3.2.x
 
 ### Installation
 
@@ -161,7 +161,7 @@ iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name:'Bob'}) DELETE a")
 
 Run simple Cypher commands from a mix task, for quick testing Cypher results or the connection with your server:
 
-    mix bolt.cypher "MATCH (people:Person) RETURN people.name LIMIT 5"
+    MIX_ENV=test mix bolt.cypher "MATCH (people:Person) RETURN people.name LIMIT 5"
 
 Output sample:
 
@@ -175,10 +175,15 @@ Output sample:
 
 Available command line options:
 
-- `--host`, `-h` - server host
-- `--port`, `-P` - server port
-- `--username`, `-u` - the user name (optional)
-- `--password`, `-p` - password
+- `--url`, `-u` - server host
+- `--ssl`, `-s` - use ssl
+
+For example, if your server requires authentication:
+
+```shell
+MIX_ENV=test mix bolt.cypher --ssl true -url "bolt://<user>:<password>@happy-warlocks.dbs.graphenedb.com:24786"\
+ "MATCH (people:Person) RETURN people.name LIMIT 5"
+```
 
 ### Testing
 
