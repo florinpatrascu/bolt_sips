@@ -2,7 +2,7 @@
 
 Neo4j driver for Elixir wrapped around the Bolt protocol.
 
-![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)
+[![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)](https://travis-ci.org/florinpatrascu/bolt_sips)
 [![Deps Status](https://beta.hexfaktor.org/badge/all/github/florinpatrascu/bolt_sips.svg)](https://beta.hexfaktor.org/github/florinpatrascu/bolt_sips)
 [![Ebert](https://ebertapp.io/github/florinpatrascu/bolt_sips.svg)](https://ebertapp.io/github/florinpatrascu/bolt_sips)
 [![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
