@@ -24,7 +24,7 @@ defmodule Bolt.Sips.Connection do
 
   @doc false
   def handle_call(:connect, _from, opts) do
-    host  = Keyword.fetch!(opts, :hostname) |> to_char_list
+    host  = Keyword.fetch!(opts, :hostname) |> to_charlist
     port  = opts[:port]
     auth  = opts[:auth]
 
