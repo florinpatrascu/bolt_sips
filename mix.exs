@@ -49,7 +49,7 @@ defmodule BoltSips.Mixfile do
       {:boltex, "~> 0.3"},
       {:benchee, "~> 0.9", only: :dev},
       # {:boltex, path: "../boltex/"},
-      {:credo, "~> 0.8.4", only: [:dev, :test]}
+      {:credo, "~> 0.8.6", only: [:dev, :test]}
     ] ++ env_specific_deps()
   end
 
