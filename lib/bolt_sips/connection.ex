@@ -123,7 +123,7 @@ defmodule Bolt.Sips.Connection do
   end
 
 
-  defp ack_failure(response = %Boltex.Error{}, transport, port) do
+  defp ack_failure(%Boltex.Error{} = response, transport, port) do
     Boltex.Bolt.ack_failure(transport, port, boltex_opts())
     {:error, response}
   end
