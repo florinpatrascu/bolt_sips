@@ -120,3 +120,4 @@ rel/example_project
 .concrete/DEV_MODE
 
 logs/
+.vscode/
