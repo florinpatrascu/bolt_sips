@@ -18,6 +18,7 @@ defmodule Bolt.Sips.Success do
   """
   def new(r) do
     case Error.new(r) do
+      {:halt, error} -> {:error, error}
       {:error, error} -> {:error, error}
       {:failure, failure} -> {:failure, failure}
       _ ->
