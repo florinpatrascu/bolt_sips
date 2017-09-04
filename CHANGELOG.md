@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.5
+
+- better error messages; issue #33
+- not retrying a connection when the server is not available/started
+- incorrect number of retries, performed by the driver in case of errors; was one extra
+
 ## v0.3.4
 
 - dependencies update, minor code cleanup, listening to Credo :) and finally using a Markdown linter
