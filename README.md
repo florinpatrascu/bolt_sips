@@ -8,6 +8,8 @@ Neo4j driver for Elixir wrapped around the Bolt protocol.
 [![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
 [![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/bolt_sips)
 
+[![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/~florinpatrascu/)
+
 Documentation: http://hexdocs.pm/bolt_sips/
 
 
