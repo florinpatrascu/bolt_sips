@@ -1,6 +1,6 @@
-## Bolt.Sips
+![](icon-60x60@3x.png)
 
-Neo4j driver for Elixir wrapped around the Bolt protocol.
+Bolt-Sips, the Neo4j driver for Elixir wrapped around the Bolt protocol.
 
 [![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)](https://travis-ci.org/florinpatrascu/bolt_sips)
 [![Deps Status](https://beta.hexfaktor.org/badge/all/github/florinpatrascu/bolt_sips.svg)](https://beta.hexfaktor.org/github/florinpatrascu/bolt_sips)
