@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.4.10
+## 0.4.11
 
 - using Elixir 1.5
 - not using the ConCache anymore. I initially intended to use its support throughout the driver, but it is not needed.
