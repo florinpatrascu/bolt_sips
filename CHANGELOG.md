@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.10
+
+- using Elixir 1.5
+- not using the ConCache anymore. I initially intended to use its support throughout the driver, but it is not needed.
+- README updated with a short snippet from a Phoenix web app demo, showing how to start Bolt.Sips, as a worker
+- dependencies update
+- minor code cleanup, to prep the code for receiving HA and Bolt routing capabilities
+
 ## v0.3.5
 
 - better error messages; issue #33

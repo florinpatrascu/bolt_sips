@@ -61,12 +61,9 @@ defmodule Bolt.Sips do
   """
   @spec start_link(Keyword.t) :: {:ok, pid} | {:error, Bolt.Sips.Error.t}
   def start_link(opts) do
-    ConCache.start_link([], name: :bolt_sips_cache)
     ssl = if System.get_env("BOLT_WITH_ETLS"), do: :etls, else: :ssl
     cnf = Utils.default_config(opts)
-    cnf = cnf |> Keyword.put(:socket, (if Keyword.get(cnf, :ssl), do: ssl, else: :gen_tcp))
-
-    ConCache.put(:bolt_sips_cache, :config, cnf)
+    cnf = Keyword.put(cnf, :socket, (if Keyword.get(cnf, :ssl), do: ssl, else: :gen_tcp))
 
     poolboy_config = [
       name: {:local, @pool_name},
@@ -76,7 +73,10 @@ defmodule Bolt.Sips do
       strategy: :fifo
     ]
 
-    children = [:poolboy.child_spec(@pool_name, poolboy_config, cnf)]
+    children = [
+      {Bolt.Sips.ConfigAgent, cnf},
+      :poolboy.child_spec(@pool_name, poolboy_config, cnf)
+    ]
     options = [strategy: :one_for_one, name: __MODULE__]
 
     Supervisor.start_link(children, options)
@@ -149,7 +149,7 @@ defmodule Bolt.Sips do
   @doc """
   returns an environment specific Bolt.Sips configuration.
   """
-  def config(), do: ConCache.get(:bolt_sips_cache, :config)
+  def config(), do: Bolt.Sips.ConfigAgent.get_config()
 
   @doc false
   def config(key), do: Keyword.get(config(), key)

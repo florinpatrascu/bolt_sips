@@ -1,16 +1,16 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.3.5"
+  @version "0.4.10"
 
   def project do
     [
       app: :bolt_sips,
       version: @version,
-      elixir: "~> 1.4",
+      elixir: "~> 1.5",
       deps: deps(),
       package: package(),
-      description: "Neo4j driver for Elixir wrapped around the fast Bolt protocol",
+      description: "Neo4j driver for Elixir, using the fast Bolt protocol",
       name: "Bolt.Sips",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -26,7 +26,7 @@ defmodule BoltSips.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poolboy, :con_cache, :retry, :boltex, :fuzzyurl] ++ opt_etls(),
+    [applications: [:logger, :poolboy, :retry, :boltex, :fuzzyurl] ++ opt_etls(),
      #mod: {Bolt.Sips.Application, [foo: "bar"]}
     ]
   end
@@ -41,15 +41,14 @@ defmodule BoltSips.Mixfile do
   defp deps() do
     [
       {:poolboy, "~> 1.5.1"},
-      {:con_cache, "~> 0.12.0"},
       {:fuzzyurl, "~> 0.9.0"},
-      {:retry, "~> 0.7"},
-      {:ex_doc, "~> 0.16.2", only: [:dev]},
-      {:mix_test_watch, "~> 0.4.1", only: [:dev, :test]},
+      {:retry, "~> 0.8.1"},
+      {:ex_doc, "~> 0.18.1", only: [:dev]},
+      {:mix_test_watch, "~> 0.5.0", only: [:dev, :test]},
       {:benchee, "~> 0.9", only: :dev},
       # {:boltex, path: "../boltex/"},
       {:boltex, "~> 0.3"},
-      {:credo, "~> 0.8.6", only: [:dev, :test]}
+      {:credo, "~> 0.8.8", only: [:dev, :test]}
     ] ++ env_specific_deps()
   end
 
