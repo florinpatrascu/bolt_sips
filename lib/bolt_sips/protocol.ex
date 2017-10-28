@@ -15,9 +15,9 @@ defmodule Bolt.Sips.Protocol do
 
   @doc "Callback for DBConnection.connect/1"
   def connect(_opts) do
-    host = Sips.config(:hostname) |> to_charlist
+    host = to_charlist(Sips.config(:hostname))
     port = Sips.config(:port)
-    auth = Sips.config(:basic_auth) |> exract_auth
+    auth = extract_auth(Sips.config(:basic_auth))
 
     timeout = Sips.config(:timeout)
 
@@ -110,8 +110,8 @@ defmodule Bolt.Sips.Protocol do
     {:ok, state}
   end
 
-  defp exract_auth(nil), do: {}
-  defp exract_auth(basic_auth) do
+  defp extract_auth(nil), do: {}
+  defp extract_auth(basic_auth) do
     {basic_auth[:username], basic_auth[:password]}
   end
 
