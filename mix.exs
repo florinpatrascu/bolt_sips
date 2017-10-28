@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.4.11"
+  @version "0.5.5"
 
   def project do
     [
@@ -33,7 +33,7 @@ defmodule BoltSips.Mixfile do
 
   defp package() do
     %{licenses: ["Apache 2.0"],
-      maintainers: ["Florin T.PATRASCU"],
+      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk"],
       links: %{"Github" => "https://github.com/florinpatrascu/bolt_sips"}}
   end
 
@@ -46,7 +46,7 @@ defmodule BoltSips.Mixfile do
       {:retry, "~> 0.8.1"},
       {:ex_doc, "~> 0.18.1", only: [:dev]},
       {:mix_test_watch, "~> 0.5.0", only: [:dev, :test]},
-      {:benchee, "~> 0.9", only: :dev},
+      {:benchee, "~> 0.10", only: :dev},
       # {:boltex, path: "../boltex/"},
       {:boltex, "~> 0.3"},
       {:credo, "~> 0.8.8", only: [:dev, :test]}

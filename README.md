@@ -7,22 +7,22 @@ Bolt-Sips, the Neo4j driver for Elixir wrapped around the Bolt protocol.
 [![Ebert](https://ebertapp.io/github/florinpatrascu/bolt_sips.svg)](https://ebertapp.io/github/florinpatrascu/bolt_sips)
 [![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
 [![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/bolt_sips)
-
-[![Support via Gratipay](https://cdn.rawgit.com/gratipay/gratipay-badge/2.3.0/dist/gratipay.png)](https://gratipay.com/~florinpatrascu/)
+[![Gratipay](https://img.shields.io/gratipay/project/bolt_sips.svg)](https://gratipay.com/bolt_sips/)
 
 Documentation: http://hexdocs.pm/bolt_sips/
 
-
 ## Disclaimer
 
-`Bolt.Sips` is currently on `0.3.x` beta releases but considered **stable** starting from version: `0.1.6`. Please check the issues tracker for more information and outstanding issues. Also, please note the following **breaking change**: `Elixir 1.4 is now required`.
+This is a new generation of `Bolt.Sips`: v0.5.nn
+
+It is implementing the [db_connection](https://github.com/elixir-ecto/db_connection) database connection behavior. The current version is using the `db_connection` dependency from its master branch, and it is considered experimental until the db_connection is released.
 
 ## Features
 
-  * It is using: Bolt. Neo4j's newest network protocol, designed for high-performance
-  * Supports transactions, simple and complex Cypher queries with or w/o parameters
-  * Connection pool implementation using: "A hunky Erlang worker pool factory", aka: [Poolboy](http://github.com/devinus/poolboy) :)
-  * Supports Neo4j 3.0.x/3.1.x/3.2.x
+* It is using: Bolt. Neo4j's newest network protocol, designed for high-performance
+* Supports transactions, simple and complex Cypher queries with or w/o parameters
+* Connection pool implementation using: "A hunky Erlang worker pool factory", aka: [Poolboy](http://github.com/devinus/poolboy) :)
+* Supports Neo4j 3.0.x/3.1.x/3.2.x
 
 ### Installation
 
@@ -32,7 +32,7 @@ Documentation: http://hexdocs.pm/bolt_sips/
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 0.3"}]
+  [{:bolt_sips, "~> 0.5"}]
 end
 ```
 
@@ -138,15 +138,14 @@ With a minimalist setup configured as above, and the Neo4j 3.x server running, y
 
 ```elixir
 $ MIX_ENV=test iex -S mix
-Erlang/OTP 19 [erts-8.2] [source] [64-bit] [smp: ....
+Erlang/OTP 20 [erts-9.1.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:10] [hipe] [kernel-poll:false] [dtrace]
 
-Interactive Elixir (1.3.4) - press Ctrl+C to exit (type h() ENTER for help)
-
+Interactive Elixir (1.5.2) - press Ctrl+C to exit (type h() ENTER for help)
 iex> {:ok, pid} = Bolt.Sips.start_link(url: "localhost")
-{:ok, #PID<0.181.0>}
+{:ok, #PID<0.185.0>}
 
 iex> conn = Bolt.Sips.conn
-#Port<0.5312>
+:bolt_sips_pool
 
 iex> Bolt.Sips.query!(conn, "CREATE (a:Person {name:'Bob'})")
 %{stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1}, type: "w"}
@@ -157,7 +156,11 @@ iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS nam
 
 iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name:'Bob'}) DELETE a")
 %{stats: %{"nodes-deleted" => 1}, type: "w"}
+
+iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name") |> Enum.map(&(&1["name"]))
+[]
 ```
+
 ### Using Bolt.Sips with Phoenix, or similar
 
 Don't forget to start the `Bolt.Sips` driver in your supervision tree. Example:

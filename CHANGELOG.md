@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.5
+
+- using the [DBConnection](https://hexdocs.pm/db_connection/DBConnection.html), thanks to the work done by Dmitriy Nesteryuk.
+
 ## 0.4.11
 
 - using Elixir 1.5
