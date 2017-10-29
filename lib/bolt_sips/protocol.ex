@@ -118,35 +118,33 @@ defmodule Bolt.Sips.Protocol do
   defp socket, do: Sips.config(:socket)
 
   defp execute(%QueryStatement{statement: statement}, params, _, sock) do
-    try do
-      case Boltex.Bolt.run_statement(socket(), sock, statement, params) do
-        [{:success, _} | _] = data ->
-          {:ok, data, sock}
+    case Boltex.Bolt.run_statement(socket(), sock, statement, params) do
+      [{:success, _} | _] = data ->
+        {:ok, data, sock}
 
-        %Boltex.Error{type: :cypher_error} = error ->
-          with :ok <- Boltex.Bolt.ack_failure(socket(), sock) do
-            {:error, error, sock}
-          else
-            error ->
-              # we cannot handle this failure, so disconnect
-              {:disconnect, error, sock}
-          end
-
-        %Boltex.Error{type: :connection_error} = error ->
-          {:disconnect, error, sock}
-
-        %Boltex.Error{} = error ->
+      %Boltex.Error{type: :cypher_error} = error ->
+        with :ok <- Boltex.Bolt.ack_failure(socket(), sock) do
           {:error, error, sock}
-      end
-    rescue e ->
-      msg =
-        case e do
-          %Boltex.PackStream.EncodeError{} -> "unable to encode value: #{inspect e.item}"
-          %Boltex.Error{} -> "#{e.message}, type: #{e.type}"
-          _ -> e.message
+        else
+          error ->
+            # we cannot handle this failure, so disconnect
+            {:disconnect, error, sock}
         end
 
-      {:error, %{code: :failure, message: msg}, sock}
+      %Boltex.Error{type: :connection_error} = error ->
+        {:disconnect, error, sock}
+
+      %Boltex.Error{} = error ->
+        {:error, error, sock}
     end
+  rescue e ->
+    msg =
+      case e do
+        %Boltex.PackStream.EncodeError{} -> "unable to encode value: #{inspect e.item}"
+        %Boltex.Error{} -> "#{e.message}, type: #{e.type}"
+        _ -> e.message
+      end
+
+    {:error, %{code: :failure, message: msg}, sock}
   end
 end

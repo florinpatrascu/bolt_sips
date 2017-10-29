@@ -29,7 +29,6 @@ defmodule Mix.Tasks.Bolt.Cypher do
 
   alias Bolt.Sips, as: Neo4j
 
-
   @doc false
   def run(args) do
     Application.ensure_all_started(:bolt_sips)
@@ -41,7 +40,7 @@ defmodule Mix.Tasks.Bolt.Cypher do
 
     cypher = args |> List.first
 
-    {:ok, pid} = Bolt.Sips.start_link(options)
+    {:ok, pid} = Neo4j.start_link(options)
 
     # display the cypher command
     log_cypher(cypher)

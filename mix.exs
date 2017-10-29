@@ -26,19 +26,26 @@ defmodule BoltSips.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :poolboy, :db_connection, :retry, :boltex, :fuzzyurl] ++ opt_etls(),
-     #mod: {Bolt.Sips.Application, [foo: "bar"]}
+    [
+      applications: [
+        :logger,
+        :poolboy,
+        :db_connection,
+        :retry,
+        :boltex,
+        :fuzzyurl
+        ] ++ opt_etls()
     ]
   end
 
-  defp package() do
+  defp package do
     %{licenses: ["Apache 2.0"],
       maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk"],
       links: %{"Github" => "https://github.com/florinpatrascu/bolt_sips"}}
   end
 
   # Type "mix help deps" for more examples and options
-  defp deps() do
+  defp deps do
     [
       {:poolboy, "~> 1.5.1"},
       {:db_connection, github: 'elixir-ecto/db_connection'},
@@ -58,7 +65,7 @@ defmodule BoltSips.Mixfile do
   end
 
   # when using Elixir < 1.4
-  defp opt_etls() do
+  defp opt_etls do
     if System.get_env("BOLT_WITH_ETLS"), do: [:etls], else: []
   end
 end
