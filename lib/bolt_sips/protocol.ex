@@ -12,6 +12,8 @@ defmodule Bolt.Sips.Protocol do
 
   alias Bolt.Sips
   alias Bolt.Sips.QueryStatement
+  alias Boltex.Bolt, as: Bolt
+  alias Boltex.Error, as: BoltError
 
   @doc "Callback for DBConnection.connect/1"
   def connect(_opts) do
@@ -24,16 +26,16 @@ defmodule Bolt.Sips.Protocol do
     socket_opts = [packet: :raw, mode: :binary, active: false]
 
     with {:ok, sock} <- socket().connect(host, port, socket_opts, timeout),
-         :ok         <- Boltex.Bolt.handshake(socket(), sock),
-         :ok         <- Boltex.Bolt.init(socket(), sock, auth),
+         :ok         <- Bolt.handshake(socket(), sock),
+         :ok         <- Bolt.init(socket(), sock, auth),
          :ok         <- socket().setopts(sock, active: :once)
     do
       {:ok, sock}
     else
-      {:error, %Boltex.Error{}} = error ->
+      {:error, %BoltError{}} = error ->
         error
       {:error, reason} ->
-        {:error, Boltex.Error.exception(reason, nil, :connect)}
+        {:error, BoltError.exception(reason, nil, :connect)}
     end
   end
 
@@ -118,12 +120,12 @@ defmodule Bolt.Sips.Protocol do
   defp socket, do: Sips.config(:socket)
 
   defp execute(%QueryStatement{statement: statement}, params, _, sock) do
-    case Boltex.Bolt.run_statement(socket(), sock, statement, params) do
+    case Bolt.run_statement(socket(), sock, statement, params) do
       [{:success, _} | _] = data ->
         {:ok, data, sock}
 
-      %Boltex.Error{type: :cypher_error} = error ->
-        with :ok <- Boltex.Bolt.ack_failure(socket(), sock) do
+      %BoltError{type: :cypher_error} = error ->
+        with :ok <- Bolt.ack_failure(socket(), sock) do
           {:error, error, sock}
         else
           error ->
@@ -131,17 +133,17 @@ defmodule Bolt.Sips.Protocol do
             {:disconnect, error, sock}
         end
 
-      %Boltex.Error{type: :connection_error} = error ->
+      %BoltError{type: :connection_error} = error ->
         {:disconnect, error, sock}
 
-      %Boltex.Error{} = error ->
+      %BoltError{} = error ->
         {:error, error, sock}
     end
   rescue e ->
     msg =
       case e do
         %Boltex.PackStream.EncodeError{} -> "unable to encode value: #{inspect e.item}"
-        %Boltex.Error{} -> "#{e.message}, type: #{e.type}"
+        %BoltError{} -> "#{e.message}, type: #{e.type}"
         _ -> e.message
       end
 

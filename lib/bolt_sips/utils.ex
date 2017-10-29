@@ -63,11 +63,12 @@ defmodule Bolt.Sips.Utils do
   """
   @spec mod(integer, integer) :: non_neg_integer
   def mod(number, modulus) when is_integer(number) and is_integer(modulus) do
-    case rem(number, modulus) do
-      remainder when remainder > 0 and modulus < 0 or remainder < 0 and modulus > 0 ->
-        remainder + modulus
-      remainder ->
-        remainder
+    remainder = rem(number, modulus)
+
+    if remainder > 0 and modulus < 0 or remainder < 0 and modulus > 0 do
+      remainder + modulus
+    else
+      remainder
     end
   end
 

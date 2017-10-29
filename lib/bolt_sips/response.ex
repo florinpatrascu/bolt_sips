@@ -35,10 +35,11 @@ defmodule Bolt.Sips.Response do
   require Logger
   require Integer
 
-  @node                   78 # self-contained graph node
-  @path                   80 # self-contained graph path
-  @relationship           82 # self-contained graph relationship
-  @unbound_relationship  114 # self-contained graph relationship without endpoints
+  # self contained graph entities
+  @node                   78 # node
+  @path                   80 # path
+  @relationship           82 # relationship
+  @unbound_relationship  114 # relationship without endpoints
 
   @doc """
   transform a raw Bolt response to a list of Responses

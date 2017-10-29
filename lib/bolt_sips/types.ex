@@ -103,7 +103,6 @@ defmodule Bolt.Sips.Types do
       )
     end
 
-    # todo: clean up the code
     # @lint false
     defp draw_path(_n, _r, _s, _i, [], acc, _ln, _nn), do: acc
     defp draw_path(n, r, s, i, [h|t] = _rel_index, acc, ln, _nn) do
@@ -126,7 +125,8 @@ defmodule Bolt.Sips.Types do
         struct(UnboundRelationship, unbound_relationship)
       end
 
-      draw_path(n, r, s, i + 1, t, (acc ++ [urel]) ++ [next_node], next_node, ln)
+      draw_path(n, r, s, i + 1, t, (acc ++ [urel])
+        ++ [next_node], next_node, ln)
     end
   end
 end

@@ -30,7 +30,6 @@ defmodule Bolt.Sips do
        failing after a timeout, when the pool is full;
     - `:retry_linear_backoff` -  with Bolt, the initial handshake sequence (happening before sending any commands to the server) is represented by two important calls, executed in sequence: `handshake` and `init`, and they must both succeed, before sending any (Cypher) requests. You can see the details in the [Bolt protocol](http://boltprotocol.org/v1/#handshake) specs. This sequence is also sensitive to latencies, such as: network latencies, busy servers, etc., and because of that we're introducing a simple support for retrying the handshake (and the subsequent requests) with a linear backoff, and try the handshake sequence (or the request) a couple of times before giving up. See examples below.
 
-
   ## Example of valid configurations (i.e. defined in config/dev.exs) and usage:
 
       config :bolt_sips, Bolt,
