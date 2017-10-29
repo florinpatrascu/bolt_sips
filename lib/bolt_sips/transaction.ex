@@ -20,12 +20,14 @@ defmodule Bolt.Sips.Transaction do
 
   @type result :: {:ok, result :: any} | {:error, Exception.t}
 
+  alias Bolt.Sips
+
   @doc """
   begin a new transaction.
   """
   @spec begin(DBConnection.conn) :: DBConnection.t | {:error, Exception.t}
   def begin(conn) do
-    case DBConnection.begin(conn, [pool: Bolt.Sips.config(:pool)]) do
+    case DBConnection.begin(conn, [pool: Sips.config(:pool)]) do
       {:ok, conn, _} ->
         conn
       other ->

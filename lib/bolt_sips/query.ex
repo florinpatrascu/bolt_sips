@@ -46,7 +46,8 @@ defmodule Bolt.Sips.Query do
   See the various tests, or more examples and implementation details.
 
   """
-  alias Bolt.Sips.{QueryStatement, Response}
+  alias Bolt.Sips
+  alias Bolt.Sips.{QueryStatement, Response, Exception}
 
   @cypher_seps ~r/;(.){0,1}\n/
 
@@ -54,7 +55,7 @@ defmodule Bolt.Sips.Query do
   def query!(conn, statement, params) when is_map(params) do
     case query_commit(conn, statement, params) do
       {:error, f} ->
-        raise Bolt.Sips.Exception, code: f.code, message: f.message
+        raise Exception, code: f.code, message: f.message
       r -> r
     end
   end
@@ -90,16 +91,14 @@ defmodule Bolt.Sips.Query do
   end
 
   defp tx(conn, statements, params) do
-    try do
-      exec = fn(conn) ->
-        Enum.reduce(statements, [], &(send!(conn, &1, params, &2)))
-      end
-
-      DBConnection.run(conn, exec, run_opts())
-    rescue
-      e in RuntimeError ->
-        {:error, e}
+    exec = fn(conn) ->
+      Enum.reduce(statements, [], &(send!(conn, &1, params, &2)))
     end
+
+    DBConnection.run(conn, exec, run_opts())
+  rescue
+    e in RuntimeError ->
+      {:error, e}
   end
 
   defp send!(conn, statement, params, acc) do
@@ -112,6 +111,6 @@ defmodule Bolt.Sips.Query do
   end
 
   defp run_opts do
-    [pool: Bolt.Sips.config(:pool)]
+    [pool: Sips.config(:pool)]
   end
 end

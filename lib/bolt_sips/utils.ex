@@ -98,7 +98,11 @@ defmodule Bolt.Sips.Utils do
   @doc false
   defp find_username_and_password(config, f) do
     if f.username != nil && f.password != nil do
-      Keyword.put(config, :basic_auth, [username: f.username, password: f.password])
+      Keyword.put(
+        config,
+        :basic_auth,
+        [username: f.username, password: f.password]
+      )
     else
       config
     end

@@ -9,7 +9,7 @@ defmodule Bolt.Sips do
   @timeout   15_000
   # @max_rows     500
 
-  alias Bolt.Sips.{Query, Transaction, Utils}
+  alias Bolt.Sips.{Query, Transaction, Utils, ConfigAgent}
 
   @type conn :: DBConnection.conn
   @type transaction :: DBConnection.t
@@ -37,13 +37,11 @@ defmodule Bolt.Sips do
         url: 'bolt://demo:demo@hobby-wowsoeasy.dbs.graphenedb.com:24786',
         ssl: true
 
-
       config :bolt_sips, Bolt,
         url: "bolt://Bilbo:Baggins@hobby-hobbits.dbs.graphenedb.com:24786",
         ssl: true,
         timeout: 15_000,
         retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
-
 
       config :bolt_sips, Bolt,
         hostname: 'localhost',
@@ -147,18 +145,16 @@ defmodule Bolt.Sips do
   @doc """
   returns an environment specific Bolt.Sips configuration.
   """
-  def config(), do: Bolt.Sips.ConfigAgent.get_config()
+  def config, do: ConfigAgent.get_config()
 
   @doc false
   def config(key), do: Keyword.get(config(), key)
 
   @doc false
   def config(key, default) do
-    try do
-      Keyword.get(config(), key, default)
-    rescue
-      _ -> default
-    end
+    Keyword.get(config(), key, default)
+  rescue
+    _ -> default
   end
 
   @doc false

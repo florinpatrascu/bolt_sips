@@ -39,7 +39,6 @@ defmodule Bolt.Sips.Types do
     use Entity, labels: nil
   end
 
-
   defmodule Relationship do
     @moduledoc """
       Self-contained graph relationship.
@@ -118,7 +117,8 @@ defmodule Bolt.Sips.Types do
         struct(UnboundRelationship, unbound_relationship)
       else
         # rel: rels[-rel_index - 1], start/end: (next_node.id, ln.id)
-        # Neo4j sends: -1, and Boltex returns 255 instead? Investigating, meanwhile ugly path:
+        # Neo4j sends: -1, and Boltex returns 255 instead? Investigating,
+        # meanwhile ugly path:
         haha = if h == 255, do: -1, else: h # oh dear ...
         rel = Enum.at(r, -haha - 1)
         unbound_relationship = [:id, :type, :properties, :start, :end]
@@ -129,5 +129,4 @@ defmodule Bolt.Sips.Types do
       draw_path(n, r, s, i + 1, t, (acc ++ [urel]) ++ [next_node], next_node, ln)
     end
   end
-
 end
