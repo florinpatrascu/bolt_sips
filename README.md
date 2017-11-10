@@ -7,7 +7,6 @@ Bolt-Sips, the Neo4j driver for Elixir wrapped around the Bolt protocol.
 [![Ebert](https://ebertapp.io/github/florinpatrascu/bolt_sips.svg)](https://ebertapp.io/github/florinpatrascu/bolt_sips)
 [![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
 [![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/bolt_sips)
-[![Gratipay](https://img.shields.io/gratipay/project/bolt_sips.svg)](https://gratipay.com/bolt_sips/)
 
 Documentation: http://hexdocs.pm/bolt_sips/
 
