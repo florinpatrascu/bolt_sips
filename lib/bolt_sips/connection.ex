@@ -27,24 +27,24 @@ defmodule Bolt.Sips.Connection do
     host  = Keyword.fetch!(opts, :hostname) |> to_charlist
     port  = opts[:port]
     auth  = opts[:auth]
-    
+
     [delay: delay, factor: factor, tries: tries] = Bolt.Sips.config(:retry_linear_backoff)
 
     p = retry with: lin_backoff(delay, factor) |> cap(Bolt.Sips.config(:timeout)) |> Stream.take(tries - 1) do
       case Bolt.Sips.config(:socket).connect(host, port, [active: false, mode: :binary, packet: :raw]) do
         {:ok, p} ->
           with :ok <- Boltex.Bolt.handshake(Bolt.Sips.config(:socket), p, boltex_opts()),
-               :ok <- Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth, boltex_opts()),
+              {:ok, _info} <- Boltex.Bolt.init(Bolt.Sips.config(:socket), p, auth, boltex_opts()),
                do: p
-        
-        {:error, :econnrefused} -> 
-          :halt        
-        
-        _ ->  
+
+        {:error, :econnrefused} ->
+          :halt
+
+        _ ->
           :error
       end
     end
-    
+
     {:reply, p, opts}
   end
 
@@ -129,7 +129,7 @@ defmodule Bolt.Sips.Connection do
     {:halt, response}
   end
 
-  defp ack_failure(%Boltex.Error{} = response, transport, port) do    
+  defp ack_failure(%Boltex.Error{} = response, transport, port) do
     Boltex.Bolt.ack_failure(transport, port, boltex_opts())
     {:error, response}
   end
