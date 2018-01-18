@@ -25,10 +25,10 @@ defmodule Bolt.Sips.Protocol do
 
     socket_opts = [packet: :raw, mode: :binary, active: false]
 
-    with {:ok, sock} <- socket().connect(host, port, socket_opts, timeout),
-         :ok         <- Bolt.handshake(socket(), sock),
-         :ok         <- Bolt.init(socket(), sock, auth),
-         :ok         <- socket().setopts(sock, active: :once)
+    with {:ok, sock}    <- socket().connect(host, port, socket_opts, timeout),
+         :ok            <- Bolt.handshake(socket(), sock),
+         {:ok, version} <- Bolt.init(socket(), sock, auth),
+         :ok            <- socket().setopts(sock, active: :once)
     do
       {:ok, sock}
     else
