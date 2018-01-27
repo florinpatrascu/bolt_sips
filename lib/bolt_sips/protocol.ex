@@ -25,15 +25,15 @@ defmodule Bolt.Sips.Protocol do
 
     socket_opts = [packet: :raw, mode: :binary, active: false]
 
-    with {:ok, sock}    <- socket().connect(host, port, socket_opts, timeout),
-         :ok            <- Bolt.handshake(socket(), sock),
+    with {:ok, sock} <- socket().connect(host, port, socket_opts, timeout),
+         :ok <- Bolt.handshake(socket(), sock),
          {:ok, version} <- Bolt.init(socket(), sock, auth),
-         :ok            <- socket().setopts(sock, active: :once)
-    do
+         :ok <- socket().setopts(sock, active: :once) do
       {:ok, sock}
     else
       {:error, %BoltError{}} = error ->
         error
+
       {:error, reason} ->
         {:error, BoltError.exception(reason, nil, :connect)}
     end
@@ -42,16 +42,16 @@ defmodule Bolt.Sips.Protocol do
   @doc "Callback for DBConnection.checkout/1"
   def checkout(sock) do
     case socket().setopts(sock, active: false) do
-      :ok    -> {:ok, sock}
-      other  -> other
+      :ok -> {:ok, sock}
+      other -> other
     end
   end
 
   @doc "Callback for DBConnection.checkin/1"
   def checkin(sock) do
     case socket().setopts(sock, active: :once) do
-      :ok    -> {:ok, sock}
-      other  -> other
+      :ok -> {:ok, sock}
+      other -> other
     end
   end
 
@@ -90,10 +90,11 @@ defmodule Bolt.Sips.Protocol do
         tries: tries
       ] = Sips.config(:retry_linear_backoff)
 
-      delay_stream = delay
-      |> lin_backoff(factor)
-      |> cap(Sips.config(:timeout))
-      |> Stream.take(tries)
+      delay_stream =
+        delay
+        |> lin_backoff(factor)
+        |> cap(Sips.config(:timeout))
+        |> Stream.take(tries)
 
       retry with: delay_stream do
         with {:ok, sock} <- connect([]),
@@ -105,14 +106,15 @@ defmodule Bolt.Sips.Protocol do
   end
 
   def handle_info(msg, state) do
-    Logger.error(fn() -> [inspect(__MODULE__), ?\s, inspect(self()),
-      " received unexpected message: " | inspect(msg)]
+    Logger.error(fn ->
+      [inspect(__MODULE__), ?\s, inspect(self()), " received unexpected message: " | inspect(msg)]
     end)
 
     {:ok, state}
   end
 
   defp extract_auth(nil), do: {}
+
   defp extract_auth(basic_auth) do
     {basic_auth[:username], basic_auth[:password]}
   end
@@ -139,14 +141,15 @@ defmodule Bolt.Sips.Protocol do
       %BoltError{} = error ->
         {:error, error, sock}
     end
-  rescue e ->
-    msg =
-      case e do
-        %Boltex.PackStream.EncodeError{} -> "unable to encode value: #{inspect e.item}"
-        %BoltError{} -> "#{e.message}, type: #{e.type}"
-        _ -> e.message
-      end
+  rescue
+    e ->
+      msg =
+        case e do
+          %Boltex.PackStream.EncodeError{} -> "unable to encode value: #{inspect(e.item)}"
+          %BoltError{} -> "#{e.message}, type: #{e.type}"
+          _ -> e.message
+        end
 
-    {:error, %{code: :failure, message: msg}, sock}
+      {:error, %{code: :failure, message: msg}, sock}
   end
 end

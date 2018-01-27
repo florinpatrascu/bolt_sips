@@ -36,10 +36,14 @@ defmodule Bolt.Sips.Response do
   require Integer
 
   # self contained graph entities
-  @node                   78 # node
-  @path                   80 # path
-  @relationship           82 # relationship
-  @unbound_relationship  114 # relationship without endpoints
+  # node
+  @node 78
+  # path
+  @path 80
+  # relationship
+  @relationship 82
+  # relationship without endpoints
+  @unbound_relationship 114
 
   @doc """
   transform a raw Bolt response to a list of Responses
@@ -47,33 +51,37 @@ defmodule Bolt.Sips.Response do
   def transform(raw, _stats \\ :no) do
     # IO.puts("bolt raw response: #{inspect Success.new(raw)}")
     case Success.new(raw) do
-
       {:ok, success} ->
         cond do
           success.notifications != nil ->
             [%{plan: success.plan, notifications: success.notifications}]
+
           length(success.fields) > 0 ->
             create_records(success.fields, success.records)
+
           true ->
-             %{stats: success.stats, type: success.type}
-           # success.profile != nil -> ...
+            %{stats: success.stats, type: success.type}
+            # success.profile != nil -> ...
         end
 
-      {:error, failure} -> {:error, failure}
+      {:error, failure} ->
+        {:error, failure}
 
-      _ -> raw
-
+      _ ->
+        raw
     end
   end
 
   # I am bad at naming functions .. they should be named for what they mean, not
   # for what they do ...
   defp create_records([], []), do: []
+
   defp create_records(fields, records) do
     records
     |> Enum.map(&get_entities/1)
     |> Enum.map(fn recs -> Enum.zip(fields, recs) end)
     |> Enum.map(fn data -> Enum.into(data, %{}) end)
+
     # |> one_or_many
   end
 
@@ -89,17 +97,18 @@ defmodule Bolt.Sips.Response do
   end
 
   defp extract_types([]), do: []
-  defp extract_types([sig: @node, fields: fields]) do
+
+  defp extract_types(sig: @node, fields: fields) do
     n = [:id, :labels, :properties] |> Enum.zip(fields)
     struct(Node, n)
   end
 
-  defp extract_types([sig: @relationship, fields: fields]) do
+  defp extract_types(sig: @relationship, fields: fields) do
     rel = [:id, :start, :end, :type, :properties] |> Enum.zip(fields)
     struct(Relationship, rel)
   end
 
-  defp extract_types([sig: @path, fields: fields]) do
+  defp extract_types(sig: @path, fields: fields) do
     [ns, rs, sequence] = fields
 
     if length(ns) < 1 do
@@ -113,13 +122,15 @@ defmodule Bolt.Sips.Response do
 
     relationships = Enum.map(rs, &extract_types/1)
     nodes = Enum.map(ns, &extract_types/1)
-    rel = [:nodes, :relationships, :sequence]
-    |> Enum.zip([nodes, relationships, sequence])
+
+    rel =
+      [:nodes, :relationships, :sequence]
+      |> Enum.zip([nodes, relationships, sequence])
 
     struct(Path, rel)
   end
 
-  defp extract_types([sig: @unbound_relationship, fields: fields]) do
+  defp extract_types(sig: @unbound_relationship, fields: fields) do
     rel = [:id, :type, :properties] |> Enum.zip(fields)
     struct(UnboundRelationship, rel)
   end
@@ -127,14 +138,16 @@ defmodule Bolt.Sips.Response do
   defp extract_types(r), do: extract_any(r, [])
 
   defp extract_any([], acc), do: Enum.reverse(acc)
-  defp extract_any([h|t], acc) do
+
+  defp extract_any([h | t], acc) do
     extract_any(t, [extract_types(h)] ++ acc)
   end
+
   defp extract_any(r, acc) do
     if length(acc) > 0 do
-      Logger.error("w⦿‿⦿t! Error: extract_any(#{inspect r}, #{inspect acc})")
+      Logger.error("w⦿‿⦿t! Error: extract_any(#{inspect(r)}, #{inspect(acc)})")
     end
+
     r
   end
-
 end

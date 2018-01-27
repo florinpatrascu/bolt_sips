@@ -10,7 +10,8 @@ defmodule Query.Test do
     # reuse the same connection for all the tests in the suite
     # MATCH (n {bolt_sips: TRUE}) OPTIONAL MATCH (n)-[r]-() DELETE n,r;
 
-    conn = Bolt.Sips.conn
+    conn = Bolt.Sips.conn()
+
     # assert {:ok, _r} = Bolt.Sips.query(conn, "MATCH (n:Friend {star_friend: true}) OPTIONAL MATCH (n)-[r]-() DELETE n,r")
 
     cypher = """
@@ -29,6 +30,7 @@ defmodule Query.Test do
       (Chandrian)-[:ACTED_IN {roles:['killer']}]->(TNOTW),
       (Patrick)-[:WROTE]->(TNOTW)
     """
+
     assert {:ok, _r} = Bolt.Sips.query(conn, cypher)
 
     # on_exit fn ->
@@ -48,7 +50,9 @@ defmodule Query.Test do
       ORDER BY Name DESC
       LIMIT 5
     """
+
     {:ok, row} = Bolt.Sips.query(conn, cyp)
+
     assert List.first(row)["Name"] == "Patrick Rothfuss",
            "missing 'The Name of the Wind' database, or data incomplete"
   end
@@ -61,12 +65,15 @@ defmodule Query.Test do
       WHERE n.name = {name}
       RETURN n.name AS name
     """
+
     case Bolt.Sips.query(conn, cypher, %{name: "Kote"}) do
       {:ok, rows} ->
         refute length(rows) == 0, "Did you initialize the 'The Name of the Wind' database?"
         refute length(rows) > 1, "Kote?! There is only one!"
         assert List.first(rows)["name"] == "Kote", "expecting to find Kote"
-      {:error, reason} -> IO.puts "Error: #{reason["message"]}"
+
+      {:error, reason} ->
+        IO.puts("Error: #{reason["message"]}")
     end
   end
 
@@ -77,7 +84,10 @@ defmodule Query.Test do
       CREATE(n:User {props})
     """
 
-    assert {:ok, _} = Bolt.Sips.query(conn, cypher, %{props: %Test.TestUser{name: "Strut", bolt_sips: true}})
+    assert {:ok, _} =
+             Bolt.Sips.query(conn, cypher, %{
+               props: %Test.TestUser{name: "Strut", bolt_sips: true}
+             })
   end
 
   test "executing a Cpyher query, with map parameters", context do
@@ -100,6 +110,7 @@ defmodule Query.Test do
              { name: p.name, label:head(labels(p))} AS person
       ORDER BY name DESC
     """
+
     {:ok, r} = Bolt.Sips.query(conn, cypher)
 
     assert length(r) == 3, "you're missing some characters from the 'The Name of the Wind' db"
@@ -112,12 +123,13 @@ defmodule Query.Test do
       assert row["nickname"] == "n/a"
       assert row["p"].properties["bolt_sips"] == true
     else
-      IO.puts "Did you initialize the 'The Name of the Wind' database?"
+      IO.puts("Did you initialize the 'The Name of the Wind' database?")
     end
   end
 
   test "if Patrick Rothfuss wrote The Name of the Wind", context do
     conn = context[:conn]
+
     cypher = """
       MATCH (p:Person)-[r:WROTE]->(b:Book {title: 'The Name of the Wind'})
       RETURN p
@@ -129,63 +141,71 @@ defmodule Query.Test do
 
   test "it returns only known role names", context do
     conn = context[:conn]
+
     cypher = """
       MATCH (p)-[r:ACTED_IN]->() where p.bolt_sips RETURN r.roles as roles
       LIMIT 25
     """
+
     rows = Bolt.Sips.query!(conn, cypher)
-    roles = ["killer", "sword fighter","magician","musician","many talents"]
-    my_roles = Enum.map(rows, &(&1["roles"])) |> List.flatten
+    roles = ["killer", "sword fighter", "magician", "musician", "many talents"]
+    my_roles = Enum.map(rows, & &1["roles"]) |> List.flatten()
     assert my_roles -- roles == [], "found more roles in the db than expected"
   end
 
   test "path from: MERGE p=({name:'Alice'})-[:KNOWS]-> ...", context do
     conn = context[:conn]
+
     cypher = """
     MERGE p = ({name:'Alice', bolt_sips: true})-[:KNOWS]->({name:'Bob', bolt_sips: true})
     RETURN p
     """
-    path = Bolt.Sips.query!(conn, cypher)
-    |> List.first
-    |> Map.get("p")
 
-    assert {2,1} == {length(path.nodes), length(path.relationships)}
+    path =
+      Bolt.Sips.query!(conn, cypher)
+      |> List.first()
+      |> Map.get("p")
+
+    assert {2, 1} == {length(path.nodes), length(path.relationships)}
   end
 
   test "return a single number from a statement with params", context do
     conn = context[:conn]
-    row = Bolt.Sips.query!(conn, "RETURN {n} AS num", %{n: 10}) |> List.first
+    row = Bolt.Sips.query!(conn, "RETURN {n} AS num", %{n: 10}) |> List.first()
     assert row["num"] == 10
   end
 
   test "run simple statement with complex params", context do
     conn = context[:conn]
-    row = Bolt.Sips.query!(conn, "RETURN {x} AS n", %{"x": %{"abc": ["d", "e", "f"]}}) |> List.first
+    row = Bolt.Sips.query!(conn, "RETURN {x} AS n", %{x: %{abc: ["d", "e", "f"]}}) |> List.first()
     assert row["n"]["abc"] == ["d", "e", "f"]
   end
 
   test "return an array of numbers", context do
     conn = context[:conn]
-    row = Bolt.Sips.query!(conn, "RETURN [10,11,21] AS arr") |> List.first
+    row = Bolt.Sips.query!(conn, "RETURN [10,11,21] AS arr") |> List.first()
     assert row["arr"] == [10, 11, 21]
   end
 
   test "return a string", context do
     conn = context[:conn]
-    row = Bolt.Sips.query!(conn, "RETURN 'Hello' AS salute") |> List.first
+    row = Bolt.Sips.query!(conn, "RETURN 'Hello' AS salute") |> List.first()
     assert row["salute"] == "Hello"
   end
 
   test "UNWIND range(1, 10) AS n RETURN n", context do
     conn = context[:conn]
     rows = Bolt.Sips.query!(conn, "UNWIND range(1, 10) AS n RETURN n")
-    assert {1, 10} == rows |> Enum.map(&(&1["n"])) |> Enum.min_max
+    assert {1, 10} == rows |> Enum.map(& &1["n"]) |> Enum.min_max()
   end
 
   test "MERGE (k:Person {name:'Kote'}) RETURN k", context do
     conn = context[:conn]
-    k = Bolt.Sips.query!(conn, "MERGE (k:Person {name:'Kote', bolt_sips: true}) RETURN k LIMIT 1") |> List.first
-    |> Map.get("k")
+
+    k =
+      Bolt.Sips.query!(conn, "MERGE (k:Person {name:'Kote', bolt_sips: true}) RETURN k LIMIT 1")
+      |> List.first()
+      |> Map.get("k")
 
     assert k.labels == ["Person"]
     assert k.properties["name"] == "Kote"
@@ -193,11 +213,11 @@ defmodule Query.Test do
 
   test "query/2 and query!/2", context do
     conn = context[:conn]
-    r = Bolt.Sips.query!(conn, "RETURN [10,11,21] AS arr") |> List.first
-    assert r["arr"] == [10,11,21]
+    r = Bolt.Sips.query!(conn, "RETURN [10,11,21] AS arr") |> List.first()
+    assert r["arr"] == [10, 11, 21]
 
-    assert{:ok, [r]} == Bolt.Sips.query(conn, "RETURN [10,11,21] AS arr")
-    assert r["arr"] == [10,11,21]
+    assert {:ok, [r]} == Bolt.Sips.query(conn, "RETURN [10,11,21] AS arr")
+    assert r["arr"] == [10, 11, 21]
   end
 
   test "create a Bob node and check it was deleted afterwards", context do
@@ -207,7 +227,7 @@ defmodule Query.Test do
 
     bob =
       Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name")
-      |> Enum.map(&(&1["name"]))
+      |> Enum.map(& &1["name"])
 
     assert bob == ["Bob"]
 
@@ -217,14 +237,14 @@ defmodule Query.Test do
 
   test "Cypher version 3", context do
     conn = context[:conn]
-    r = Bolt.Sips.query!(conn, "EXPLAIN RETURN 1") |> List.first
+    r = Bolt.Sips.query!(conn, "EXPLAIN RETURN 1") |> List.first()
     refute r.plan == nil
     assert Regex.match?(~r/CYPHER 3/iu, r.plan["args"]["version"])
   end
 
   test "EXPLAIN MATCH (n), (m) RETURN n, m", context do
     conn = context[:conn]
-    r = Bolt.Sips.query!(conn, "EXPLAIN MATCH (n), (m) RETURN n, m") |> List.first
+    r = Bolt.Sips.query!(conn, "EXPLAIN MATCH (n), (m) RETURN n, m") |> List.first()
     refute r.notifications == nil
     refute r.plan == nil
     assert List.first(r.plan["children"])["operatorType"] == "CartesianProduct"

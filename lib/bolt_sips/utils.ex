@@ -4,12 +4,12 @@ defmodule Bolt.Sips.Utils do
   @doc """
   Generate a random string.
   """
-  def random_id, do: :rand.uniform |> Float.to_string |> String.slice(2..10)
+  def random_id, do: :rand.uniform() |> Float.to_string() |> String.slice(2..10)
 
   @doc """
   Fills in the given `opts` with default options.
   """
-  @spec default_config(Keyword.t) :: Keyword.t
+  @spec default_config(Keyword.t()) :: Keyword.t()
   def default_config(config \\ Application.get_env(:bolt_sips, Bolt)) do
     config
     |> Keyword.put_new(:hostname, System.get_env("NEO4J_HOST") || 'localhost')
@@ -21,10 +21,9 @@ defmodule Bolt.Sips.Utils do
     |> Keyword.put_new(:socket, Bolt.Sips.Socket)
     |> Keyword.put_new(:with_etls, false)
     |> Keyword.put_new(:pool, DBConnection.Poolboy)
-    |> Keyword.put_new(:retry_linear_backoff, [delay: 150, factor: 2, tries: 3])
+    |> Keyword.put_new(:retry_linear_backoff, delay: 150, factor: 2, tries: 3)
     |> or_use_url_if_present
     |> Enum.reject(fn {_k, v} -> is_nil(v) end)
-
   end
 
   @doc """
@@ -65,7 +64,7 @@ defmodule Bolt.Sips.Utils do
   def mod(number, modulus) when is_integer(number) and is_integer(modulus) do
     remainder = rem(number, modulus)
 
-    if remainder > 0 and modulus < 0 or remainder < 0 and modulus > 0 do
+    if (remainder > 0 and modulus < 0) or (remainder < 0 and modulus > 0) do
       remainder + modulus
     else
       remainder
@@ -75,7 +74,7 @@ defmodule Bolt.Sips.Utils do
   @doc false
   defp or_use_url_if_present(config) do
     if Keyword.has_key?(config, :url) do
-      f = to_string(config[:url]) |> Fuzzyurl.from_string
+      f = to_string(config[:url]) |> Fuzzyurl.from_string()
 
       config
       |> Keyword.put(:hostname, String.to_charlist(f.hostname))
@@ -85,7 +84,7 @@ defmodule Bolt.Sips.Utils do
     else
       config
     end
-   end
+  end
 
   @doc false
   defp find_port_number(config, f) do
@@ -102,7 +101,8 @@ defmodule Bolt.Sips.Utils do
       Keyword.put(
         config,
         :basic_auth,
-        [username: f.username, password: f.password]
+        username: f.username,
+        password: f.password
       )
     else
       config

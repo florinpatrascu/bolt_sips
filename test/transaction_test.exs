@@ -2,12 +2,16 @@ defmodule Transaction.Test do
   use ExUnit.Case, async: true
 
   setup do
-    {:ok, [main_conn: Bolt.Sips.conn]}
+    {:ok, [main_conn: Bolt.Sips.conn()]}
   end
 
   test "execute statements in an open transaction", %{main_conn: main_conn} do
     conn = Bolt.Sips.begin(main_conn)
-    book = Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b") |> List.first
+
+    book =
+      Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b")
+      |> List.first()
+
     assert %{"b" => g_o_t} = book
     assert g_o_t.properties["title"] == "The Game Of Trolls"
     Bolt.Sips.rollback(conn)
@@ -32,14 +36,17 @@ defmodule Transaction.Test do
 
       conn = Bolt.Sips.begin(main_conn)
 
-      book = Bolt.Sips.query(conn, "CREATE (x:XactRollback {title:\"The Game Of Trolls\"}) return x")
+      book =
+        Bolt.Sips.query(conn, "CREATE (x:XactRollback {title:\"The Game Of Trolls\"}) return x")
+
       assert {:ok, [row]} = book
       assert row["x"].properties["title"] == "The Game Of Trolls"
 
       # Original connection (outside the transaction) should not see this node.
       {:ok, [result]} = Bolt.Sips.query(main_conn, "MATCH (x:XactRollback) RETURN count(x)")
+
       assert result["count(x)"] == original_count,
-          "Main connection should not be able to see transactional change"
+             "Main connection should not be able to see transactional change"
 
       Bolt.Sips.rollback(conn)
 
@@ -62,8 +69,9 @@ defmodule Transaction.Test do
       # Main connection should not see this new node.
       {:ok, results} = Bolt.Sips.query(main_conn, "MATCH (x:XactCommit) RETURN x")
       assert is_list(results)
+
       assert Enum.count(results) == 0,
-          "Main connection should not be able to see transactional changes"
+             "Main connection should not be able to see transactional changes"
 
       # Now, commit...
       Bolt.Sips.commit(conn)
@@ -72,7 +80,6 @@ defmodule Transaction.Test do
       {:ok, [%{"x" => node}]} = Bolt.Sips.query(main_conn, "MATCH (x:XactCommit) RETURN x")
       assert node.labels == ["XactCommit"]
       assert node.properties["foo"] == "bar"
-
     after
       # Delete any XactCommit nodes that were succesfully committed!
       Bolt.Sips.query(main_conn, "MATCH (x:XactCommit) DETACH DELETE x")

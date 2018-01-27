@@ -6,13 +6,13 @@ defmodule Bolt.Sips do
   use Supervisor
 
   @pool_name :bolt_sips_pool
-  @timeout   15_000
+  @timeout 15_000
   # @max_rows     500
 
   alias Bolt.Sips.{Query, Transaction, Utils, ConfigAgent}
 
-  @type conn :: DBConnection.conn
-  @type transaction :: DBConnection.t
+  @type conn :: DBConnection.conn()
+  @type transaction :: DBConnection.t()
 
   @doc """
   Start the connection process and connect to Neo4j
@@ -58,7 +58,7 @@ defmodule Bolt.Sips do
       Bolt.Sips.query!(pid, "MATCH (a:Person) RETURN a.name AS name")
       |> Enum.map(&(&1["name"]))
   """
-  @spec start_link(Keyword.t) :: Supervisor.on_start
+  @spec start_link(Keyword.t()) :: Supervisor.on_start()
   def start_link(opts) do
     Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
   end
@@ -67,10 +67,13 @@ defmodule Bolt.Sips do
   def init(opts) do
     ssl = if System.get_env("BOLT_WITH_ETLS"), do: :etls, else: :ssl
     cnf = Utils.default_config(opts)
-    cnf = cnf |> Keyword.put(
-      :socket,
-      (if Keyword.get(cnf, :ssl), do: ssl, else: Keyword.get(cnf, :socket))
-    )
+
+    cnf =
+      cnf
+      |> Keyword.put(
+        :socket,
+        if(Keyword.get(cnf, :ssl), do: ssl, else: Keyword.get(cnf, :socket))
+      )
 
     children = [
       {Bolt.Sips.ConfigAgent, cnf},
@@ -92,30 +95,26 @@ defmodule Bolt.Sips do
   sends the query (and its parameters) to the server and returns `{:ok, Bolt.Sips.Response}` or
   `{:error, error}` otherwise
   """
-  @spec query(conn, String.t) ::
-    {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
+  @spec query(conn, String.t()) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
   defdelegate query(conn, statement), to: Query
 
   @doc """
   The same as query/2 but raises a Bolt.Sips.Exception if it fails.
   Returns the server response otherwise.
   """
-  @spec query!(conn, String.t) ::
-    Bolt.Sips.Response | Bolt.Sips.Exception
+  @spec query!(conn, String.t()) :: Bolt.Sips.Response | Bolt.Sips.Exception
   defdelegate query!(conn, statement), to: Query
 
   @doc """
   send a query and an associated map of parameters. Returns the server response or an error
   """
-  @spec query(conn, String.t, Map.t) ::
-    {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
+  @spec query(conn, String.t(), Map.t()) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
   defdelegate query(conn, statement, params), to: Query
 
   @doc """
   The same as query/3 but raises a Bolt.Sips.Exception if it fails.
   """
-  @spec query!(conn, String.t, Map.t) ::
-    Bolt.Sips.Response | Bolt.Sips.Exception
+  @spec query!(conn, String.t(), Map.t()) :: Bolt.Sips.Response | Bolt.Sips.Exception
   defdelegate query!(conn, statement, params), to: Query
 
   ## Transaction
@@ -124,13 +123,13 @@ defmodule Bolt.Sips do
   @doc """
   begin a new transaction.
   """
-  @spec begin(conn) :: transaction | {:error, Exception.t}
+  @spec begin(conn) :: transaction | {:error, Exception.t()}
   defdelegate begin(conn), to: Transaction
 
   @doc """
   given you have an open transaction, you can use this to send a commit request
   """
-  @spec commit(transaction) :: Transaction.result
+  @spec commit(transaction) :: Transaction.result()
   defdelegate commit(transaction), to: Transaction
 
   @doc """
@@ -138,7 +137,7 @@ defmodule Bolt.Sips do
   The server will rollback the transaction. Any further statements trying to run
   in this transaction will fail immediately.
   """
-  @spec rollback(transaction) :: Transaction.result
+  @spec rollback(transaction) :: Transaction.result()
   defdelegate rollback(conn), to: Transaction
 
   @doc """

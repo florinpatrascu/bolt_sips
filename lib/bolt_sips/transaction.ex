@@ -18,18 +18,19 @@ defmodule Bolt.Sips.Transaction do
   ```
   """
 
-  @type result :: {:ok, result :: any} | {:error, Exception.t}
+  @type result :: {:ok, result :: any} | {:error, Exception.t()}
 
   alias Bolt.Sips
 
   @doc """
   begin a new transaction.
   """
-  @spec begin(DBConnection.conn) :: DBConnection.t | {:error, Exception.t}
+  @spec begin(DBConnection.conn()) :: DBConnection.t() | {:error, Exception.t()}
   def begin(conn) do
-    case DBConnection.begin(conn, [pool: Sips.config(:pool)]) do
+    case DBConnection.begin(conn, pool: Sips.config(:pool)) do
       {:ok, conn, _} ->
         conn
+
       other ->
         other
     end
@@ -40,12 +41,12 @@ defmodule Bolt.Sips.Transaction do
   The server will rollback the transaction. Any further statements trying to run
   in this transaction will fail immediately.
   """
-  @spec rollback(DBConnection.t) :: result
+  @spec rollback(DBConnection.t()) :: result
   defdelegate rollback(conn), to: DBConnection
 
   @doc """
   given you have an open transaction, you can use this to send a commit request
   """
-  @spec commit(DBConnection.t) :: result
+  @spec commit(DBConnection.t()) :: result
   defdelegate commit(conn), to: DBConnection
 end

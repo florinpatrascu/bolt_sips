@@ -1,9 +1,10 @@
-%{"benchee": {:hex, :benchee, "0.11.0", "cf96e328ff5d69838dd89c21a9db22716bfcc6ef772e9d9dddf7ba622102722d", [:mix], [{:deep_merge, "~> 0.1", [hex: :deep_merge, repo: "hexpm", optional: false]}], "hexpm"},
+%{
+  "benchee": {:hex, :benchee, "0.12.0", "771e919505cbe399df5f49b8a21c56af5225542ca5c877e0baa0c503efb4e626", [:mix], [{:deep_merge, "~> 0.1", [hex: :deep_merge, repo: "hexpm", optional: false]}], "hexpm"},
   "boltex": {:hex, :boltex, "0.4.0", "813333088c9cfe7fe5867d16583e3df5f49c64bcd89e0c54fd2c9729885108b0", [:hex], [], "hexpm"},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], [], "hexpm"},
   "credo": {:hex, :credo, "0.8.10", "261862bb7363247762e1063713bb85df2bbd84af8d8610d1272cd9c1943bba63", [:mix], [{:bunt, "~> 0.2.0", [hex: :bunt, repo: "hexpm", optional: false]}], "hexpm"},
-  "db_connection": {:hex, :db_connection, "1.1.3", "89b30ca1ef0a3b469b1c779579590688561d586694a3ce8792985d4d7e575a61", [:mix], [{:connection, "~> 1.0.2", [hex: :connection, repo: "hexpm", optional: false]}, {:poolboy, "~> 1.5", [hex: :poolboy, repo: "hexpm", optional: true]}, {:sbroker, "~> 1.0", [hex: :sbroker, repo: "hexpm", optional: true]}], "hexpm"},
+  "db_connection": {:git, "https://github.com/elixir-ecto/db_connection.git", "c790b36ab4d4a56c8f9182874553f48ff4f9d51f", []},
   "deep_merge": {:hex, :deep_merge, "0.1.1", "c27866a7524a337b6a039eeb8dd4f17d458fd40fbbcb8c54661b71a22fffe846", [:mix], [], "hexpm"},
   "earmark": {:hex, :earmark, "1.2.3", "206eb2e2ac1a794aa5256f3982de7a76bf4579ff91cb28d0e17ea2c9491e46a4", [:mix], [], "hexpm"},
   "ex_doc": {:hex, :ex_doc, "0.18.1", "37c69d2ef62f24928c1f4fdc7c724ea04aecfdf500c4329185f8e3649c915baf", [:mix], [{:earmark, "~> 1.1", [hex: :earmark, repo: "hexpm", optional: false]}], "hexpm"},
@@ -11,4 +12,5 @@
   "fuzzyurl": {:hex, :fuzzyurl, "0.9.1", "81ed7a5f6b42706b65e3948958e6f584d38e3749a5445d5a26d5f80ac1121033", [:mix], [], "hexpm"},
   "mix_test_watch": {:hex, :mix_test_watch, "0.5.0", "2c322d119a4795c3431380fca2bca5afa4dc07324bd3c0b9f6b2efbdd99f5ed3", [:mix], [{:fs, "~> 0.9.1", [hex: :fs, repo: "hexpm", optional: false]}], "hexpm"},
   "poolboy": {:hex, :poolboy, "1.5.1", "6b46163901cfd0a1b43d692657ed9d7e599853b3b21b95ae5ae0a777cf9b6ca8", [:rebar], [], "hexpm"},
-  "retry": {:hex, :retry, "0.8.1", "46bd45c98dcba126bee04967d60f84ac13b854dfedaf6c2fb3b7f0cae884e090", [:mix], [], "hexpm"}}
+  "retry": {:hex, :retry, "0.8.1", "46bd45c98dcba126bee04967d60f84ac13b854dfedaf6c2fb3b7f0cae884e090", [:mix], [], "hexpm"},
+}

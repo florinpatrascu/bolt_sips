@@ -51,16 +51,20 @@ defmodule Bolt.Sips.Query do
 
   @cypher_seps ~r/;(.){0,1}\n/
 
-  def query!(conn, statement),  do: query!(conn, statement, %{})
+  def query!(conn, statement), do: query!(conn, statement, %{})
+
   def query!(conn, statement, params) when is_map(params) do
     case query_commit(conn, statement, params) do
       {:error, f} ->
         raise Exception, code: f.code, message: f.message
-      r -> r
+
+      r ->
+        r
     end
   end
 
   def query(conn, statement), do: query(conn, statement, %{})
+
   def query(conn, statement, params) when is_map(params) do
     case query_commit(conn, statement, params) do
       {:error, f} -> {:error, code: f.code, message: f.message}
@@ -70,15 +74,15 @@ defmodule Bolt.Sips.Query do
 
   defp query_commit(conn, statement, params) do
     statements =
-    String.split(statement, @cypher_seps, trim: true)
-    |> Enum.map(&(String.trim(&1)))
-    |> Enum.filter(&(String.length(&1) > 0))
+      String.split(statement, @cypher_seps, trim: true)
+      |> Enum.map(&String.trim(&1))
+      |> Enum.filter(&(String.length(&1) > 0))
 
     tx(conn, statements, params)
   end
 
   defp tx(conn, statements, params) when length(statements) == 1 do
-    exec = fn(conn) ->
+    exec = fn conn ->
       q = %QueryStatement{statement: hd(statements)}
 
       case DBConnection.execute(conn, q, params) do
@@ -91,8 +95,8 @@ defmodule Bolt.Sips.Query do
   end
 
   defp tx(conn, statements, params) do
-    exec = fn(conn) ->
-      Enum.reduce(statements, [], &(send!(conn, &1, params, &2)))
+    exec = fn conn ->
+      Enum.reduce(statements, [], &send!(conn, &1, params, &2))
     end
 
     DBConnection.run(conn, exec, run_opts())

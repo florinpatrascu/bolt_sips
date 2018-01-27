@@ -6,10 +6,13 @@ defmodule Bolt.Sips.Success do
   alias __MODULE__
   alias Bolt.Sips.Error
 
-  defstruct [
-    fields: nil, type: nil, records: nil, stats: nil,
-    notifications: nil, plan: nil, profile: nil
-  ]
+  defstruct fields: nil,
+            type: nil,
+            records: nil,
+            stats: nil,
+            notifications: nil,
+            plan: nil,
+            profile: nil
 
   @doc """
   parses a record received from Bolt and returns `{:ok, %Bolt.Sips.Success{}}`
@@ -18,37 +21,55 @@ defmodule Bolt.Sips.Success do
   """
   def new(r) do
     case Error.new(r) do
-      {:halt, error} -> {:error, error}
-      {:error, error} -> {:error, error}
-      {:failure, failure} -> {:failure, failure}
+      {:halt, error} ->
+        {:error, error}
+
+      {:error, error} ->
+        {:error, error}
+
+      {:failure, failure} ->
+        {:failure, failure}
+
       _ ->
         case Keyword.has_key?(r, :success) && Keyword.get_values(r, :success) do
-          [f|t] ->
+          [f | t] ->
             %{"fields" => fields} = f
+
             case List.first(t) do
               %{"profile" => profile, "stats" => stats, "type" => type} ->
-                {:ok, %Success{fields: fields, type: type, profile: profile,
-                         stats: stats, records: Keyword.get_values(r, :record)}}
+                {:ok,
+                 %Success{
+                   fields: fields,
+                   type: type,
+                   profile: profile,
+                   stats: stats,
+                   records: Keyword.get_values(r, :record)
+                 }}
 
               %{"notifications" => notifications, "plan" => plan, "type" => type} ->
-                {:ok, %Success{fields: fields, type: type,
-                         notifications: notifications, plan: plan}}
+                {:ok,
+                 %Success{fields: fields, type: type, notifications: notifications, plan: plan}}
 
               %{"plan" => plan, "type" => type} ->
-                {:ok, %Success{fields: fields, type: type, plan: plan,
-                         notifications: []}}
+                {:ok, %Success{fields: fields, type: type, plan: plan, notifications: []}}
 
               %{"stats" => stats, "type" => type} ->
-                {:ok, %Success{fields: fields, type: type, stats: stats,
-                         records: Keyword.get_values(r, :record)}}
+                {:ok,
+                 %Success{
+                   fields: fields,
+                   type: type,
+                   stats: stats,
+                   records: Keyword.get_values(r, :record)
+                 }}
 
               %{"type" => type} ->
-                {:ok, %Success{fields: fields, type: type,
-                         records: Keyword.get_values(r, :record)}}
+                {:ok,
+                 %Success{fields: fields, type: type, records: Keyword.get_values(r, :record)}}
             end
-          _ -> r
+
+          _ ->
+            r
         end
     end
   end
-
 end

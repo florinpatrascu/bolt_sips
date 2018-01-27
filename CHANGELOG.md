@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.7
+
+- elixir 1.6 and code formatting, of course :)
+- minor test updates
+- update dependencies
+- pending code for the newest `db_connection` (currently using db_connection from the master branch)
+
 ## 0.5.5
 
 - using the [DBConnection](https://hexdocs.pm/db_connection/DBConnection.html), thanks to the work done by Dmitriy Nesteryuk.
@@ -45,7 +52,7 @@ You can also specify custom configuration settings in you app's mix config file.
 
 ```elixir
 def application do
-  [extra_applications: [:logger], mod: 
+  [extra_applications: [:logger], mod:
     {Bolt.Sips.Application, [url: 'localhost', pool_size: 15]}
   ]
 end
@@ -85,7 +92,7 @@ end
 
 - Elixir 1.4 is now required.
 - Using Boltex 0.2.0
-- bugfix: invalid Cypher statements will now be properly handled when the request is retried automatically 
+- bugfix: invalid Cypher statements will now be properly handled when the request is retried automatically
 
 ## v0.1.11
 
@@ -123,7 +130,7 @@ Many thanks to: [Ben Wilson](https://elixir-lang.slack.com/team/benwilson512), f
 
 ## v0.1.7 (2017-01-02)
 
-- Connection code refactored for capturing the errors when the remote server is not responding on the first request, or if the driver is misconfigured i.e. wrong port number, bad hostname ... 
+- Connection code refactored for capturing the errors when the remote server is not responding on the first request, or if the driver is misconfigured i.e. wrong port number, bad hostname ...
 - updated the test configuration file with detailed info about the newly introduced option: `:retry_linear_backoff`, mostly as a reminder
 
 ## v0.1.6 (2017-01-01)

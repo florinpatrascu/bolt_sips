@@ -9,18 +9,18 @@ defmodule Config.Test do
   @basic_tls_config [
     url: @graphenedb_like_url,
     basic_auth: [username: "xmas", password: "Kr1ngl3"],
-    ssl: true,
+    ssl: true
   ]
 
   @light_tls_config [
     url: 'bolt://xmas:Kr1ngl3@hobby-happyHoHoHo.dbs.graphenedb.com:24786',
-    ssl: true,
+    ssl: true
   ]
 
   @mixed_config [
     hostname: '127.0.0.1',
     port: 0,
-    url: @graphenedb_like_url,
+    url: @graphenedb_like_url
   ]
 
   @basic_config [
@@ -31,7 +31,7 @@ defmodule Config.Test do
     max_overflow: 3
   ]
 
-  test "parsing the host and the port, from a url string config parameter"do
+  test "parsing the host and the port, from a url string config parameter" do
     config = Utils.default_config(@basic_tls_config)
 
     assert config[:url] == @graphenedb_like_url
@@ -78,10 +78,9 @@ defmodule Config.Test do
   end
 
   test "url in configuration and :port" do
-    config = Utils.default_config([url: 'example.com', port: 123])
+    config = Utils.default_config(url: 'example.com', port: 123)
 
     assert config[:hostname] == 'example.com'
     assert config[:port] == 123
   end
-
 end
