@@ -171,13 +171,14 @@ defmodule MoviesElixirPhoenix do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   def start(_type, _args) do
-    import Supervisor.Spec
-
     # Define workers and child supervisors to be supervised
     children = [
       # Start the endpoint when the application starts
-      worker(Bolt.Sips, [Application.get_env(:bolt_sips, Bolt)]),
-      supervisor(MoviesElixirPhoenix.Endpoint, [])
+      {Bolt.Sips, Application.get_env(:bolt_sips, Bolt)},
+      %{
+        id: MoviesElixirPhoenix.Endpoint,
+        start: {MoviesElixirPhoenix.Endpoint, :start_link, []}
+      }
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
