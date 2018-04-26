@@ -121,3 +121,4 @@ rel/example_project
 
 logs/
 .vscode/
+.elixir_ls/

@@ -1,6 +1,6 @@
 %{
   "benchee": {:hex, :benchee, "0.12.0", "771e919505cbe399df5f49b8a21c56af5225542ca5c877e0baa0c503efb4e626", [:mix], [{:deep_merge, "~> 0.1", [hex: :deep_merge, repo: "hexpm", optional: false]}], "hexpm"},
-  "boltex": {:hex, :boltex, "0.4.0", "813333088c9cfe7fe5867d16583e3df5f49c64bcd89e0c54fd2c9729885108b0", [:hex], [], "hexpm"},
+  "boltex": {:hex, :boltex, "0.4.1", "49de302ebb59d92419532f1953fbfea0acc312503306be57b493b56d6b7a3fb7", [:hex], [], "hexpm"},
   "bunt": {:hex, :bunt, "0.2.0", "951c6e801e8b1d2cbe58ebbd3e616a869061ddadcc4863d0a2182541acae9a38", [:mix], [], "hexpm"},
   "connection": {:hex, :connection, "1.0.4", "a1cae72211f0eef17705aaededacac3eb30e6625b04a6117c1b2db6ace7d5976", [:mix], [], "hexpm"},
   "credo": {:hex, :credo, "0.8.10", "261862bb7363247762e1063713bb85df2bbd84af8d8610d1272cd9c1943bba63", [:mix], [{:bunt, "~> 0.2.0", [hex: :bunt, repo: "hexpm", optional: false]}], "hexpm"},

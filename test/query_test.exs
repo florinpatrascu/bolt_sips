@@ -255,4 +255,9 @@ defmodule Query.Test do
     assert {:error, _} = Bolt.Sips.query(conn, "INVALID CYPHER")
     assert {:ok, [%{"n" => 22}]} = Bolt.Sips.query(conn, "RETURN 22 as n")
   end
+
+  test "negative numbers are returned as negative numbers", context do
+    conn = context[:conn]
+    assert {:ok, [%{"n" => -1}]} = Bolt.Sips.query(conn, "RETURN -1 as n")
+  end
 end
