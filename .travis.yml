@@ -1,6 +1,8 @@
 sudo: required
 services: docker
 language: elixir
+elixir: 1.5
+otp_release: 19.1
 
 addons:
   apt:
@@ -18,9 +20,6 @@ env:
     - CXX=g++-6
     - CC=gcc-6
     - NEO4J_VERSION=3.3
-
-elixir:
-  - 1.5
 
 before_install:
   - if [ ! -d "$HOME/cmake/bin" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh && sh cmake-3.5.2-Linux-x86_64.sh --prefix=$HOME/cmake --exclude-subdir; fi
