@@ -37,14 +37,10 @@ defmodule ErrorsTest do
   end
 
   test "exception when creating a node using SET properties with a list" do
-    assert_raise Bolt.Sips.Exception,
-                 "Expected {props} to be a map, but it was :`List{String(\"foo\"), String(\"bar\")}`",
-                 fn ->
-                   Bolt.Sips.query!(
-                     Bolt.Sips.conn(),
-                     "CREATE (report:Report) SET report = {props}",
-                     %{props: ["foo", "bar"]}
-                   )
-                 end
+    assert_raise Bolt.Sips.Exception, fn ->
+      Bolt.Sips.query!(Bolt.Sips.conn(), "CREATE (report:Report) SET report = {props}", %{
+        props: ["foo", "bar"]
+      })
+    end
   end
 end
