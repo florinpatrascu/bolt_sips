@@ -3,7 +3,6 @@
 Bolt-Sips, the Neo4j driver for Elixir wrapped around the Bolt protocol.
 
 [![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)](https://travis-ci.org/florinpatrascu/bolt_sips)
-[![Deps Status](https://beta.hexfaktor.org/badge/all/github/florinpatrascu/bolt_sips.svg)](https://beta.hexfaktor.org/github/florinpatrascu/bolt_sips)
 [![Ebert](https://ebertapp.io/github/florinpatrascu/bolt_sips.svg)](https://ebertapp.io/github/florinpatrascu/bolt_sips)
 [![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
 [![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/bolt_sips)
@@ -61,15 +60,15 @@ Therefore, if you want the **much** faster ssl/tls support offered by ETLS, then
 
 To successfully compile [etls](https://github.com/kzemek/etls), you will need the following:
 
-- cmake >= 3.1.0
-- erlang >= 17.0
-- g++ >= 4.9.0 (or clang)
-- git
-- perl
-- golang
-- make
-- ninja-build
-- openssl
+* cmake >= 3.1.0
+* erlang >= 17.0
+* g++ >= 4.9.0 (or clang)
+* git
+* perl
+* golang
+* make
+* ninja-build
+* openssl
 
 Currently only `TLSv1.2` is supported, and default [BoringSSL](https://boringssl.googlesource.com/boringssl) cipher is used.
 
@@ -242,7 +241,7 @@ mix test
 
 ### Special thanks
 
-- Michael Schaefermeyer (@mschae), for implementing the Bolt protocol in Elixir: [mschae/boltex](https://github.com/mschae/boltex)
+* Michael Schaefermeyer (@mschae), for implementing the Bolt protocol in Elixir: [mschae/boltex](https://github.com/mschae/boltex)
 
 ### Contributors
 
@@ -250,12 +249,12 @@ As reported by Github: [contributions to master, excluding merge commits](https:
 
 ### Contributing
 
-- [Fork it](https://github.com/florinpatrascu/bolt_sips/fork)
-- Create your feature branch (`git checkout -b my-new-feature`)
-- Test (`mix test`)
-- Commit your changes (`git commit -am 'Add some feature'`)
-- Push to the branch (`git push origin my-new-feature`)
-- Create new Pull Request
+* [Fork it](https://github.com/florinpatrascu/bolt_sips/fork)
+* Create your feature branch (`git checkout -b my-new-feature`)
+* Test (`mix test`)
+* Commit your changes (`git commit -am 'Add some feature'`)
+* Push to the branch (`git push origin my-new-feature`)
+* Create new Pull Request
 
 ### Author
 
@@ -263,7 +262,7 @@ Florin T.PATRASCU (@florin, on Twitter)
 
 ### License
 
-```
+```txt
 Copyright 2016-2017 Florin T.PATRASCU
 
 Licensed under the Apache License, Version 2.0 (the "License");
