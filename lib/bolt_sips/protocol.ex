@@ -27,7 +27,7 @@ defmodule Bolt.Sips.Protocol do
 
     with {:ok, sock} <- socket().connect(host, port, socket_opts, timeout),
          :ok <- Bolt.handshake(socket(), sock),
-         {:ok, version} <- Bolt.init(socket(), sock, auth),
+         {:ok, _version} <- Bolt.init(socket(), sock, auth),
          :ok <- socket().setopts(sock, active: :once) do
       {:ok, sock}
     else
@@ -113,11 +113,19 @@ defmodule Bolt.Sips.Protocol do
     {:ok, state}
   end
 
+  ### Calming the warnings
+  # Callbacks for ...
+  def ping(state), do: {:ok, state}
+  def handle_prepare(query, _opts, state), do: {:ok, query, state}
+  def handle_close(query, _opts, state), do: {:ok, query, state}
+  def handle_deallocate(query, _cursor, _opts, state), do: {:ok, query, state}
+  def handle_declare(query, _params, _opts, state), do: {:ok, query, state}
+  def handle_fetch(query, _cursor, _opts, state), do: {:cont, query, state}
+  def handle_status(_opts, state), do: {:idle, state}
+
   defp extract_auth(nil), do: {}
 
-  defp extract_auth(basic_auth) do
-    {basic_auth[:username], basic_auth[:password]}
-  end
+  defp extract_auth(basic_auth), do: {basic_auth[:username], basic_auth[:password]}
 
   defp socket, do: Sips.config(:socket)
 

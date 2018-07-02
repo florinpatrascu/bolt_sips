@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.5.8"
+  @version "0.5.9"
 
   def project do
     [
@@ -51,16 +51,16 @@ defmodule BoltSips.Mixfile do
   defp deps do
     [
       {:poolboy, "~> 1.5.1"},
-      {:db_connection, github: 'elixir-ecto/db_connection'},
+      {:db_connection, github: 'elixir-ecto/db_connection', ref: "c65e26f"},
       # {:db_connection, "~> 1.1"},
       {:fuzzyurl, "~> 0.9.1"},
-      {:retry, "~> 0.8.1"},
-      {:ex_doc, "~> 0.18.1", only: [:dev]},
-      {:mix_test_watch, "~> 0.5.0", only: [:dev, :test]},
-      {:benchee, "~> 0.12", only: :dev},
+      {:retry, "~> 0.8.2"},
+      {:ex_doc, "~> 0.18.3", only: [:dev]},
+      {:mix_test_watch, "~> 0.6.0", only: [:dev, :test]},
+      {:benchee, "~> 0.13", only: :dev},
       # {:boltex, path: "../boltex/"},
       {:boltex, "~> 0.4.1"},
-      {:credo, "~> 0.8.10", only: [:dev, :test]}
+      {:credo, "~> 0.9.3", only: [:dev, :test]}
     ] ++ env_specific_deps()
   end
 

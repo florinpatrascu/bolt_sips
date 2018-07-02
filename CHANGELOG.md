@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.5.9
+
+* upgrade dependencies
+* trading carefully around the new db_connection, as we're chasing the code from `master` currently, and there more changes in the pipe to come for the both projects; db_connection, and this one, respectively.
+
 ## 0.5.8
 
 * dealing with negative integers see issue #42, for more details
