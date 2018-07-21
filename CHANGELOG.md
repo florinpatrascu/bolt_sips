@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.10
+
+* update the links referencing the Bolt protocol documentation (types, etc)
+
 ## 0.5.9
 
 * upgrade dependencies

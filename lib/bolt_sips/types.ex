@@ -9,6 +9,9 @@ defmodule Bolt.Sips.Types do
   - Relationship
   - UnboundRelationship
   - Path
+
+  More details, about the Bolt protocol, here:
+  https://github.com/boltprotocol/boltprotocol/blob/master/README.md
   """
 
   defmodule Entity do
@@ -33,7 +36,7 @@ defmodule Bolt.Sips.Types do
       unique identifier (within the scope of its origin graph), a list of
       labels and a map of properties.
 
-      https://github.com/neo4j/neo4j/blob/3.1/manual/bolt/src/docs/dev/serialization.asciidoc#node
+      https://github.com/boltprotocol/boltprotocol/blob/master/v1/_serialization.asciidoc#node
     """
 
     use Entity, labels: nil
@@ -47,7 +50,7 @@ defmodule Bolt.Sips.Types do
       a unique identifier (within the scope of its origin graph), identifiers
       for the start and end nodes of that relationship, a type and a map of properties.
 
-      https://github.com/neo4j/neo4j/blob/3.1/manual/bolt/src/docs/dev/serialization.asciidoc#bolt-value-relstruct
+      https://github.com/boltprotocol/boltprotocol/blob/master/v1/_serialization.asciidoc#relationship
     """
 
     use Entity, start: nil, end: nil, type: nil
@@ -59,7 +62,7 @@ defmodule Bolt.Sips.Types do
       An UnboundRelationship represents a relationship relative to a
       separately known start point and end point.
 
-      https://github.com/neo4j/neo4j/blob/3.1/manual/bolt/src/docs/dev/serialization.asciidoc#unboundrelationship
+      https://github.com/boltprotocol/boltprotocol/blob/master/v1/_serialization.asciidoc#unboundrelationship
     """
 
     use Entity, start: nil, end: nil, type: nil
@@ -75,7 +78,7 @@ defmodule Bolt.Sips.Types do
       a list of distinct relationships and a sequence of integers describing the
       path traversal
 
-      https://github.com/neo4j/neo4j/blob/3.1/manual/bolt/src/docs/dev/serialization.asciidoc#path
+      https://github.com/boltprotocol/boltprotocol/blob/master/v1/_serialization.asciidoc#path
     """
     @type t :: %__MODULE__{
             nodes: List.t() | nil,
