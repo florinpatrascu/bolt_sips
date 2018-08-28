@@ -221,7 +221,7 @@ Available command line options:
 For example, if your server requires authentication:
 
 ```shell
-MIX_ENV=test mix bolt.cypher --ssl true -url "bolt://<user>:<password>@happy-warlocks.dbs.graphenedb.com:24786"\
+MIX_ENV=test mix bolt.cypher --ssl true --url "bolt://<user>:<password>@happy-warlocks.dbs.graphenedb.com:24786"\
  "MATCH (people:Person) RETURN people.name LIMIT 5"
 ```
 
