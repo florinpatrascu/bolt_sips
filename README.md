@@ -139,7 +139,8 @@ $ MIX_ENV=test iex -S mix
 Erlang/OTP 20 [erts-9.1.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:10] [hipe] [kernel-poll:false] [dtrace]
 
 Interactive Elixir (1.5.2) - press Ctrl+C to exit (type h() ENTER for help)
-iex> {:ok, pid} = Bolt.Sips.start_link(url: "localhost")
+iex> opts = Application.get_env(:bolt_sips, Bolt)
+iex> {:ok, _pid} = Bolt.Sips.start_link(opts)
 {:ok, #PID<0.185.0>}
 
 iex> conn = Bolt.Sips.conn
