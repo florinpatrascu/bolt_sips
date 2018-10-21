@@ -53,7 +53,7 @@ defmodule BoltSips.Mixfile do
       {:retry, "0.9.1"},
       # {:boltex, path: "../boltex/"},
       {:boltex, "0.4.1"},
-      {:ex_doc, "~> 0.16.4", only: [:dev]},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:benchee, "~> 0.13", only: :dev},
       {:credo, "~> 0.4", only: [:dev, :test]}
