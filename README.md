@@ -63,7 +63,7 @@ Edit your `config/config.exs` and set Bolt connection, for example:
 ```elixir
 config :bolt_sips, Bolt,
   hostname: 'localhost',
-  # basic_auth: [username: "neo4j", password: "*********"],
+  basic_auth: [username: "neo4j", password: "*********"],
   port: 7687,
   pool_size: 5,
   max_overflow: 1
@@ -78,7 +78,7 @@ config :bolt_sips, Bolt,
   max_overflow: 1
 ```
 
-And if you are using any remote instances of hosted Neo4j servers, such as the ones available (also for free) at [Neo4j/Sandbox(https://neo4j.com/sandbox-v2/) configuring the driver is a matter of a simple copy and paste:
+And if you are using any remote instances of hosted Neo4j servers, such as the ones available (also for free) at [Neo4j/Sandbox](https://neo4j.com/sandbox-v2/) configuring the driver is a matter of a simple copy and paste:
 
 ```elixir
 config :bolt_sips, Bolt,
@@ -204,7 +204,8 @@ For example, if your server requires authentication:
 
 ```shell
 MIX_ENV=test mix bolt.cypher --ssl true --url "bolt://<user>:<password>@happy-warlocks.dbs.graphenedb.com:24786"\
- "MATCH (people:Person) RETURN people.name LIMIT 5"
+
+"MATCH (people:Person) RETURN people.name LIMIT 5"
 ```
 
 ### Testing
