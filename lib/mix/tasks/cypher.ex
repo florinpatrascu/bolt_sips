@@ -33,19 +33,21 @@ defmodule Mix.Tasks.Bolt.Cypher do
   def run(args) do
     Application.ensure_all_started(:bolt_sips)
 
-    {cli_opts, args, _} = OptionParser.parse(args, aliases: [u: :url, s: :ssl])
+    {cli_opts, args, _} =
+      OptionParser.parse(args, aliases: [u: :url, s: :ssl], shitches: [], strict: true)
+
     options = run_options(cli_opts, Application.get_env(:bolt_sips, Bolt))
 
     if args == [], do: Mix.raise("Try entering a Cypher command")
 
     cypher = args |> List.first()
 
-    {:ok, pid} = Neo4j.start_link(options)
+    {:ok, _pid} = Neo4j.start_link(options)
 
     # display the cypher command
     log_cypher(cypher)
 
-    case Neo4j.query(pid, cypher) do
+    case Neo4j.query(Bolt.Sips.conn(), cypher) do
       {:ok, row} ->
         row |> log_response
 

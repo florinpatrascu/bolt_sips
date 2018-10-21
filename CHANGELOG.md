@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0-rc2
+
+### Breaking changes
+
+* non-closure based transactions are not supported anymore. This is a change introduced in DBConnection 2.x. `Bolt.Sips` version tagged `v0.5.10` is the last version supporting open transactions.
+* the support for ETLS was dropped. It was mostly used for development or hand-crafted deployments
+
+This version is using the official [DBConnection 2.0.0-rc2](https://hex.pm/packages/db_connection/2.0.0-rc.0), from [hex.pm](https://hex.pm)
+
 ## 0.5.10
 
 * update the links referencing the Bolt protocol documentation (types, etc)

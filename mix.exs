@@ -1,13 +1,13 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "0.5.10"
+  @version "1.0.0-rc2"
 
   def project do
     [
       app: :bolt_sips,
       version: @version,
-      elixir: "~> 1.5",
+      elixir: "~> 1.6",
       deps: deps(),
       package: package(),
       description: "Neo4j driver for Elixir, using the fast Bolt protocol",
@@ -27,15 +27,13 @@ defmodule BoltSips.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications:
-        [
-          :logger,
-          :poolboy,
-          :db_connection,
-          :retry,
-          :boltex,
-          :fuzzyurl
-        ] ++ opt_etls()
+      applications: [
+        :logger,
+        :db_connection,
+        :retry,
+        :boltex,
+        :fuzzyurl
+      ]
     ]
   end
 
@@ -50,26 +48,15 @@ defmodule BoltSips.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:poolboy, "~> 1.5.1"},
-      {:db_connection, github: 'elixir-ecto/db_connection', ref: "c65e26f"},
-      # {:db_connection, "~> 1.1"},
-      {:fuzzyurl, "~> 0.9.1"},
-      {:retry, "~> 0.8.2"},
-      {:ex_doc, "~> 0.18.3", only: [:dev]},
-      {:mix_test_watch, "~> 0.6.0", only: [:dev, :test]},
-      {:benchee, "~> 0.13", only: :dev},
+      {:db_connection, "~> 2.0.0-rc.0"},
+      {:fuzzyurl, "~> 1.0"},
+      {:retry, "0.9.1"},
       # {:boltex, path: "../boltex/"},
-      {:boltex, "~> 0.4.1"},
-      {:credo, "~> 0.9.3", only: [:dev, :test]}
-    ] ++ env_specific_deps()
-  end
-
-  defp env_specific_deps do
-    if System.get_env("BOLT_WITH_ETLS"), do: [{:etls, "~> 1.2"}], else: []
-  end
-
-  # when using Elixir < 1.4
-  defp opt_etls do
-    if System.get_env("BOLT_WITH_ETLS"), do: [:etls], else: []
+      {:boltex, "0.4.1"},
+      {:ex_doc, "~> 0.16.4", only: [:dev]},
+      {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
+      {:benchee, "~> 0.13", only: :dev},
+      {:credo, "~> 0.4", only: [:dev, :test]}
+    ]
   end
 end

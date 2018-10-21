@@ -5,16 +5,17 @@ defmodule Transaction.Test do
     {:ok, [main_conn: Bolt.Sips.conn()]}
   end
 
-  test "execute statements in an open transaction", %{main_conn: main_conn} do
-    conn = Bolt.Sips.begin(main_conn)
+  test "execute statements in transaction", %{main_conn: main_conn} do
+    Bolt.Sips.transaction(main_conn, fn conn ->
+      book =
+        Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b")
+        |> List.first()
 
-    book =
-      Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b")
-      |> List.first()
+      assert %{"b" => g_o_t} = book
+      assert g_o_t.properties["title"] == "The Game Of Trolls"
+      Bolt.Sips.rollback(conn, :changed_my_mind)
+    end)
 
-    assert %{"b" => g_o_t} = book
-    assert g_o_t.properties["title"] == "The Game Of Trolls"
-    Bolt.Sips.rollback(conn)
     books = Bolt.Sips.query!(main_conn, "MATCH (b:Book {title: \"The Game Of Trolls\"}) return b")
     assert length(books) == 0
   end
@@ -28,27 +29,27 @@ defmodule Transaction.Test do
   ### random cases where the underlying state changes.
   ###
 
-  test "rollback statements in an open transaction", %{main_conn: main_conn} do
+  test "rollback statements in transaction", %{main_conn: main_conn} do
     try do
       # In case there's already a copy in our DB, count them...
       {:ok, [result]} = Bolt.Sips.query(main_conn, "MATCH (x:XactRollback) RETURN count(x)")
       original_count = result["count(x)"]
 
-      conn = Bolt.Sips.begin(main_conn)
+      Bolt.Sips.transaction(main_conn, fn conn ->
+        book =
+          Bolt.Sips.query(conn, "CREATE (x:XactRollback {title:\"The Game Of Trolls\"}) return x")
 
-      book =
-        Bolt.Sips.query(conn, "CREATE (x:XactRollback {title:\"The Game Of Trolls\"}) return x")
+        assert {:ok, [row]} = book
+        assert row["x"].properties["title"] == "The Game Of Trolls"
 
-      assert {:ok, [row]} = book
-      assert row["x"].properties["title"] == "The Game Of Trolls"
+        # Original connection (outside the transaction) should not see this node.
+        {:ok, [result]} = Bolt.Sips.query(main_conn, "MATCH (x:XactRollback) RETURN count(x)")
 
-      # Original connection (outside the transaction) should not see this node.
-      {:ok, [result]} = Bolt.Sips.query(main_conn, "MATCH (x:XactRollback) RETURN count(x)")
+        assert result["count(x)"] == original_count,
+               "Main connection should not be able to see transactional change"
 
-      assert result["count(x)"] == original_count,
-             "Main connection should not be able to see transactional change"
-
-      Bolt.Sips.rollback(conn)
+        Bolt.Sips.rollback(conn, :changed_my_mind)
+      end)
 
       # Original connection should still not see this node committed.
       {:ok, [result]} = Bolt.Sips.query(main_conn, "MATCH (x:XactRollback) RETURN count(x)")
@@ -59,22 +60,20 @@ defmodule Transaction.Test do
     end
   end
 
-  test "commit statements in an open transaction", %{main_conn: main_conn} do
+  test "commit statements in transaction", %{main_conn: main_conn} do
     try do
-      conn = Bolt.Sips.begin(main_conn)
-      book = Bolt.Sips.query(conn, "CREATE (x:XactCommit {foo: 'bar'}) return x")
-      assert {:ok, [row]} = book
-      assert row["x"].properties["foo"] == "bar"
+      Bolt.Sips.transaction(main_conn, fn conn ->
+        book = Bolt.Sips.query(conn, "CREATE (x:XactCommit {foo: 'bar'}) return x")
+        assert {:ok, [row]} = book
+        assert row["x"].properties["foo"] == "bar"
 
-      # Main connection should not see this new node.
-      {:ok, results} = Bolt.Sips.query(main_conn, "MATCH (x:XactCommit) RETURN x")
-      assert is_list(results)
+        # Main connection should not see this new node.
+        {:ok, results} = Bolt.Sips.query(main_conn, "MATCH (x:XactCommit) RETURN x")
+        assert is_list(results)
 
-      assert Enum.count(results) == 0,
-             "Main connection should not be able to see transactional changes"
-
-      # Now, commit...
-      Bolt.Sips.commit(conn)
+        assert Enum.count(results) == 0,
+               "Main connection should not be able to see transactional changes"
+      end)
 
       # And we should see it now with the main connection.
       {:ok, [%{"x" => node}]} = Bolt.Sips.query(main_conn, "MATCH (x:XactCommit) RETURN x")

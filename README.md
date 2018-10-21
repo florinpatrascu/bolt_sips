@@ -9,18 +9,22 @@ Bolt-Sips, the Neo4j driver for Elixir wrapped around the Bolt protocol.
 
 Documentation: http://hexdocs.pm/bolt_sips/
 
-## Disclaimer
+# Disclaimer
 
-This is a new generation of `Bolt.Sips`: v0.5.nn
+This is a new generation of `Bolt.Sips`: v1.0.nn - transitioning to a new driver design
 
-It is implementing the [db_connection](https://github.com/elixir-ecto/db_connection) database connection behavior. The current version is using the `db_connection` dependency from its master branch, and it is considered experimental until the db_connection is released.
+It is implementing the [db_connection](https://github.com/elixir-ecto/db_connection) database connection behavior.
 
 ## Features
 
-* It is using: Bolt. Neo4j's newest network protocol, designed for high-performance
+* It is using: Bolt. The Neo4j's newest network protocol, designed for high-performance
 * Supports transactions, simple and complex Cypher queries with or w/o parameters
-* Connection pool implementation using: "A hunky Erlang worker pool factory", aka: [Poolboy](http://github.com/devinus/poolboy) :)
-* Supports Neo4j 3.0.x/3.1.x/3.2.x
+* Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x
+
+## Breaking changes introduced in version 1.x
+
+* non-closure based transactions are not supported anymore. This is a change introduced in DBConnection 2.x. `Bolt.Sips` version tagged `v0.5.10` is the last version supporting open transactions.
+* the support for ETLS was dropped. It was mostly used for development or hand-crafted deployments
 
 ### Installation
 
@@ -30,7 +34,7 @@ It is implementing the [db_connection](https://github.com/elixir-ecto/db_connect
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 0.5"}]
+  [{:bolt_sips, "~> 1.0"}]
 end
 ```
 
@@ -51,36 +55,6 @@ def application do
   ]
 end
 ```
-
-#### (Optional) 3. Use [etls](https://github.com/kzemek/etls) TCP/TLS layer:
-
-`Bolt.Sips` is working **very well** with [etls](https://github.com/kzemek/etls), for encrypted communications; the preferred method. However, many users complained about the difficulty they encountered while building this dependency on some systems; especially on Windows. To use **etls**, you must define the environment variable: `BOLT_WITH_ETLS`, and compile the project again. If the `BOLT_WITH_ETLS` is not defined, then `Bolt.Sips` will use the standard Erlang [`:ssl` module](http://erlang.org/doc/man/ssl.html), for the SSL/TLS protocol; this is the default behavior, starting with this version.
-
-Therefore, if you want the **much** faster ssl/tls support offered by ETLS, then use this: `export BOLT_WITH_ETLS=true` on Linux/OSX, for example. [etls](https://github.com/kzemek/etls) is a NIF-based implementation of the whole TLS stack, built on top of [Asio](http://think-async.com/) and [BoringSSL](https://boringssl.googlesource.com/boringssl). It manages its own native threads to asynchronously handle socket operations.
-
-To successfully compile [etls](https://github.com/kzemek/etls), you will need the following:
-
-* cmake >= 3.1.0
-* erlang >= 17.0
-* g++ >= 4.9.0 (or clang)
-* git
-* perl
-* golang
-* make
-* ninja-build
-* openssl
-
-Currently only `TLSv1.2` is supported, and default [BoringSSL](https://boringssl.googlesource.com/boringssl) cipher is used.
-
-**`etls`** is very fast!
-
-| OTP version | transport | bandwidth |
-|:------------|:----------|:----------|
-| 18.3        | ssl       | 70 MB/s   |
-| 19.0-rc1    | ssl       | 111 MB/s  |
-| 19.0-rc1    | etls      | 833 MB/s  |
-
-*(data extracted from [etls](https://github.com/kzemek/etls/blob/master/README.md)'s own project page)*
 
 ### Usage
 
@@ -104,12 +78,12 @@ config :bolt_sips, Bolt,
   max_overflow: 1
 ```
 
-And if you are using any remote instances of hosted Neo4j servers, such as the ones available (also for free) at [GrapheneDB.com](http://www.graphenedb.com), configuring the driver is a matter of a simple copy and paste:
+And if you are using any remote instances of hosted Neo4j servers, such as the ones available (also for free) at [Neo4j/Sandbox(https://neo4j.com/sandbox-v2/) configuring the driver is a matter of a simple copy and paste:
 
 ```elixir
 config :bolt_sips, Bolt,
-  url: "bolt://hobby-happyHoHoHo.dbs.graphenedb.com:24786",
-  basic_auth: [username: "demo", password: "demo"]
+  url: "bolt://<ip_address>:<bolt_port>",
+  basic_auth: [username: "neo4j", password: "#######"]
   ssl: true
 ```
 
@@ -117,8 +91,9 @@ We’re also retrying sending the requests to the Neo4j server, with a linear ba
 
 ```elixir
 config :bolt_sips, Bolt,
-  url: "bolt://Bilbo:Baggins@hobby-hobbits.dbs.graphenedb.com:24786",
-  ssl: true,
+  url: "bolt://<ip_address>:<bolt_port>",
+  basic_auth: [username: "neo4j", password: "#######"]
+  ssl: true
   timeout: 15_000,
   retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
 ```
@@ -136,17 +111,20 @@ With a minimalist setup configured as above, and the Neo4j 3.x server running, y
 
 ```elixir
 $ MIX_ENV=test iex -S mix
-Erlang/OTP 20 [erts-9.1.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:10] [hipe] [kernel-poll:false] [dtrace]
+Erlang/OTP 21 [erts-10.0.5] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [hipe]
 
-Interactive Elixir (1.5.2) - press Ctrl+C to exit (type h() ENTER for help)
+Interactive Elixir (1.7.3) - press Ctrl+C to exit (type h() ENTER for help)
 iex> {:ok, pid} = Bolt.Sips.start_link(url: "localhost")
-{:ok, #PID<0.185.0>}
+{:ok, #PID<0.191.0>}
 
 iex> conn = Bolt.Sips.conn
 :bolt_sips_pool
 
 iex> Bolt.Sips.query!(conn, "CREATE (a:Person {name:'Bob'})")
-%{stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1}, type: "w"}
+%{
+  stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1},
+  type: "w"
+}
 
 iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name") |> Enum.map(&(&1["name"]))
 
@@ -205,29 +183,33 @@ Run simple Cypher commands from a mix task, for quick testing Cypher results or 
 
 Output sample:
 
-    "MATCH (people:Person) RETURN people.name as name LIMIT 5"
+    "MATCH (people:Person) RETURN people.name LIMIT 5"
 
 ```elixir
-[%{"name" => "Keanu Reeves"}, %{"name" => "Carrie-Anne Moss"},
- %{"name" => "Andy Wachowski"}, %{"name" => "Lana Wachowski"},
- %{"name" => "Joel Silver"}]
+[
+  %{"people.name" => "Keanu Reeves"},
+  %{"people.name" => "Carrie-Anne Moss"},
+  %{"people.name" => "Laurence Fishburne"},
+  %{"people.name" => "Hugo Weaving"},
+  %{"people.name" => "Lilly Wachowski"}
+]
 ```
 
 Available command line options:
 
-- `--url`, `-u` - server host
-- `--ssl`, `-s` - use ssl
+* `--url`, `-u` - server host
+* `--ssl`, `-s` - use ssl
 
 For example, if your server requires authentication:
 
 ```shell
-MIX_ENV=test mix bolt.cypher --ssl true -url "bolt://<user>:<password>@happy-warlocks.dbs.graphenedb.com:24786"\
+MIX_ENV=test mix bolt.cypher --ssl true --url "bolt://<user>:<password>@happy-warlocks.dbs.graphenedb.com:24786"\
  "MATCH (people:Person) RETURN people.name LIMIT 5"
 ```
 
 ### Testing
 
-Tests run against a running instance of Neo4J. Please verify that you do not store critical data on this server!
+Tests run against a running instance of Neo4j. Please verify that you do not store critical data on this server!
 
 If you have docker available on your system, you can start an instance before running the test suite:
 
@@ -263,7 +245,7 @@ Florin T.PATRASCU (@florin, on Twitter)
 ### License
 
 ```txt
-Copyright 2016-2017 Florin T.PATRASCU
+Copyright 2016-2018 Florin T.PATRASCU
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

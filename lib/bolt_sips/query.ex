@@ -86,7 +86,7 @@ defmodule Bolt.Sips.Query do
       q = %QueryStatement{statement: hd(statements)}
 
       case DBConnection.execute(conn, q, params) do
-        {:ok, resp} -> resp
+        {:ok, _query, resp} -> resp
         other -> other
       end
     end
@@ -106,10 +106,8 @@ defmodule Bolt.Sips.Query do
   end
 
   defp send!(conn, statement, params, acc) do
-    q = %QueryStatement{statement: statement}
-
-    case DBConnection.execute(conn, q, params) do
-      {:ok, resp} -> acc ++ [Response.transform(resp)]
+    case DBConnection.execute(conn, %QueryStatement{statement: statement}, params) do
+      {:ok, _query, resp} -> acc ++ [Response.transform(resp)]
       {:error, error} -> raise RuntimeError, error
     end
   end

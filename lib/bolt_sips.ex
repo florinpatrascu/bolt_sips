@@ -9,10 +9,11 @@ defmodule Bolt.Sips do
   @timeout 15_000
   # @max_rows     500
 
-  alias Bolt.Sips.{Query, Transaction, Utils, ConfigAgent}
+  alias Bolt.Sips.{Query, Utils, ConfigAgent}
 
   @type conn :: DBConnection.conn()
   @type transaction :: DBConnection.t()
+  @type result :: {:ok, result :: any} | {:error, Exception.t()}
 
   @doc """
   Start the connection process and connect to Neo4j
@@ -26,8 +27,6 @@ defmodule Bolt.Sips do
     - `:pool_size` - maximum pool size;
     - `:max_overflow` - maximum number of workers created if pool is empty
     - `:timeout` - Connect timeout in milliseconds (default: `#{@timeout}`)
-       Poolboy will block the current process and wait for an available worker,
-       failing after a timeout, when the pool is full;
     - `:retry_linear_backoff` -  with Bolt, the initial handshake sequence (happening before sending any commands to the server) is represented by two important calls, executed in sequence: `handshake` and `init`, and they must both succeed, before sending any (Cypher) requests. You can see the details in the [Bolt protocol](http://boltprotocol.org/v1/#handshake) specs. This sequence is also sensitive to latencies, such as: network latencies, busy servers, etc., and because of that we're introducing a simple support for retrying the handshake (and the subsequent requests) with a linear backoff, and try the handshake sequence (or the request) a couple of times before giving up. See examples below.
 
   ## Example of valid configurations (i.e. defined in config/dev.exs) and usage:
@@ -65,19 +64,13 @@ defmodule Bolt.Sips do
 
   @doc false
   def init(opts) do
-    ssl = if System.get_env("BOLT_WITH_ETLS"), do: :etls, else: :ssl
-    cnf = Utils.default_config(opts)
-
-    cnf =
-      cnf
-      |> Keyword.put(
-        :socket,
-        if(Keyword.get(cnf, :ssl), do: ssl, else: Keyword.get(cnf, :socket))
-      )
+    options = Utils.default_config(opts)
+    ssl_or_sock = if(Keyword.get(options, :ssl), do: :ssl, else: Keyword.get(options, :socket))
+    config = Keyword.put(options, :socket, ssl_or_sock)
 
     children = [
-      {Bolt.Sips.ConfigAgent, cnf},
-      DBConnection.child_spec(Bolt.Sips.Protocol, pool_config(cnf))
+      {Bolt.Sips.ConfigAgent, config},
+      DBConnection.child_spec(Bolt.Sips.Protocol, pool_config(config))
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -121,24 +114,52 @@ defmodule Bolt.Sips do
   ########################
 
   @doc """
-  begin a new transaction.
+    Example:
+
+    ```elixir
+    setup do
+      {:ok, [main_conn: Bolt.Sips.conn()]}
+    end
+
+    test "execute statements in transaction", %{main_conn: main_conn} do
+      Bolt.Sips.transaction(main_conn, fn conn ->
+        book =
+          Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b")
+          |> List.first()
+
+        assert %{"b" => g_o_t} = book
+        assert g_o_t.properties["title"] == "The Game Of Trolls"
+        Bolt.Sips.rollback(conn, :changed_my_mind)
+      end)
+
+      books = Bolt.Sips.query!(main_conn, "MATCH (b:Book {title: \"The Game Of Trolls\"}) return b")
+      assert length(books) == 0
+    end
+    ```
   """
-  @spec begin(conn) :: transaction | {:error, Exception.t()}
-  defdelegate begin(conn), to: Transaction
+
+  @spec transaction(DBConnection.t(), (DBConnection.t() -> result), opts :: Keyword.t()) ::
+          {:ok, result} | {:error, reason :: any}
+        when result: var
+  defdelegate transaction(conn, fun, opts \\ []), to: DBConnection
 
   @doc """
-  given you have an open transaction, you can use this to send a commit request
-  """
-  @spec commit(transaction) :: Transaction.result()
-  defdelegate commit(transaction), to: Transaction
+  Rollback a database transaction and release lock on connection.
 
-  @doc """
-  given that you have an open transaction, you can send a rollback request.
-  The server will rollback the transaction. Any further statements trying to run
-  in this transaction will fail immediately.
+  When inside of a `transaction/3` call does a non-local return, using a
+  `throw/1` to cause the transaction to enter a failed state and the
+  `transaction/3` call returns `{:error, reason}`. If `transaction/3` calls are
+  nested the connection is marked as failed until the outermost transaction call
+  does the database rollback.
+
+  ### Example
+
+      {:error, :oops} = Bolt.Sips.transaction(pool, fun(conn) ->
+        Bolt.Sips.rollback(conn, :oops)
+      end)
   """
-  @spec rollback(transaction) :: Transaction.result()
-  defdelegate rollback(conn), to: Transaction
+  @spec rollback(DBConnection.t(), reason :: any) :: no_return
+  defdelegate rollback(conn, opts), to: DBConnection
 
   @doc """
   returns an environment specific Bolt.Sips configuration.
@@ -161,14 +182,9 @@ defmodule Bolt.Sips do
   ## Helpers
   ######################
 
-  # defp defaults(opts) do
-  #   Keyword.put_new(opts, :timeout, @timeout)
-  # end
-
   defp pool_config(cnf) do
     [
-      name: {:local, pool_name()},
-      pool: Keyword.get(cnf, :pool),
+      name: pool_name(),
       pool_size: Keyword.get(cnf, :pool_size),
       pool_overflow: Keyword.get(cnf, :max_overflow)
     ]

@@ -65,19 +65,24 @@ defmodule Bolt.Sips.Protocol do
   @doc "Callback for DBConnection.handle_begin/1"
   def handle_begin(_opts, sock) do
     q = %QueryStatement{statement: "BEGIN"}
+
     handle_execute(q, %{}, [], sock)
+
+    {:ok, :began, sock}
   end
 
   @doc "Callback for DBConnection.handle_rollback/1"
   def handle_rollback(_opts, sock) do
     q = %QueryStatement{statement: "ROLLBACK"}
     handle_execute(q, %{}, [], sock)
+    {:ok, :rolledback, sock}
   end
 
   @doc "Callback for DBConnection.handle_commit/1"
   def handle_commit(_opts, sock) do
     q = %QueryStatement{statement: "COMMIT"}
     handle_execute(q, %{}, [], sock)
+    {:ok, :committed, sock}
   end
 
   @doc "Callback for DBConnection.handle_execute/1"
@@ -129,10 +134,10 @@ defmodule Bolt.Sips.Protocol do
 
   defp socket, do: Sips.config(:socket)
 
-  defp execute(%QueryStatement{statement: statement}, params, _, sock) do
+  defp execute(%QueryStatement{statement: statement} = q, params, _, sock) do
     case Bolt.run_statement(socket(), sock, statement, params) do
       [{:success, _} | _] = data ->
-        {:ok, data, sock}
+        {:ok, q, data, sock}
 
       %BoltError{type: :cypher_error} = error ->
         with :ok <- Bolt.ack_failure(socket(), sock) do
