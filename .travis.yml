@@ -1,12 +1,8 @@
 sudo: required
 services: docker
 language: elixir
-# env:
-#   - ELIXIR_ERL_OPTIONS="+T 9"
 matrix:
   include:
-    - elixir: 1.5.3
-      otp_release: 20.3
     - elixir: 1.6.5
       otp_release: 19.3
     - elixir: 1.6.5
@@ -23,6 +19,7 @@ cache:
     - $HOME/cmake
 env:
   global:
+    - ELIXIR_ERL_OPTIONS="+T 9"
     - PATH=$HOME/cmake/bin:$PATH
     - CXX=g++-6
     - CC=gcc-6
