@@ -1,4 +1,4 @@
-defmodule Bolt.Sips.Internals.Bolt do
+defmodule Bolt.Sips.Internals.BoltProtocol do
   alias Bolt.Sips.Internals.Error
   alias Bolt.Sips.Internals.PackStream.Message
   require Logger
@@ -142,10 +142,10 @@ defmodule Bolt.Sips.Internals.Bolt do
 
   ## Examples
 
-      iex> Bolt.Sips.Internals.Bolt.init :gen_tcp, port
+      iex> Bolt.Sips.Internals.BoltProtocol.init :gen_tcp, port
       {:ok, info}
 
-      iex> Bolt.Sips.Internals.Bolt.init :gen_tcp, port, {"username", "password"}
+      iex> Bolt.Sips.Internals.BoltProtocol.init :gen_tcp, port, {"username", "password"}
       {:ok, info}
   """
   @spec init(atom(), port(), tuple(), Keyword.t()) ::
@@ -190,7 +190,7 @@ defmodule Bolt.Sips.Internals.Bolt do
 
   ## Examples
 
-      iex> Bolt.Sips.Internals.Bolt.run_statement("MATCH (n) RETURN n")
+      iex> Bolt.Sips.Internals.BoltProtocol.run_statement("MATCH (n) RETURN n")
       [
         {:success, %{"fields" => ["n"]}},
         {:record, [sig: 1, fields: [1, "Example", "Labels", %{"some_attribute" => "some_value"}]]},

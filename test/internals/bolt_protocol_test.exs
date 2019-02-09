@@ -1,6 +1,6 @@
-defmodule Bolt.Sips.Internals.BoltTest do
+defmodule Bolt.Sips.Internals.BoltProtocolTest do
   use Bolt.Sips.InternalCase
-  alias Bolt.Sips.Internals.Bolt, as: BoltProtocol
+  alias Bolt.Sips.Internals.BoltProtocol
 
   test "works for small queries", %{port: port} do
     string = Enum.to_list(0..100) |> Enum.join()
