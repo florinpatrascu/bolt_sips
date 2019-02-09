@@ -31,7 +31,6 @@ defmodule BoltSips.Mixfile do
         :logger,
         :db_connection,
         :retry,
-        :boltex,
         :fuzzyurl
       ]
     ]
@@ -51,8 +50,6 @@ defmodule BoltSips.Mixfile do
       {:db_connection, "~> 2.0.0-rc.0"},
       {:fuzzyurl, "~> 1.0"},
       {:retry, "0.9.1"},
-      # {:boltex, path: "../boltex/"},
-      {:boltex, "0.4.1"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:benchee, "~> 0.13", only: :dev},

@@ -127,7 +127,7 @@ defmodule Bolt.Sips.Types do
           struct(UnboundRelationship, unbound_relationship)
         else
           # rel: rels[-rel_index - 1], start/end: (next_node.id, ln.id)
-          # Neo4j sends: -1, and Boltex returns 255 instead? Investigating,
+          # Neo4j sends: -1, and Bolt.Sips.Internals. returns 255 instead? Investigating,
           # meanwhile ugly path:
           # oh dear ...
           haha = if h == 255, do: -1, else: h
