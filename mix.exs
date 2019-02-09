@@ -8,6 +8,7 @@ defmodule BoltSips.Mixfile do
       app: :bolt_sips,
       version: @version,
       elixir: "~> 1.6",
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       package: package(),
       description: "Neo4j driver for Elixir, using the fast Bolt protocol",
@@ -35,6 +36,9 @@ defmodule BoltSips.Mixfile do
       ]
     ]
   end
+
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
 
   defp package do
     %{
