@@ -5,8 +5,28 @@ matrix:
   include:
     - elixir: 1.6.5
       otp_release: 19.3
+      env:
+        - NEO4J_VERSION=3.0
+    - elixir: 1.6.5
+      otp_release: 19.3
+      env:
+        - NEO4J_VERSION=3.1
+    - elixir: 1.6.5
+      otp_release: 19.3
+      env:
+        - NEO4J_VERSION=3.4
     - elixir: 1.6.5
       otp_release: 20.3
+      env:
+        - NEO4J_VERSION=3.0
+    - elixir: 1.6.5
+      otp_release: 20.3
+      env:
+        - NEO4J_VERSION=3.1
+    - elixir: 1.6.5
+      otp_release: 20.3
+      env:
+        - NEO4J_VERSION=3.4
 addons:
   apt:
     sources:
@@ -17,13 +37,14 @@ addons:
 cache:
   directories:
     - $HOME/cmake
+
 env:
   global:
     - ELIXIR_ERL_OPTIONS="+T 9"
     - PATH=$HOME/cmake/bin:$PATH
     - CXX=g++-6
     - CC=gcc-6
-    - NEO4J_VERSION=3.3
+
 
 before_install:
   - if [ ! -d "$HOME/cmake/bin" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh && sh cmake-3.5.2-Linux-x86_64.sh --prefix=$HOME/cmake --exclude-subdir; fi
