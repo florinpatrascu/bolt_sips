@@ -9,7 +9,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   #   - message_type: atom amongst the valid message type (:init, :discard_all, :pull_all, :ack_failure, :reset, :run)
   #   - data: a list of data to be used by the message
 
-  @client_name "BoltSips/1.1.0-rc2"
+  @client_name "BoltSips/" <> to_string(Application.spec(:bolt_sips, :vsn))
 
   @max_chunk_size 65_535
   @end_marker <<0x00, 0x00>>

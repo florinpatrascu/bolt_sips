@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "1.0.0-rc2"
+  @version "1.1.0-rc2"
 
   def project do
     [
@@ -43,7 +43,7 @@ defmodule BoltSips.Mixfile do
   defp package do
     %{
       licenses: ["Apache 2.0"],
-      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk"],
+      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk", "Dominique VASSARD"],
       links: %{"Github" => "https://github.com/florinpatrascu/bolt_sips"}
     }
   end
