@@ -3,6 +3,7 @@ use Mix.Config
 config :bolt_sips, Bolt,
   # default port considered to be: 7687
   url: 'localhost',
+  basic_auth: [username: "neo4j", password: "test"],
   pool_size: 5,
   max_overflow: 1,
   # retry the request, in case of error - in the example below the retry will
@@ -20,6 +21,10 @@ level =
   else
     :info
   end
+
+config :bolt_sips,
+  log: true,
+  log_hex: false
 
 config :logger, :console,
   level: level,

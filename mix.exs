@@ -1,13 +1,14 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "1.0.0-rc2"
+  @version "1.1.0-rc2"
 
   def project do
     [
       app: :bolt_sips,
       version: @version,
       elixir: "~> 1.6",
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       package: package(),
       description: "Neo4j driver for Elixir, using the fast Bolt protocol",
@@ -31,16 +32,18 @@ defmodule BoltSips.Mixfile do
         :logger,
         :db_connection,
         :retry,
-        :boltex,
         :fuzzyurl
       ]
     ]
   end
 
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_), do: ["lib"]
+
   defp package do
     %{
       licenses: ["Apache 2.0"],
-      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk"],
+      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk", "Dominique VASSARD"],
       links: %{"Github" => "https://github.com/florinpatrascu/bolt_sips"}
     }
   end
@@ -51,8 +54,6 @@ defmodule BoltSips.Mixfile do
       {:db_connection, "~> 2.0.0-rc.0"},
       {:fuzzyurl, "~> 1.0"},
       {:retry, "0.9.1"},
-      # {:boltex, path: "../boltex/"},
-      {:boltex, "0.4.1"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:benchee, "~> 0.13", only: :dev},

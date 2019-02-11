@@ -12,8 +12,8 @@ defmodule Bolt.Sips.Protocol do
 
   alias Bolt.Sips
   alias Bolt.Sips.QueryStatement
-  alias Boltex.Bolt, as: Bolt
-  alias Boltex.Error, as: BoltError
+  alias Bolt.Sips.Internals.Error, as: BoltError
+  alias Bolt.Sips.Internals.BoltProtocol
 
   @doc "Callback for DBConnection.connect/1"
   def connect(_opts) do
@@ -26,8 +26,8 @@ defmodule Bolt.Sips.Protocol do
     socket_opts = [packet: :raw, mode: :binary, active: false]
 
     with {:ok, sock} <- socket().connect(host, port, socket_opts, timeout),
-         :ok <- Bolt.handshake(socket(), sock),
-         {:ok, _version} <- Bolt.init(socket(), sock, auth),
+         :ok <- BoltProtocol.handshake(socket(), sock),
+         {:ok, _version} <- BoltProtocol.init(socket(), sock, auth),
          :ok <- socket().setopts(sock, active: :once) do
       {:ok, sock}
     else
@@ -135,12 +135,12 @@ defmodule Bolt.Sips.Protocol do
   defp socket, do: Sips.config(:socket)
 
   defp execute(%QueryStatement{statement: statement} = q, params, _, sock) do
-    case Bolt.run_statement(socket(), sock, statement, params) do
+    case BoltProtocol.run_statement(socket(), sock, statement, params) do
       [{:success, _} | _] = data ->
         {:ok, q, data, sock}
 
       %BoltError{type: :cypher_error} = error ->
-        with :ok <- Bolt.ack_failure(socket(), sock) do
+        with :ok <- BoltProtocol.ack_failure(socket(), sock) do
           {:error, error, sock}
         else
           error ->
@@ -158,9 +158,14 @@ defmodule Bolt.Sips.Protocol do
     e ->
       msg =
         case e do
-          %Boltex.PackStream.EncodeError{} -> "unable to encode value: #{inspect(e.item)}"
-          %BoltError{} -> "#{e.message}, type: #{e.type}"
-          _ -> e.message
+          %Bolt.Sips.Internals.PackStream.EncodeError{} ->
+            "unable to encode value: #{inspect(e.item)}"
+
+          %BoltError{} ->
+            "#{e.message}, type: #{e.type}"
+
+          _ ->
+            e.message
         end
 
       {:error, %{code: :failure, message: msg}, sock}
