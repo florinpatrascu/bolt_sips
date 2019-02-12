@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.0-rc2
+* Remove `boltex` dependecy and add all low-level code in `internals`.
+
 ## 1.0.0-rc2
 
 ### Breaking changes
