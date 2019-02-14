@@ -1,4 +1,5 @@
 defmodule Bolt.Sips.Internals.Error do
+  @moduledoc false
   defexception [:message, :code, :connection_id, :function, :type]
 
   @type t :: %__MODULE__{
