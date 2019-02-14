@@ -29,7 +29,17 @@ defmodule Bolt.Sips.Response do
 
   @type t :: __MODULE__
 
-  alias Bolt.Sips.Types.{Node, Relationship, UnboundRelationship, Path}
+  alias Bolt.Sips.Types.{
+    Node,
+    Relationship,
+    UnboundRelationship,
+    Path,
+    Duration,
+    DateTimeWithTZOffset,
+    TimeWithTZOffset,
+    Point
+  }
+
   alias Bolt.Sips.{Success}
 
   require Logger
@@ -44,6 +54,24 @@ defmodule Bolt.Sips.Response do
   @relationship 82
   # relationship without endpoints
   @unbound_relationship 114
+  # Date
+  @date 68
+  # Time
+  @time 84
+  # Local time
+  @local_time 116
+  # Duration
+  @duration 69
+  # Local datetime
+  @local_datetime 100
+  # Datetime with offset
+  @datetime_with_zone_offset 70
+  # Datetime with zone id
+  @datetime_with_zone_id 102
+  # Point 2D
+  @point2d 88
+  # Point 3D
+  @point3d 89
 
   @doc """
   transform a raw Bolt response to a list of Responses
@@ -106,6 +134,71 @@ defmodule Bolt.Sips.Response do
   defp extract_types(sig: @relationship, fields: fields) do
     rel = [:id, :start, :end, :type, :properties] |> Enum.zip(fields)
     struct(Relationship, rel)
+  end
+
+  defp extract_types(sig: @date, fields: [days_since_epoch]) when is_integer(days_since_epoch) do
+    Date.add(~D[1970-01-01], days_since_epoch)
+  end
+
+  defp extract_types(sig: @time, fields: [time_since_epoch, offset])
+       when is_integer(time_since_epoch) and is_integer(offset) do
+    %TimeWithTZOffset{
+      time: Time.add(~T[00:00:00.000], time_since_epoch, :nanosecond),
+      timezone_offset: offset
+    }
+  end
+
+  defp extract_types(sig: @local_time, fields: [time]) when is_integer(time) do
+    Time.add(~T[00:00:00.000], time, :nanosecond)
+  end
+
+  defp extract_types(sig: @duration, fields: [months, days, seconds, nanoseconds])
+       when is_integer(months) and is_integer(days) and is_integer(seconds) and
+              is_integer(nanoseconds) do
+    Duration.create(months, days, seconds, nanoseconds)
+  end
+
+  defp extract_types(sig: @local_datetime, fields: [seconds, nanoseconds])
+       when is_integer(seconds) and is_integer(nanoseconds) do
+    NaiveDateTime.add(
+      ~N[1970-01-01 00:00:00.000],
+      seconds * 1_000_000_000 + nanoseconds,
+      :nanosecond
+    )
+  end
+
+  defp extract_types(sig: @datetime_with_zone_offset, fields: [seconds, nanoseconds, offset])
+       when is_integer(seconds) and is_integer(nanoseconds) and is_integer(offset) do
+    naive_dt =
+      NaiveDateTime.add(
+        ~N[1970-01-01 00:00:00.000],
+        seconds * 1_000_000_000 + nanoseconds,
+        :nanosecond
+      )
+
+    %DateTimeWithTZOffset{naive_datetime: naive_dt, timezone_offset: offset}
+  end
+
+  defp extract_types(sig: @datetime_with_zone_id, fields: [seconds, nanoseconds, zone_id])
+       when is_integer(seconds) and is_integer(nanoseconds) and is_bitstring(zone_id) do
+    naive_dt =
+      NaiveDateTime.add(
+        ~N[1970-01-01 00:00:00.000],
+        seconds * 1_000_000_000 + nanoseconds,
+        :nanosecond
+      )
+
+    Bolt.Sips.TypesHelper.datetime_with_micro(naive_dt, zone_id)
+  end
+
+  defp extract_types(sig: @point2d, fields: [srid, x, y])
+       when is_integer(srid) and is_float(x) and is_float(y) do
+    Point.create(srid, x, y)
+  end
+
+  defp extract_types(sig: @point3d, fields: [srid, x, y, z])
+       when is_integer(srid) and is_float(x) and is_float(y) and is_float(z) do
+    Point.create(srid, x, y, z)
   end
 
   defp extract_types(sig: @path, fields: fields) do

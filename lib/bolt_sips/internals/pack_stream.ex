@@ -118,7 +118,7 @@ defmodule Bolt.Sips.Internals.PackStream do
   @spec to_map(list()) :: map()
   defp to_map(map) do
     map
-    |> Enum.chunk(2)
+    |> Enum.chunk_every(2)
     |> Enum.map(&List.to_tuple/1)
     |> Map.new()
   end

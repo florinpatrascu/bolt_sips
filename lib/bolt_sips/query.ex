@@ -47,7 +47,7 @@ defmodule Bolt.Sips.Query do
 
   """
   alias Bolt.Sips
-  alias Bolt.Sips.{QueryStatement, Response, Exception}
+  alias Bolt.Sips.{QueryStatement, Response, Types, Exception}
 
   @cypher_seps ~r/;(.){0,1}\n/
 
@@ -78,8 +78,77 @@ defmodule Bolt.Sips.Query do
       |> Enum.map(&String.trim(&1))
       |> Enum.filter(&(String.length(&1) > 0))
 
-    tx(conn, statements, params)
+    formated_params =
+      params
+      |> Enum.map(&format_param/1)
+      |> Enum.map(fn {k, {:ok, value}} -> {k, value} end)
+      |> Map.new()
+
+    errors =
+      formated_params
+      |> Enum.filter(fn {_, formated} ->
+        case formated do
+          {:error, _} -> true
+          _ -> false
+        end
+      end)
+      |> Enum.map(fn {k, {:error, error}} -> {k, error} end)
+
+    if length(errors) == 0 do
+      tx(conn, statements, formated_params)
+    else
+      {:error, %Sips.Error{message: "Unable to format params: #{inspect(errors)}"}}
+    end
   end
+
+  # Format the param to be used in query
+  # must return a tuple of the form: {:ok, param} or {:error, param}
+  # In order to let querey_commit handle the error
+  @spec format_param({String.t(), any()}) :: {String.t(), {:ok | :error, any()}}
+  defp format_param({name, %Types.Duration{} = duration}) do
+    {name, Types.Duration.format_param(duration)}
+  end
+
+  defp format_param({name, %Time{} = time}) do
+    {name, {:ok, Time.to_iso8601(time)}}
+  end
+
+  defp format_param({name, %Date{} = date}) do
+    {name, {:ok, Date.to_iso8601(date)}}
+  end
+
+  defp format_param({name, %DateTime{time_zone: time_zone} = date}) when not is_nil(date) do
+    d = date |> Calendar.DateTime.Format.iso8601()
+
+    datetime_with_zone_id =
+      case time_zone do
+        "Etc/UTC" ->
+          Regex.replace(~r/Z/, d, "[#{time_zone}]")
+
+        _ ->
+          Regex.replace(~r/\+[0-9]{2}:[0-9]{2}/, d, "[#{time_zone}]")
+      end
+
+    {name, {:ok, datetime_with_zone_id}}
+  end
+
+  defp format_param({name, %NaiveDateTime{} = ndt}) do
+    {name, {:ok, ndt |> NaiveDateTime.to_iso8601()}}
+  end
+
+  defp format_param({name, %Types.TimeWithTZOffset{} = timetz}) do
+    {name, Types.TimeWithTZOffset.format_param(timetz)}
+  end
+
+  defp format_param({name, %Types.DateTimeWithTZOffset{} = datetimetz}) do
+    {name, Types.DateTimeWithTZOffset.format_param(datetimetz)}
+  end
+
+  defp format_param({name, %Types.Point{} = point}) do
+    {name, Types.Point.format_param(point)}
+  end
+
+  defp format_param({name, value}), do: {name, {:ok, value}}
 
   defp tx(conn, statements, params) when length(statements) == 1 do
     exec = fn conn ->

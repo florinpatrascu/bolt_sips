@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0-rc2
+* spatial and temporal types are now supported
+
+## 1.1.0-rc2
+* Remove `boltex` dependecy and add all low-level code in `internals`.
+
 ## 1.0.0-rc2
 
 ### Breaking changes

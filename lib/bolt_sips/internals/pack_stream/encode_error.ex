@@ -1,9 +1,9 @@
 defmodule Bolt.Sips.Internals.PackStream.EncodeError do
-  @moduledoc """
-  Represents an error when encoding data for the Bolt protocol.
+  @moduledoc false
 
-  Shamelessly inspired by @devinus' Poison encoder.
-  """
+  # Represents an error when encoding data for the Bolt protocol.
+
+  # Shamelessly inspired by @devinus' Poison encoder.
 
   defexception item: nil, message: nil
 

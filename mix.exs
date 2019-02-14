@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "1.1.0-rc2"
+  @version "1.2.0-rc2"
 
   def project do
     [
@@ -30,6 +30,7 @@ defmodule BoltSips.Mixfile do
     [
       applications: [
         :logger,
+        :calendar,
         :db_connection,
         :retry,
         :fuzzyurl
@@ -54,6 +55,7 @@ defmodule BoltSips.Mixfile do
       {:db_connection, "~> 2.0.0-rc.0"},
       {:fuzzyurl, "~> 1.0"},
       {:retry, "0.9.1"},
+      {:calendar, "~> 0.17.2"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:benchee, "~> 0.13", only: :dev},
