@@ -94,11 +94,4 @@ defmodule BoltSips.Element.SpatialTypesTest do
              }
            ] == Response.transform(@geo_3d_point)
   end
-
-  # test "success with a DURATION" do
-  #   # assert  == Response.transform(@duration)
-
-  #   res = Response.transform(@duration)
-  #   IO.puts(inspect(res))
-  # end
 end
