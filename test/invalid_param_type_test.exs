@@ -13,8 +13,8 @@ defmodule Bolt.Sips.InvalidParamType.Test do
     """
 
     {:error, [code: :failure, message: message]} =
-      Bolt.Sips.query(conn, cypher, %{an_elixir_datetime: DateTime.utc_now()})
+      Bolt.Sips.query(conn, cypher, %{an_elixir_tuple: {:not, :valid}})
 
-    assert String.match?(message, ~r/unable to encode value: {\d+, \d+}/i)
+    assert String.match?(message, ~r/unable to encode value: {:not, :valid}/i)
   end
 end
