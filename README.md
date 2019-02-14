@@ -18,8 +18,12 @@ It is implementing the [db_connection](https://github.com/elixir-ecto/db_connect
 ## Features
 
 * It is using: Bolt. The Neo4j's newest network protocol, designed for high-performance
+* Supported bolt version: 1, 2
 * Supports transactions, simple and complex Cypher queries with or w/o parameters
-* Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x
+* Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x
+
+### Note 
+It works with Neo4j 3.5.x but not with the new bolt v3 but with bolt v2. However, as bolt v3 only introduces alternative message for initialization and transaction, all neo4j's features can be used.
 
 ## Breaking changes introduced in version 1.x
 
