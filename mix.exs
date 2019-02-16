@@ -52,14 +52,14 @@ defmodule BoltSips.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:db_connection, "~> 2.0.0-rc.0"},
+      {:db_connection, "~> 2.0"},
       {:fuzzyurl, "~> 1.0"},
       {:retry, "0.9.1"},
       {:calendar, "~> 0.17.2"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
-      {:benchee, "~> 0.13", only: :dev},
-      {:credo, "~> 0.4", only: [:dev, :test]}
+      {:benchee, "~> 0.14", only: :dev},
+      {:credo, "~> 1.0", only: [:dev, :test]}
     ]
   end
 end
