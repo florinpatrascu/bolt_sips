@@ -17,18 +17,19 @@ It is implementing the [db_connection](https://github.com/elixir-ecto/db_connect
 
 ## Features
 
-* It is using: Bolt. The Neo4j's newest network protocol, designed for high-performance
-* Supported bolt version: 1, 2
-* Supports transactions, simple and complex Cypher queries with or w/o parameters
-* Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x
+- It is using: Bolt. The Neo4j's newest network protocol, designed for high-performance
+- Supported bolt version: 1, 2
+- Supports transactions, simple and complex Cypher queries with or w/o parameters
+- Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x
 
-### Note 
+### Note
+
 It works with Neo4j 3.5.x but not with the new bolt v3 but with bolt v2. However, as bolt v3 only introduces alternative message for initialization and transaction, all neo4j's features can be used.
 
 ## Breaking changes introduced in version 1.x
 
-* non-closure based transactions are not supported anymore. This is a change introduced in DBConnection 2.x. `Bolt.Sips` version tagged `v0.5.10` is the last version supporting open transactions.
-* the support for ETLS was dropped. It was mostly used for development or hand-crafted deployments
+- non-closure based transactions are not supported anymore. This is a change introduced in DBConnection 2.x. `Bolt.Sips` version tagged `v0.5.10` is the last version supporting open transactions.
+- the support for ETLS was dropped. It was mostly used for development or hand-crafted deployments
 
 ### Installation
 
@@ -73,7 +74,7 @@ config :bolt_sips, Bolt,
   max_overflow: 1
 ```
 
-A new parameter: `url`, can be used for reducing the verbosity of the config files; available starting with  version `0.1.5`. For example:
+A new parameter: `url`, can be used for reducing the verbosity of the config files; available starting with version `0.1.5`. For example:
 
 ```elixir
 config :bolt_sips, Bolt,
@@ -142,8 +143,9 @@ iex> Bolt.Sips.query!(conn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS nam
 ```
 
 ### Using temporal and spatial types
-Temporal and spatial types are supported since Neo4J 3.4.  
-You can used the elixir structs: Time, NaiveDateTime, DateTime, 
+
+Temporal and spatial types are supported since Neo4J 3.4.
+You can used the elixir structs: Time, NaiveDateTime, DateTime,
 as well as the Bolt Sips structs: DateTimeWithTZOffset, TimeWithTZOffset, Duration, Point.
 
 ```elixir
@@ -305,7 +307,7 @@ iex> point_geo_3D = Point.create(:wgs_84, 50, 60.5, 12.34)
   crs: "wgs-84-3d",
   height: 12.34,
   latitude: 60.5,
-  longitude: 50.0, 
+  longitude: 50.0,
   srid: 4979,
   x: 50.0,
   y: 60.5,
@@ -388,8 +390,8 @@ Output sample:
 
 Available command line options:
 
-* `--url`, `-u` - server host
-* `--ssl`, `-s` - use ssl
+- `--url`, `-u` - server host
+- `--ssl`, `-s` - use ssl
 
 For example, if your server requires authentication:
 
@@ -408,6 +410,7 @@ If you have docker available on your system, you can start an instance before ru
 ```shell
 docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=neo4j/test' neo4j:3.0.6
 ```
+
 Neo4j versions used for test: 3.0, 3.1, 3.4, 3.5
 
 ```shell
@@ -416,7 +419,7 @@ mix test
 
 ### Special thanks
 
-* Michael Schaefermeyer (@mschae), for implementing the Bolt protocol in Elixir: [mschae/boltex](https://github.com/mschae/boltex)
+- Michael Schaefermeyer (@mschae), for implementing the Bolt protocol in Elixir: [mschae/boltex](https://github.com/mschae/boltex)
 
 ### Contributors
 
@@ -424,21 +427,17 @@ As reported by Github: [contributions to master, excluding merge commits](https:
 
 ### Contributing
 
-* [Fork it](https://github.com/florinpatrascu/bolt_sips/fork)
-* Create your feature branch (`git checkout -b my-new-feature`)
-* Test (`mix test`)
-* Commit your changes (`git commit -am 'Add some feature'`)
-* Push to the branch (`git push origin my-new-feature`)
-* Create new Pull Request
-
-### Author
-
-Florin T.PATRASCU (@florin, on Twitter)
+- [Fork it](https://github.com/florinpatrascu/bolt_sips/fork)
+- Create your feature branch (`git checkout -b my-new-feature`)
+- Test (`mix test`)
+- Commit your changes (`git commit -am 'Add some feature'`)
+- Push to the branch (`git push origin my-new-feature`)
+- Create new Pull Request
 
 ### License
 
 ```txt
-Copyright 2016-2018 Florin T.PATRASCU
+Copyright 2016-2019 the original author or authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
