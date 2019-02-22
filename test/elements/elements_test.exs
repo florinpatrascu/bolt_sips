@@ -299,6 +299,34 @@ defmodule Bolt.Sips.Elements.Test do
     success: %{"type" => "r"}
   ]
 
+  # Issue #55 : https://github.com/florinpatrascu/bolt_sips/issues/55
+  # Specific types in properties should be successfully decoded
+  @types_in_properties [
+    success: %{"fields" => ["t1", "t2", "rel"], "result_available_after" => 1},
+    record: [
+      [
+        sig: 78,
+        fields: [
+          69,
+          ["Test"],
+          %{"created" => [sig: 70, fields: [1_464_096_368, 543_000_000, 7200]], "uuid" => 12345}
+        ]
+      ],
+      [sig: 78, fields: [30, ["Test"], %{"uuid" => 6789}]],
+      [
+        sig: 82,
+        fields: [
+          5,
+          69,
+          30,
+          "UPDATED_TO_",
+          %{"created" => [sig: 70, fields: [1_464_096_368, 543_000_000, 7200]]}
+        ]
+      ]
+    ],
+    success: %{"result_consumed_after" => 1, "type" => "r"}
+  ]
+
   test "records from a complex Path" do
     row = Response.transform(@complex_path) |> List.first()
     graph = Path.graph(row["path"])
@@ -449,5 +477,38 @@ defmodule Bolt.Sips.Elements.Test do
              properties: %{"roles" => ["Julian Mercer"]},
              type: "ACTED_IN"
            }
+  end
+
+  test "success with specific types in properties" do
+    expected = [
+      %{
+        "rel" => %Bolt.Sips.Types.Relationship{
+          end: 30,
+          id: 5,
+          start: 69,
+          type: "UPDATED_TO_",
+          properties: %{
+            "created" => %Bolt.Sips.Types.DateTimeWithTZOffset{
+              naive_datetime: ~N[2016-05-24 13:26:08.543],
+              timezone_offset: 7200
+            }
+          }
+        },
+        "t1" => %Bolt.Sips.Types.Node{
+          id: 69,
+          labels: ["Test"],
+          properties: %{
+            "created" => %Bolt.Sips.Types.DateTimeWithTZOffset{
+              naive_datetime: ~N[2016-05-24 13:26:08.543],
+              timezone_offset: 7200
+            },
+            "uuid" => 12345
+          }
+        },
+        "t2" => %Bolt.Sips.Types.Node{id: 30, labels: ["Test"], properties: %{"uuid" => 6789}}
+      }
+    ]
+
+    assert expected == Response.transform(@types_in_properties)
   end
 end
