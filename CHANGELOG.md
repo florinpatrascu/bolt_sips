@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.1-rc2
+
+- Bug fix: If a property contains a speciifc types (date, datetime, point, etc.), it wasn't decoded. see: https://github.com/florinpatrascu/bolt_sips/issues/55
+
 ## 1.2.0-rc2
 
 - support for the spatial and temporal types.
