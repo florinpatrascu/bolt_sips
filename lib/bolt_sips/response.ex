@@ -128,12 +128,12 @@ defmodule Bolt.Sips.Response do
 
   defp extract_types(sig: @node, fields: fields) do
     n = [:id, :labels, :properties] |> Enum.zip(fields)
-    struct(Node, n)
+    struct(Node, extract_types_from_props(n))
   end
 
   defp extract_types(sig: @relationship, fields: fields) do
     rel = [:id, :start, :end, :type, :properties] |> Enum.zip(fields)
-    struct(Relationship, rel)
+    struct(Relationship, extract_types_from_props(rel))
   end
 
   defp extract_types(sig: @date, fields: [days_since_epoch]) when is_integer(days_since_epoch) do
@@ -229,6 +229,11 @@ defmodule Bolt.Sips.Response do
   end
 
   defp extract_types(r), do: extract_any(r, [])
+
+  defp extract_types_from_props(data) do
+    formated_props = Enum.into(data[:properties], %{}, fn {k, v} -> {k, extract_types(v)} end)
+    Keyword.put(data, :properties, formated_props)
+  end
 
   defp extract_any([], acc), do: Enum.reverse(acc)
 
