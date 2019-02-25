@@ -310,7 +310,8 @@ defmodule Bolt.Sips.Types do
                is_integer(nanoseconds) do
       years = div(months, 12)
       months_ = rem(months, 12)
-      {hours, minutes, seconds_} = TypesHelper.decompose_in_hms(seconds)
+      {hours, minutes, seconds_inter} = TypesHelper.decompose_in_hms(seconds)
+      {seconds_, nanoseconds_} = manage_nanoseconds(seconds_inter, nanoseconds)
 
       %Duration{
         years: years,
@@ -319,8 +320,19 @@ defmodule Bolt.Sips.Types do
         hours: hours,
         minutes: minutes,
         seconds: seconds_,
-        nanoseconds: nanoseconds
+        nanoseconds: nanoseconds_
       }
+    end
+
+    @spec manage_nanoseconds(integer(), integer()) :: {integer(), integer()}
+    defp manage_nanoseconds(seconds, nanoseconds) when nanoseconds >= 1_000_000_000 do
+      seconds_ = seconds + div(nanoseconds, 1_000_000_000)
+      nanoseconds_ = rem(nanoseconds, 1_000_000_000)
+      {seconds_, nanoseconds_}
+    end
+
+    defp manage_nanoseconds(seconds, nanoseconds) do
+      {seconds, nanoseconds}
     end
 
     @doc """
@@ -368,12 +380,13 @@ defmodule Bolt.Sips.Types do
     defp format_time(%Duration{
            hours: hours,
            minutes: minutes,
-           seconds: seconds,
-           nanoseconds: nanoseconds
+           seconds: s,
+           nanoseconds: ns
          })
-         when hours > 0 or minutes > 0 or seconds > 0 or nanoseconds > 0 do
-      seconds_f =
-        "#{Integer.to_string(seconds)}.#{Integer.to_string(nanoseconds)}" |> String.to_float()
+         when hours > 0 or minutes > 0 or s > 0 or ns > 0 do
+      {seconds, nanoseconds} = manage_nanoseconds(s, ns)
+      nanoseconds_f = nanoseconds |> Integer.to_string() |> String.pad_leading(9, "0")
+      seconds_f = "#{Integer.to_string(seconds)}.#{nanoseconds_f}" |> String.to_float()
 
       @time_prefix <>
         format_duration_part(hours, @hour_suffix) <>

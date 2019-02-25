@@ -69,7 +69,27 @@ defmodule Bolt.Sips.TypesTest do
     test "format_param/1 successful with valid data" do
       duration = Duration.create(15, 53, 125, 54)
 
-      assert {:ok, "P1Y3M53DT2M5.54S"} = Duration.format_param(duration)
+      assert {:ok, "P1Y3M53DT2M5.000000054S"} = Duration.format_param(duration)
+    end
+
+    test "format_param/1 successfull with large amount of nanoseconds (use create/4 to build struct)" do
+      duration = Duration.create(0, 0, 0, 12_545_876_654)
+      assert {:ok, "PT12.545876654S"} = Duration.format_param(duration)
+    end
+
+    test "format_param/1 successfull with large amount of nanoseconds (use %Duration{} to build struct)" do
+      duration = %Duration{
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        months: 0,
+        nanoseconds: 12_545_876_654,
+        seconds: 0,
+        weeks: 0,
+        years: 0
+      }
+
+      assert {:ok, "PT12.545876654S"} = Duration.format_param(duration)
     end
 
     test "format_param/1 fails for invalid data" do
