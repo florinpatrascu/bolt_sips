@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.2-rc2
+
+- Bug fix: Nanoseconds formating was erroneous. Example: 54 nanoseconds was formated to "PT0.54S" instead of "PT0.000000054S"
+- Bug fix: Large amount of nanoseconds (>= 1_000_000) wasn't treated and lead to Neo4j errors. Now large amount of nanosconds are converted in seconds, with the remainder in nanoseconds.
+
 ## 1.2.1-rc2
 
 - Bug fix: If a property contains a speciifc types (date, datetime, point, etc.), it wasn't decoded. see: https://github.com/florinpatrascu/bolt_sips/issues/55
