@@ -98,9 +98,9 @@ defmodule Bolt.Sips.Types do
       https://github.com/boltprotocol/boltprotocol/blob/master/v1/_serialization.asciidoc#path
     """
     @type t :: %__MODULE__{
-            nodes: List.t() | nil,
-            relationships: List.t() | nil,
-            sequence: List.t() | nil
+            nodes: list() | nil,
+            relationships: list() | nil,
+            sequence: list() | nil
           }
     defstruct nodes: nil, relationships: nil, sequence: nil
 
@@ -108,7 +108,7 @@ defmodule Bolt.Sips.Types do
     represents a traversal or walk through a graph and maintains a direction
     separate from that of any relationships traversed
     """
-    @spec graph(Path.t()) :: List.t() | nil
+    @spec graph(Path.t()) :: list() | nil
     def graph(path) do
       entities = [List.first(path.nodes)]
 
@@ -398,7 +398,7 @@ defmodule Bolt.Sips.Types do
       ""
     end
 
-    @spec format_duration_part(integer(), String.t()) :: String.t()
+    @spec format_duration_part(number(), String.t()) :: String.t()
     defp format_duration_part(duration_part, suffix)
          when duration_part > 0 and is_bitstring(suffix) do
       "#{stringify_number(duration_part)}#{suffix}"

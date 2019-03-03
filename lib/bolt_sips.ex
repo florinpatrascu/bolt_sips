@@ -101,13 +101,13 @@ defmodule Bolt.Sips do
   @doc """
   send a query and an associated map of parameters. Returns the server response or an error
   """
-  @spec query(conn, String.t(), Map.t()) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
+  @spec query(conn, String.t(), map()) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
   defdelegate query(conn, statement, params), to: Query
 
   @doc """
   The same as query/3 but raises a Bolt.Sips.Exception if it fails.
   """
-  @spec query!(conn, String.t(), Map.t()) :: Bolt.Sips.Response | Bolt.Sips.Exception
+  @spec query!(conn, String.t(), map()) :: Bolt.Sips.Response | Bolt.Sips.Exception
   defdelegate query!(conn, statement, params), to: Query
 
   ## Transaction

@@ -124,7 +124,7 @@ defmodule Bolt.Sips.Protocol do
   def handle_prepare(query, _opts, state), do: {:ok, query, state}
   def handle_close(query, _opts, state), do: {:ok, query, state}
   def handle_deallocate(query, _cursor, _opts, state), do: {:ok, query, state}
-  def handle_declare(query, _params, _opts, state), do: {:ok, query, state}
+  def handle_declare(query, _params, _opts, state), do: {:ok, query, state, nil}
   def handle_fetch(query, _cursor, _opts, state), do: {:cont, query, state}
   def handle_status(_opts, state), do: {:idle, state}
 

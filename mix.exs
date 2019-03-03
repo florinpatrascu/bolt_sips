@@ -19,7 +19,8 @@ defmodule BoltSips.Mixfile do
         extras: ["README.md", "CHANGELOG.md"],
         source_ref: "v#{@version}",
         source_url: "https://github.com/florinpatrascu/bolt_sips"
-      ]
+      ],
+      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"]
     ]
   end
 
@@ -59,7 +60,8 @@ defmodule BoltSips.Mixfile do
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:benchee, "~> 0.14", only: :dev},
-      {:credo, "~> 1.0", only: [:dev, :test]}
+      {:credo, "~> 1.0", only: [:dev, :test]},
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false}
     ]
   end
 end
