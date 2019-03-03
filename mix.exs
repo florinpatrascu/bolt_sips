@@ -20,7 +20,7 @@ defmodule BoltSips.Mixfile do
         source_ref: "v#{@version}",
         source_url: "https://github.com/florinpatrascu/bolt_sips"
       ],
-      dialyzer: [ignore_warnings: ".dialyzer_ignore.exs"]
+      dialyzer: [plt_add_apps: [:jason, :poison, :mix], ignore_warnings: ".dialyzer_ignore.exs"]
     ]
   end
 
@@ -57,6 +57,8 @@ defmodule BoltSips.Mixfile do
       {:fuzzyurl, "~> 1.0"},
       {:retry, "0.9.1"},
       {:calendar, "~> 0.17.2"},
+      {:jason, "~> 1.1"},
+      {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:benchee, "~> 0.14", only: :dev},
