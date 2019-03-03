@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0-rc2
+- Fix some types
+- add json encoding capability
+
 ## 1.2.2-rc2
 
 - Bug fix: Nanoseconds formating was erroneous. Example: 54 nanoseconds was formated to "PT0.54S" instead of "PT0.000000054S"

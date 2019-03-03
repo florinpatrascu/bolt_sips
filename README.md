@@ -368,6 +368,51 @@ end
 
 The code above was extracted from [the Neo4j Movies Demo](https://github.com/florinpatrascu/bolt_movies_elixir_phoenix), a Phoenix web application using this driver and the well known [Dataset - Movie Database](https://neo4j.com/developer/movie-database/).
 
+Note: as explained below, you don't need to convert your query result before having it  encoded in JSON. BoltSips provides Jason and Poison implementation to tackle this problem automatically.
+
+### About encoding
+Bolt.Sips povides solution for encoding your query result in different format.  
+For now, only JSON is supported.  
+
+There is two way of encoding data to json:
+- By using the helpers provided by the module `Bolt.Sips.ResponseEncoder`
+- Using your usual JSON encoding library. `Bolt.Sips` have implementation for: Jason and Poison. With this the query results can be automatically encoded by one of the libraries available: Jason or Poison. No further work is required when using a framework like: Phoenix, for example.  
+
+##### Examples
+```elixir
+iex> query_result = [
+   %{
+     "t" => %Bolt.Sips.Types.Node{
+       id: 26,
+       labels: ["Test"],
+       properties: %{
+         "created_at" => "2019-08-03T12:34:56+01:00",
+         "name" => "A test node",
+         "uid" => 12345
+       }
+     }
+   }
+ ]
+
+# Using Bolt.Sips.ResponseEncoder
+ iex> Bolt.Sips.ResponseEncoder.encode(query_result, :json)
+{:ok,
+ "[{\"t\":{\"id\":26,\"labels\":[\"Test\"],\"properties\":{\"created_at\":\"2019-08-03T12:34:56+01:00\",\"name\":\"A test node\",\"uid\":12345}}}]"}
+iex(11)> Bolt.Sips.ResponseEncoder.encode!(query_result, :json)
+"[{\"t\":{\"id\":26,\"labels\":[\"Test\"],\"properties\":{\"created_at\":\"2019-08-03T12:34:56+01:00\",\"name\":\"A test node\",\"uid\":12345}}}]"
+
+# Using Jason
+iex(14)> Jason.encode!(query_result) 
+"[{\"t\":{\"id\":26,\"labels\":[\"Test\"],\"properties\":{\"created_at\":\"2019-08-03T12:34:56+01:00\",\"name\":\"A test node\",\"uid\":12345}}}]"
+
+# Using Poison
+iex(13)> Poison.encode!(query_result)
+"[{\"t\":{\"properties\":{\"uid\":12345,\"name\":\"A test node\",\"created_at\":\"2019-08-03T12:34:56+01:00\"},\"labels\":[\"Test\"],\"id\":26}}]"
+```
+
+Both solutions rely on protocols, then they can be easily overriden if needed.  
+More info in the modules `Bolt.Sips.ResponseEncoder.Json`, `Bolt.Sips.ResponseEncoder.Json.Jason`, `Bolt.Sips.ResponseEncoder.Json.Poison`
+
 ### Command line
 
 Run simple Cypher commands from a mix task, for quick testing Cypher results or the connection with your server:

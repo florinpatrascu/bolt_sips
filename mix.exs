@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "1.2.2-rc2"
+  @version "1.3.0-rc2"
 
   def project do
     [
@@ -19,7 +19,8 @@ defmodule BoltSips.Mixfile do
         extras: ["README.md", "CHANGELOG.md"],
         source_ref: "v#{@version}",
         source_url: "https://github.com/florinpatrascu/bolt_sips"
-      ]
+      ],
+      dialyzer: [plt_add_apps: [:jason, :poison, :mix], ignore_warnings: ".dialyzer_ignore.exs"]
     ]
   end
 
@@ -56,10 +57,13 @@ defmodule BoltSips.Mixfile do
       {:fuzzyurl, "~> 1.0"},
       {:retry, "0.9.1"},
       {:calendar, "~> 0.17.2"},
+      {:jason, "~> 1.1"},
+      {:poison, "~> 3.1"},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:benchee, "~> 0.14", only: :dev},
-      {:credo, "~> 1.0", only: [:dev, :test]}
+      {:credo, "~> 1.0", only: [:dev, :test]},
+      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false}
     ]
   end
 end

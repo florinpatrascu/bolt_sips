@@ -14,7 +14,7 @@ defmodule Bolt.Sips.Internals.Error do
 
   @doc false
   # Produce a Bolt.Sips.Internals.Error depending on the context.
-  @spec exception(any(), port(), atom()) :: Bolt.Sips.Internals.Error.t()
+  @spec exception(any(), nil | port(), atom()) :: Bolt.Sips.Internals.Error.t()
   def exception(%{"message" => message, "code" => code}, pid, function) do
     %Bolt.Sips.Internals.Error{
       message: message,
