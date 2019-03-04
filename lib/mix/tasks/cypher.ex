@@ -33,8 +33,7 @@ defmodule Mix.Tasks.Bolt.Cypher do
   def run(args) do
     Application.ensure_all_started(:bolt_sips)
 
-    {cli_opts, args, _} =
-      OptionParser.parse(args, aliases: [u: :url, s: :ssl], shitches: [], strict: true)
+    {cli_opts, args, _} = OptionParser.parse(args, aliases: [u: :url, s: :ssl], switches: [])
 
     options = run_options(cli_opts, Application.get_env(:bolt_sips, Bolt))
 
@@ -47,12 +46,16 @@ defmodule Mix.Tasks.Bolt.Cypher do
     # display the cypher command
     log_cypher(cypher)
 
-    case Neo4j.query(Bolt.Sips.conn(), cypher) do
-      {:ok, row} ->
-        row |> log_response
+    with {:ok, response} <- Neo4j.query(Bolt.Sips.conn(), cypher) do
+      response |> log_response
+    else
+      {:error, [code: code, message: message]} ->
+        log_error(
+          inspect(code) <> " - cannot execute the command, see error above.Details" <> message
+        )
 
-      {:error, code} ->
-        log_error("Cannot execute the command, see error above; #{inspect(code)}")
+      e ->
+        log_error("Unknown error: #{inspect(e)}")
     end
   end
 

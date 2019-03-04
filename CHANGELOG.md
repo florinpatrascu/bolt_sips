@@ -1,13 +1,18 @@
 # Changelog
 
+## 1.3.0
+
+- 1.3.0 stable release. Many thanks to Dominique VASSARD, for his awesome contributions.
+
 ## 1.3.0-rc2
-- Fix some types
+
+- Fix some typos
 - add json encoding capability
 
 ## 1.2.2-rc2
 
 - Bug fix: Nanoseconds formating was erroneous. Example: 54 nanoseconds was formated to "PT0.54S" instead of "PT0.000000054S"
-- Bug fix: Large amount of nanoseconds (>= 1_000_000) wasn't treated and lead to Neo4j errors. Now large amount of nanosconds are converted in seconds, with the remainder in nanoseconds.
+- Bug fix: Large amount of nanoseconds (>= 1_000_000) wasn't treated and lead to Neo4j errors. Now large amount of nanoseconds are converted in seconds, with the remainder in nanoseconds.
 
 ## 1.2.1-rc2
 
