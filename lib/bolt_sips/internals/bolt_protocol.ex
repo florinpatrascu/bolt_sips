@@ -96,7 +96,8 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
 
   See "Shared options" in the documentation of this module.
   """
-  @spec handshake(atom(), port(), Keyword.t()) :: :ok | {:error, Bolt.Sips.Internals.Error.t()}
+  @spec handshake(atom(), port(), Keyword.t()) ::
+          {:ok, integer()} | {:error, Bolt.Sips.Internals.Error.t()}
   def handshake(transport, port, options \\ []) do
     recv_timeout = get_recv_timeout(options)
 
@@ -120,7 +121,7 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
       {:ok, <<version::32>> = packet} when version <= @max_version ->
         Bolt.Sips.Internals.Logger.log_message(:server, :handshake, packet, :hex)
         Bolt.Sips.Internals.Logger.log_message(:server, :handshake, version)
-        :ok
+        {:ok, version}
 
       {:ok, other} ->
         {:error, Error.exception(other, port, :handshake)}
