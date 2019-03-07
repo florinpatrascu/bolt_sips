@@ -1,4 +1,9 @@
 defmodule Bolt.Sips.Internals.PackStreamTest do
+  @moduledoc """
+  Since refactoring, encode / decode function are in DecoderVx and EncoderVx,
+  then this tests are not really necessary.
+  They can be kept as "integration" tests.
+  """
   use ExUnit.Case, async: true
 
   alias Bolt.Sips.Internals.{Utils, PackStream}
