@@ -1,19 +1,6 @@
 defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
   alias Bolt.Sips.Internals.PackStream.Encoder
-
-  @null_marker 0xC0
-  @true_marker 0xC3
-  @false_marker 0xC2
-
-  @tiny_bitstring_marker 0x8
-  @bitstring8_marker 0xD0
-  @bitstring16_marker 0xD1
-  @bitstring32_marker 0xD2
-
-  @int8_marker 0xC8
-  @int16_marker 0xC9
-  @int32_marker 0xCA
-  @int64_marker 0xCB
+  use Bolt.Sips.Internals.PackStream.Markers
 
   @int8 -127..-17
   @int16_low -32_768..-129
@@ -22,22 +9,6 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
   @int32_high 32_768..2_147_483_647
   @int64_low -9_223_372_036_854_775_808..-2_147_483_649
   @int64_high 2_147_483_648..9_223_372_036_854_775_807
-
-  @float_marker 0xC1
-
-  @tiny_list_marker 0x9
-  @list8_marker 0xD4
-  @list16_marker 0xD5
-  @list32_marker 0xD6
-
-  @tiny_map_marker 0xA
-  @map8_marker 0xD8
-  @map16_marker 0xD9
-  @map32_marker 0xDA
-
-  @tiny_struct_marker 0xB
-  @struct8_marker 0xDC
-  @struct16_marker 0xDD
 
   @doc """
   Encode an atom into Bolt binary format.
