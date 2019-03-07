@@ -2,14 +2,14 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderTest do
   use ExUnit.Case, async: true
 
   alias Bolt.Sips.Internals.PackStream.Encoder
-  alias Bolt.Sips.Internals.PackStream.EncoderHelper
+  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
 
   defmodule TestStruct do
     defstruct foo: "bar"
   end
 
   test "Encode common types" do
-    Enum.each(EncoderHelper.available_bolt_versions(), fn bolt_version ->
+    Enum.each(BoltVersionHelper.available_versions(), fn bolt_version ->
       # Atom
       assert <<0xC0>> = Encoder.encode(nil, bolt_version)
       assert <<_::binary>> = Encoder.encode(true, bolt_version)

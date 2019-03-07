@@ -1,14 +1,8 @@
 defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
   alias Bolt.Sips.Internals.PackStream.EncodeError
+  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
 
-  @available_bolt_versions [1, 2]
-
-  @doc """
-  List bolt versions.
-  Only bolt version that have specific encoding functions are listed.
-
-  """
-  def available_bolt_versions(), do: @available_bolt_versions
+  @available_bolt_versions BoltVersionHelper.available_versions()
 
   @doc """
   For the given `data_type` and `bolt_version`, determine the right enconding function
@@ -16,9 +10,13 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
   """
   @spec call_encode(atom(), any(), any()) :: binary() | EncodeError.t()
   def call_encode(data_type, data, bolt_version)
-      when is_integer(bolt_version) and not (bolt_version in @available_bolt_versions) do
-    if bolt_version > List.last(@available_bolt_versions) do
-      call_encode(data_type, data, List.last(@available_bolt_versions))
+      when is_integer(bolt_version) and bolt_version in @available_bolt_versions do
+    do_call_encode(data_type, data, bolt_version, bolt_version)
+  end
+
+  def call_encode(data_type, data, bolt_version) when is_integer(bolt_version) do
+    if bolt_version > BoltVersionHelper.last() do
+      call_encode(data_type, data, BoltVersionHelper.last())
     else
       raise EncodeError,
         data_type: data_type,
@@ -26,11 +24,6 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
         bolt_version: bolt_version,
         message: "Unsupported encoder version"
     end
-  end
-
-  def call_encode(data_type, data, bolt_version)
-      when is_integer(bolt_version) and bolt_version in @available_bolt_versions do
-    do_call_encode(data_type, data, bolt_version, bolt_version)
   end
 
   def call_encode(data_type, data, bolt_version) do
@@ -68,16 +61,8 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
           data_type,
           data,
           original_version,
-          previous_version(used_version, @available_bolt_versions)
+          BoltVersionHelper.previous(used_version)
         )
     end
-  end
-
-  # Retrieve previous version
-  @spec previous_version(integer(), list()) :: nil | integer()
-  defp previous_version(version, available_versions) do
-    available_versions
-    |> Enum.take_while(&(&1 < version))
-    |> List.last()
   end
 end
