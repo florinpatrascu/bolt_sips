@@ -176,7 +176,7 @@ defmodule Bolt.Sips.Protocol do
       msg =
         case e do
           %Bolt.Sips.Internals.PackStream.EncodeError{} ->
-            "unable to encode value: #{inspect(e.item)}"
+            "unable to encode value: #{inspect(e.data)}"
 
           %BoltError{} ->
             "#{e.message}, type: #{e.type}"

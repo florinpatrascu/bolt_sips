@@ -21,9 +21,10 @@ defmodule Bolt.Sips.Internals.PackStream do
       iex> Bolt.Sips.Internals.PackStream.encode "hello world"
       <<0x8B, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x77, 0x6F, 0x72, 0x6C, 0x64>>
   """
-  @spec encode({integer(), %{:__struct__ => String.t()} | list()}) ::
-          Bolt.Sips.Internals.PackStream.value() | <<_::16, _::_*8>>
-  def encode(item), do: Bolt.Sips.Internals.PackStream.Encoder.encode(item)
+  @spec encode(any(), integer()) :: Bolt.Sips.Internals.PackStream.value() | <<_::16, _::_*8>>
+  def encode(item, bolt_version \\ 1) do
+    Bolt.Sips.Internals.PackStream.Encoder.encode(item, bolt_version)
+  end
 
   ##
   # Decode

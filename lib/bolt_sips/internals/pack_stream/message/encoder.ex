@@ -21,6 +21,17 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @reset_signature 0x0F
   @run_signature 0x10
 
+  def valid_signatures() do
+    [
+      @ack_failure_signature,
+      @discard_all_signature,
+      @init_signature,
+      @pull_all_signature,
+      @reset_signature,
+      @run_signature
+    ]
+  end
+
   @doc """
   Encode INIT message without auth token
 
@@ -91,7 +102,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
 
     encoded =
       {signature(message_type), data}
-      |> Bolt.Sips.Internals.PackStream.Encoder.encode()
+      |> Bolt.Sips.Internals.PackStream.encode()
       |> generate_chunks()
 
     Bolt.Sips.Internals.Logger.log_message(:client, message_type, encoded, :hex)
