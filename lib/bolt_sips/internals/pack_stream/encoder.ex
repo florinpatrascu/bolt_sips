@@ -63,7 +63,7 @@ defimpl PackStream.Encoder, for: Any do
   end
 
   def encode(data, bolt_version) do
-    raise Bolt.Sips.Internals.PackStream.EncodeError,
+    raise Bolt.Sips.Internals.PackStreamError,
       message: "Unable to encode",
       data: data,
       bolt_version: bolt_version

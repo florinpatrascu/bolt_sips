@@ -1,4 +1,4 @@
-defmodule Bolt.Sips.Internals.PackStream.PackStreamError do
+defmodule Bolt.Sips.Internals.PackStreamError do
   @moduledoc false
 
   # Represents an error when encoding data for the Bolt protocol.

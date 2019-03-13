@@ -2,7 +2,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelperTest do
   use ExUnit.Case, async: true
 
   alias Bolt.Sips.Internals.PackStream.EncoderHelper
-  alias Bolt.Sips.Internals.PackStream.EncodeError
+  alias Bolt.Sips.Internals.PackStreamError
 
   describe "call_encode/3" do
     test "successfull when call with existing bolt_version" do
@@ -14,20 +14,20 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelperTest do
     end
 
     test "fails when call with bolt_version <= 0" do
-      assert_raise EncodeError, fn ->
+      assert_raise PackStreamError, fn ->
         EncoderHelper.call_encode(:atom, true, -1)
       end
     end
 
     test "fails when call with a non integer bolt_version" do
-      assert_raise EncodeError, fn ->
+      assert_raise PackStreamError, fn ->
         EncoderHelper.call_encode(:atom, true, :invalid)
       end
     end
 
     test "fails when call with a non supported data type" do
-      assert_raise EncodeError, fn ->
-        EncoderHelper.call_encode(:non_supported, true, -1)
+      assert_raise PackStreamError, fn ->
+        EncoderHelper.call_encode(:non_supported, true, 1)
       end
     end
   end

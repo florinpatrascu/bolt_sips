@@ -1,5 +1,5 @@
 defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
-  alias Bolt.Sips.Internals.PackStream.EncodeError
+  alias Bolt.Sips.Internals.PackStreamError
   alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
 
   @available_bolt_versions BoltVersionHelper.available_versions()
@@ -8,7 +8,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
   For the given `data_type` and `bolt_version`, determine the right enconding function
   and call it agains `data`
   """
-  @spec call_encode(atom(), any(), any()) :: binary() | EncodeError.t()
+  @spec call_encode(atom(), any(), any()) :: binary() | PackStreamError.t()
   def call_encode(data_type, data, bolt_version)
       when is_integer(bolt_version) and bolt_version in @available_bolt_versions do
     do_call_encode(data_type, data, bolt_version, bolt_version)
@@ -18,7 +18,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
     if bolt_version > BoltVersionHelper.last() do
       call_encode(data_type, data, BoltVersionHelper.last())
     else
-      raise EncodeError,
+      raise PackStreamError,
         data_type: data_type,
         data: data,
         bolt_version: bolt_version,
@@ -27,7 +27,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
   end
 
   def call_encode(data_type, data, bolt_version) do
-    raise EncodeError,
+    raise PackStreamError,
       data_type: data_type,
       data: data,
       bolt_version: bolt_version,
@@ -39,9 +39,10 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
   # If not, fallback to previous bolt version
   #
   # If encoding function is present in none of the bolt  version, an error will be raised
-  @spec do_call_encode(atom(), any(), integer(), nil | integer()) :: binary() | EncodeError.t()
+  @spec do_call_encode(atom(), any(), integer(), nil | integer()) ::
+          binary() | PackStreamError.t()
   defp do_call_encode(data_type, data, original_version, nil) do
-    raise EncodeError,
+    raise PackStreamError,
       data_type: data_type,
       data: data,
       bolt_version: original_version,

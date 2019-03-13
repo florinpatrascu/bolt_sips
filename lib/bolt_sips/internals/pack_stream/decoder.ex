@@ -13,7 +13,7 @@ defmodule Bolt.Sips.Internals.PackStream.Decoder do
   - Path
   """
   alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
-  alias Bolt.Sips.Internals.PackStream.PackStreamError
+  alias Bolt.Sips.Internals.PackStreamError
 
   @available_bolt_versions BoltVersionHelper.available_versions()
 

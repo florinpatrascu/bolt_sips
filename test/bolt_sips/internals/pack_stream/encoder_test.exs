@@ -37,7 +37,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderTest do
   end
 
   test "unkown type" do
-    assert_raise Bolt.Sips.Internals.PackStream.EncodeError, fn ->
+    assert_raise Bolt.Sips.Internals.PackStreamError, fn ->
       Encoder.encode({:error, "unencodable"}, 1)
     end
   end

@@ -122,15 +122,15 @@ defmodule Bolt.Sips.Internals.PackStreamTest do
     assert <<0xDC, 0x6F, _::binary>> = PackStream.encode({0x01, Enum.into(1..111, [])})
     assert <<0xDD, 0x1, 0x4D, _::binary>> = PackStream.encode({0x01, Enum.into(1..333, [])})
 
-    assert_raise Bolt.Sips.Internals.PackStream.EncodeError, ~r/^unable to encode/i, fn ->
+    assert_raise Bolt.Sips.Internals.PackStreamError, ~r/^unable to encode/i, fn ->
       PackStream.encode({128, []})
     end
 
-    assert_raise Bolt.Sips.Internals.PackStream.EncodeError, ~r/^unable to encode/i, fn ->
+    assert_raise Bolt.Sips.Internals.PackStreamError, ~r/^unable to encode/i, fn ->
       PackStream.encode({-1, []})
     end
 
-    assert_raise Bolt.Sips.Internals.PackStream.EncodeError, ~r/^unable to encode/i, fn ->
+    assert_raise Bolt.Sips.Internals.PackStreamError, ~r/^unable to encode/i, fn ->
       PackStream.encode({"a", []})
     end
   end
@@ -141,7 +141,7 @@ defmodule Bolt.Sips.Internals.PackStreamTest do
   end
 
   test "raises an error when trying to encode something we don't know" do
-    assert_raise Bolt.Sips.Internals.PackStream.EncodeError, fn ->
+    assert_raise Bolt.Sips.Internals.PackStreamError, fn ->
       PackStream.encode({:tuple})
     end
   end

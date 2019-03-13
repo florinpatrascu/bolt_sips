@@ -89,7 +89,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolTest do
   test "an invalid parameter value yields an error", %{port: port} do
     cypher = "MATCH (n:Person {invalid: {an_elixir_datetime}}) RETURN TRUE"
 
-    assert_raise Bolt.Sips.Internals.PackStream.EncodeError, ~r/^unable to encode/i, fn ->
+    assert_raise Bolt.Sips.Internals.PackStreamError, ~r/^unable to encode/i, fn ->
       BoltProtocol.run_statement(:gen_tcp, port, cypher, %{an_elixir_datetime: DateTime.utc_now()})
     end
   end

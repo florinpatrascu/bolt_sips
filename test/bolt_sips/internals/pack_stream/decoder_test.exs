@@ -2,7 +2,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderTest do
   use ExUnit.Case, async: true
 
   alias Bolt.Sips.Internals.PackStream.Decoder
-  alias Bolt.Sips.Internals.PackStream.PackStreamError
+  alias Bolt.Sips.Internals.PackStreamError
   alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
 
   test "Decode to common types" do
