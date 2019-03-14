@@ -30,10 +30,6 @@ defmodule Bolt.Sips.Response do
   @type t :: __MODULE__
 
   alias Bolt.Sips.Types.{
-    Node,
-    Relationship,
-    UnboundRelationship,
-    Path,
     Duration,
     DateTimeWithTZOffset,
     TimeWithTZOffset,
@@ -46,14 +42,6 @@ defmodule Bolt.Sips.Response do
   require Integer
 
   # self contained graph entities
-  # node
-  @node 78
-  # path
-  @path 80
-  # relationship
-  @relationship 82
-  # relationship without endpoints
-  @unbound_relationship 114
   # Date
   @date 68
   # Time
@@ -77,7 +65,9 @@ defmodule Bolt.Sips.Response do
   transform a raw Bolt response to a list of Responses
   """
   def transform(raw, _stats \\ :no) do
-    # IO.puts("bolt raw response: #{inspect Success.new(raw)}")
+    # IO.puts("bolt raw response: #{inspect(raw)}")
+    # IO.puts("bolt raw response: #{inspect(Success.new(raw))}")
+
     case Success.new(raw) do
       {:ok, success} ->
         cond do
@@ -125,16 +115,6 @@ defmodule Bolt.Sips.Response do
   end
 
   defp extract_types([]), do: []
-
-  defp extract_types(sig: @node, fields: fields) do
-    n = [:id, :labels, :properties] |> Enum.zip(fields)
-    struct(Node, extract_types_from_props(n))
-  end
-
-  defp extract_types(sig: @relationship, fields: fields) do
-    rel = [:id, :start, :end, :type, :properties] |> Enum.zip(fields)
-    struct(Relationship, extract_types_from_props(rel))
-  end
 
   defp extract_types(sig: @date, fields: [days_since_epoch]) when is_integer(days_since_epoch) do
     Date.add(~D[1970-01-01], days_since_epoch)
@@ -201,39 +181,7 @@ defmodule Bolt.Sips.Response do
     Point.create(srid, x, y, z)
   end
 
-  defp extract_types(sig: @path, fields: fields) do
-    [ns, rs, sequence] = fields
-
-    if length(ns) < 1 do
-      raise "Invalid path. Must have some nodes"
-    end
-
-    # if Utils.mod(length(sequence), 2) != 0 do
-    unless Integer.is_even(length(sequence)) do
-      raise "Invalid path sequence. Must always consist of an even number of integers"
-    end
-
-    relationships = Enum.map(rs, &extract_types/1)
-    nodes = Enum.map(ns, &extract_types/1)
-
-    rel =
-      [:nodes, :relationships, :sequence]
-      |> Enum.zip([nodes, relationships, sequence])
-
-    struct(Path, rel)
-  end
-
-  defp extract_types(sig: @unbound_relationship, fields: fields) do
-    rel = [:id, :type, :properties] |> Enum.zip(fields)
-    struct(UnboundRelationship, rel)
-  end
-
   defp extract_types(r), do: extract_any(r, [])
-
-  defp extract_types_from_props(data) do
-    formated_props = Enum.into(data[:properties], %{}, fn {k, v} -> {k, extract_types(v)} end)
-    Keyword.put(data, :properties, formated_props)
-  end
 
   defp extract_any([], acc), do: Enum.reverse(acc)
 

@@ -12,6 +12,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
   """
   use Bolt.Sips.Internals.PackStream.Markers
   alias Bolt.Sips.Internals.PackStream.Decoder
+  alias Bolt.Sips.Types
 
   @spec decode(binary(), integer()) :: list() | {:error, :not_implemented}
   def decode(<<@null_marker, rest::binary>>, bolt_version) do
@@ -152,10 +153,70 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
     |> Map.new()
   end
 
+  ######### SPECIAL STRUCTS
+
+  # Node
+  defp decode_struct(@node_marker, struct, struct_size, bolt_version) do
+    {[id, labels, props], rest} = do_decode_struct(struct, struct_size, bolt_version)
+
+    node = %Types.Node{id: id, labels: labels, properties: props}
+
+    [node | rest]
+  end
+
+  # Relationship
+  defp decode_struct(@relationship_marker, struct, struct_size, bolt_version) do
+    {[id, start_node, end_node, type, props], rest} =
+      do_decode_struct(struct, struct_size, bolt_version)
+
+    relationship = %Types.Relationship{
+      id: id,
+      start: start_node,
+      end: end_node,
+      type: type,
+      properties: props
+    }
+
+    [relationship | rest]
+  end
+
+  # UnboundedRelationship
+  defp decode_struct(@unbounded_relationship_marker, struct, struct_size, bolt_version) do
+    {[id, type, props], rest} = do_decode_struct(struct, struct_size, bolt_version)
+
+    unbounded_relationship = %Types.UnboundRelationship{
+      id: id,
+      type: type,
+      properties: props
+    }
+
+    [unbounded_relationship | rest]
+  end
+
+  # Path
+  defp decode_struct(@path_marker, struct, struct_size, bolt_version) do
+    {[nodes, relationships, sequence], rest} = do_decode_struct(struct, struct_size, bolt_version)
+
+    path = %Types.Path{
+      nodes: nodes,
+      relationships: relationships,
+      sequence: sequence
+    }
+
+    [path | rest]
+  end
+
   @spec decode_struct(integer(), binary(), integer(), integer()) :: list()
   defp decode_struct(signature, struct, struct_size, bolt_version) do
     {struct, rest} = struct |> Decoder.decode(bolt_version) |> Enum.split(struct_size)
 
     [[sig: signature, fields: struct] | rest]
+  end
+
+  @spec do_decode_struct(binary(), integer(), integer()) :: tuple()
+  defp do_decode_struct(struct, struct_size, bolt_version) do
+    struct
+    |> Decoder.decode(bolt_version)
+    |> Enum.split(struct_size)
   end
 end

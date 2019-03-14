@@ -5,15 +5,41 @@ defmodule Bolt.Sips.Elements.Test do
   alias Bolt.Sips.{Success, Error, Response}
   alias Bolt.Sips.Types.{Node, Relationship, Path}
 
+  # MATCH
+  #   (p:Person {name: "Keanu Reeves"})-[r:ACTED_IN]->(m:Movie)
+  # WHERE
+  #   m.title IN ["Johnny Mnemonic", "Something's Gotta Give"]
+  # RETURN
+  # p, r
   @success [
     success: %{"fields" => ["p", "r"]},
     record: [
-      [sig: 78, fields: [1, ["Person"], %{"born" => 1964, "name" => "Keanu Reeves"}]],
-      [sig: 82, fields: [221, 1, 154, "ACTED_IN", %{"roles" => ["Julian Mercer"]}]]
+      %Bolt.Sips.Types.Node{
+        id: 1,
+        labels: ["Person"],
+        properties: %{"born" => 1964, "name" => "Keanu Reeves"}
+      },
+      %Bolt.Sips.Types.Relationship{
+        end: 154,
+        id: 221,
+        properties: %{"roles" => ["Julian Mercer"]},
+        start: 1,
+        type: "ACTED_IN"
+      }
     ],
     record: [
-      [sig: 78, fields: [1, ["Person"], %{"born" => 1964, "name" => "Keanu Reeves"}]],
-      [sig: 82, fields: [132, 1, 100, "ACTED_IN", %{"roles" => ["Johnny Mnemonic"]}]]
+      %Bolt.Sips.Types.Node{
+        id: 1,
+        labels: ["Person"],
+        properties: %{"born" => 1964, "name" => "Keanu Reeves"}
+      },
+      %Bolt.Sips.Types.Relationship{
+        end: 107,
+        id: 139,
+        properties: %{"roles" => ["Johnny Mnemonic"]},
+        start: 401,
+        type: "ACTED_IN"
+      }
     ],
     success: %{"type" => "r"}
   ]
@@ -126,50 +152,73 @@ defmodule Bolt.Sips.Elements.Test do
 
   # MERGE p=({name:'Alice'})-[:KNOWS]->({name:'Bob'}) RETURN p
   @path [
-    success: %{"fields" => ["p"]},
+    success: %{"fields" => ["p"], "result_available_after" => 17},
     record: [
-      [
-        sig: 80,
-        fields: [
-          [
-            [sig: 78, fields: [172, [], %{"name" => "Alice"}]],
-            [sig: 78, fields: [182, [], %{"name" => "Bob"}]]
-          ],
-          [[sig: 114, fields: [259, "KNOWS", %{}]]],
-          [1, 1]
-        ]
-      ]
+      %Bolt.Sips.Types.Path{
+        nodes: [
+          %Bolt.Sips.Types.Node{id: 172, labels: [], properties: %{"name" => "Alice"}},
+          %Bolt.Sips.Types.Node{id: 182, labels: [], properties: %{"name" => "Bob"}}
+        ],
+        relationships: [
+          %Bolt.Sips.Types.UnboundRelationship{
+            end: nil,
+            id: 259,
+            properties: %{},
+            start: nil,
+            type: "KNOWS"
+          }
+        ],
+        sequence: [1, 1]
+      }
     ],
-    success: %{"type" => "rw"}
+    success: %{
+      "stats" => %{"nodes-created" => 2, "properties-set" => 2, "relationships-created" => 1},
+      "type" => "rw"
+    }
   ]
 
   # "MATCH (p:Person {bolt_sips: true})  RETURN p, p.name AS name,
   #  upper(p.name) as NAME, coalesce(p.nickname,\"n/a\") AS nickname,
   #  {name: p.name, label:head(labels(p))} AS person"
   @coalesce [
-    success: %{"fields" => ["p", "name", "NAME", "nickname", "person"]},
+    success: %{
+      "fields" => ["p", "name", "NAME", "nickname", "person"],
+      "result_available_after" => 13
+    },
     record: [
-      [sig: 78, fields: [432, ["Person"], %{"bolt_sips" => true, "name" => "Patrick Rothfuss"}]],
+      %Bolt.Sips.Types.Node{
+        id: 432,
+        labels: ["Person"],
+        properties: %{"bolt_sips" => true, "name" => "Patrick Rothfuss"}
+      },
       "Patrick Rothfuss",
       "PATRICK ROTHFUSS",
       "n/a",
       %{"label" => "Person", "name" => "Patrick Rothfuss"}
     ],
     record: [
-      [sig: 78, fields: [433, ["Person"], %{"bolt_sips" => true, "name" => "Kote"}]],
+      %Bolt.Sips.Types.Node{
+        id: 176,
+        labels: ["Person"],
+        properties: %{"bolt_sips" => true, "name" => "Kote"}
+      },
       "Kote",
       "KOTE",
       "n/a",
       %{"label" => "Person", "name" => "Kote"}
     ],
     record: [
-      [sig: 78, fields: [434, ["Person"], %{"bolt_sips" => true, "name" => "Denna"}]],
+      %Bolt.Sips.Types.Node{
+        id: 351,
+        labels: ["Person"],
+        properties: %{"bolt_sips" => true, "name" => "Denna"}
+      },
       "Denna",
       "DENNA",
       "n/a",
       %{"label" => "Person", "name" => "Denna"}
     ],
-    success: %{"type" => "r"}
+    success: %{"result_consumed_after" => 1, "type" => "r"}
   ]
 
   # match (a)-[:HAS*]->(b) return collect(distinct b)
@@ -177,8 +226,16 @@ defmodule Bolt.Sips.Elements.Test do
     success: %{"fields" => ["collect(distinct b)"]},
     record: [
       [
-        [sig: 78, fields: [76, ["Wheel"], %{"bolt_sips" => true, "spokes" => 3}]],
-        [sig: 78, fields: [77, ["Wheel"], %{"bolt_sips" => true, "spokes" => 32}]]
+        %Bolt.Sips.Types.Node{
+          id: 76,
+          labels: ["Wheel"],
+          properties: %{"bolt_sips" => true, "spokes" => 3}
+        },
+        %Bolt.Sips.Types.Node{
+          id: 77,
+          labels: ["Wheel"],
+          properties: %{"bolt_sips" => true, "spokes" => 32}
+        }
       ]
     ],
     success: %{"type" => "r"}
@@ -242,24 +299,6 @@ defmodule Bolt.Sips.Elements.Test do
   @movie_crew [
     success: %{"fields" => ["movie", "cast"]},
     record: ["Apollo 13", ["Tom Hanks", "Kevin Bacon", "Ed Harris", "Bill Paxton", "Gary Sinise"]],
-    record: [
-      "You've Got Mail",
-      ["Steve Zahn", "Dave Chappelle", "Meg Ryan", "Tom Hanks", "Parker Posey", "Greg Kinnear"]
-    ],
-    record: ["Johnny Mnemonic", ["Ice-T", "Dina Meyer", "Takeshi Kitano", "Keanu Reeves"]],
-    record: [
-      "Stand By Me",
-      [
-        "Marshall Bell",
-        "John Cusack",
-        "Kiefer Sutherland",
-        "Corey Feldman",
-        "Jerry O'Connell",
-        "River Phoenix",
-        "Wil Wheaton"
-      ]
-    ],
-    record: ["The Polar Express", ["Tom Hanks"]],
     success: %{"type" => "r"}
   ]
 
@@ -278,23 +317,40 @@ defmodule Bolt.Sips.Elements.Test do
   @complex_path [
     success: %{"fields" => ["db", "expert", "path"]},
     record: [
-      [sig: 78, fields: [130, ["Database"], %{"name" => "Neo4j"}]],
-      [sig: 78, fields: [129, ["Person", "Expert"], %{"name" => "Amanda"}]],
-      [
-        sig: 80,
-        fields: [
-          [
-            [sig: 78, fields: [126, ["Person"], %{"name" => "You"}]],
-            [sig: 78, fields: [125, ["Person"], %{"name" => "Anna"}]],
-            [sig: 78, fields: [129, ["Person", "Expert"], %{"name" => "Amanda"}]]
-          ],
-          [
-            [sig: 114, fields: [294, "FRIEND", %{}]],
-            [sig: 114, fields: [302, "FRIEND", %{}]]
-          ],
-          [1, 1, 2, 2]
-        ]
-      ]
+      %Bolt.Sips.Types.Node{id: 130, labels: ["Database"], properties: %{"name" => "Neo4j"}},
+      %Bolt.Sips.Types.Node{
+        id: 129,
+        labels: ["Person", "Expert"],
+        properties: %{"name" => "Amanda"}
+      },
+      %Bolt.Sips.Types.Path{
+        nodes: [
+          %Bolt.Sips.Types.Node{id: 126, labels: ["Person"], properties: %{"name" => "You"}},
+          %Bolt.Sips.Types.Node{id: 125, labels: ["Person"], properties: %{"name" => "Anna"}},
+          %Bolt.Sips.Types.Node{
+            id: 129,
+            labels: ["Person", "Expert"],
+            properties: %{"name" => "Amanda"}
+          }
+        ],
+        relationships: [
+          %Bolt.Sips.Types.UnboundRelationship{
+            end: nil,
+            id: 294,
+            properties: %{},
+            start: nil,
+            type: "FRIEND"
+          },
+          %Bolt.Sips.Types.UnboundRelationship{
+            end: nil,
+            id: 302,
+            properties: %{},
+            start: nil,
+            type: "FRIEND"
+          }
+        ],
+        sequence: [1, 1, 2, 2]
+      }
     ],
     success: %{"type" => "r"}
   ]
@@ -302,29 +358,34 @@ defmodule Bolt.Sips.Elements.Test do
   # Issue #55 : https://github.com/florinpatrascu/bolt_sips/issues/55
   # Specific types in properties should be successfully decoded
   @types_in_properties [
-    success: %{"fields" => ["t1", "t2", "rel"], "result_available_after" => 1},
+    success: %{"fields" => ["t1", "t2", "rel"]},
     record: [
-      [
-        sig: 78,
-        fields: [
-          69,
-          ["Test"],
-          %{"created" => [sig: 70, fields: [1_464_096_368, 543_000_000, 7200]], "uuid" => 12345}
-        ]
-      ],
-      [sig: 78, fields: [30, ["Test"], %{"uuid" => 6789}]],
-      [
-        sig: 82,
-        fields: [
-          5,
-          69,
-          30,
-          "UPDATED_TO_",
-          %{"created" => [sig: 70, fields: [1_464_096_368, 543_000_000, 7200]]}
-        ]
-      ]
+      %Bolt.Sips.Types.Node{
+        id: 69,
+        labels: ["Test"],
+        properties: %{
+          "created" => %Bolt.Sips.Types.DateTimeWithTZOffset{
+            naive_datetime: ~N[2016-05-24 13:26:08.543],
+            timezone_offset: 7200
+          },
+          "uuid" => 12345
+        }
+      },
+      %Bolt.Sips.Types.Node{id: 30, labels: ["Test"], properties: %{"uuid" => 6789}},
+      %Bolt.Sips.Types.Relationship{
+        end: 30,
+        id: 5,
+        properties: %{
+          "created" => %Bolt.Sips.Types.DateTimeWithTZOffset{
+            naive_datetime: ~N[2016-05-24 13:26:08.543],
+            timezone_offset: 7200
+          }
+        },
+        start: 69,
+        type: "UPDATED_TO_"
+      }
     ],
-    success: %{"result_consumed_after" => 1, "type" => "r"}
+    success: %{"type" => "r"}
   ]
 
   test "records from a complex Path" do
@@ -419,19 +480,43 @@ defmodule Bolt.Sips.Elements.Test do
   test "success" do
     {:ok, s} = Success.new(@success)
 
-    assert %Success{
+    assert %Bolt.Sips.Success{
              fields: ["p", "r"],
-             type: "r",
+             notifications: nil,
+             plan: nil,
+             profile: nil,
              records: [
                [
-                 [sig: 78, fields: [1, ["Person"], %{"born" => 1964, "name" => "Keanu Reeves"}]],
-                 [sig: 82, fields: [221, 1, 154, "ACTED_IN", %{"roles" => ["Julian Mercer"]}]]
+                 %Bolt.Sips.Types.Node{
+                   id: 1,
+                   labels: ["Person"],
+                   properties: %{"born" => 1964, "name" => "Keanu Reeves"}
+                 },
+                 %Bolt.Sips.Types.Relationship{
+                   end: 154,
+                   id: 221,
+                   properties: %{"roles" => ["Julian Mercer"]},
+                   start: 1,
+                   type: "ACTED_IN"
+                 }
                ],
                [
-                 [sig: 78, fields: [1, ["Person"], %{"born" => 1964, "name" => "Keanu Reeves"}]],
-                 [sig: 82, fields: [132, 1, 100, "ACTED_IN", %{"roles" => ["Johnny Mnemonic"]}]]
+                 %Bolt.Sips.Types.Node{
+                   id: 1,
+                   labels: ["Person"],
+                   properties: %{"born" => 1964, "name" => "Keanu Reeves"}
+                 },
+                 %Bolt.Sips.Types.Relationship{
+                   end: 107,
+                   id: 139,
+                   properties: %{"roles" => ["Johnny Mnemonic"]},
+                   start: 401,
+                   type: "ACTED_IN"
+                 }
                ]
-             ]
+             ],
+             stats: nil,
+             type: "r"
            } == s
 
     assert ["p", "r"] == s.fields

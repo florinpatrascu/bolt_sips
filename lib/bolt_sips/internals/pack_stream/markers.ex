@@ -30,6 +30,11 @@ defmodule Bolt.Sips.Internals.PackStream.Markers do
       @tiny_struct_marker 0xB
       @struct8_marker 0xDC
       @struct16_marker 0xDD
+
+      @node_marker 0x4E
+      @relationship_marker 0x52
+      @unbounded_relationship_marker 0x72
+      @path_marker 0x50
     end
   end
 end
