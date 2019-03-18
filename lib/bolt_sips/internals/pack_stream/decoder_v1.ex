@@ -9,6 +9,9 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
   - List
   - Map
   - Struct
+
+  Functions from this module are not meant to be used directly.
+  Use `Decoder.decode(data, bolt_version)` for all decoding purposes.
   """
   use Bolt.Sips.Internals.PackStream.Markers
   alias Bolt.Sips.Internals.PackStream.Decoder
@@ -155,11 +158,11 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
   # TODO: All structs are known ones
   # This function should be useless
   # Delete it as soon as decoder V2 is implemented!
-  def decode({signature, struct, struct_size}, bolt_version) do
-    {struct, rest} = struct |> Decoder.decode(bolt_version) |> Enum.split(struct_size)
+  # def decode({signature, struct, struct_size}, bolt_version) do
+  #   {struct, rest} = struct |> Decoder.decode(bolt_version) |> Enum.split(struct_size)
 
-    [[sig: signature, fields: struct] | rest]
-  end
+  #   [[sig: signature, fields: struct] | rest]
+  # end
 
   # Manage the end of data
   def decode("", _), do: []

@@ -54,28 +54,39 @@ defmodule Bolt.Sips.Internals.PackStream.Markers do
 
       # Local Time
       @local_time_signature 0x74
+      @local_time_struct_size 1
 
       # Time With TZ Offset
       @time_with_tz_signature 0x54
+      @time_with_tz_struct_size 2
 
       # Date
       @date_signature 0x44
+      @date_struct_size 1
 
       # Local DateTime
       @local_datetime_signature 0x64
+      @local_datetime_struct_size 2
 
       # Datetime with TZ offset
       @datetime_with_zone_offset_signature 0x46
+      @datetime_with_zone_offset_struct_size 3
 
       # Datetime with TZ id
       @datetime_with_zone_id_signature 0x66
+      @datetime_with_zone_id_struct_size 3
 
       # Duration
       @duration_signature 0x45
+      @duration_struct_size 4
 
-      # Point
+      # Point 2D
       @point2d_signature 0x58
+      @point2d_struct_size 3
+
+      # Point 3D
       @point3d_signature 0x59
+      @point3d_struct_size 4
     end
   end
 end
