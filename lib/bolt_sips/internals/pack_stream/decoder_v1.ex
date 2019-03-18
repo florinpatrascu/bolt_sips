@@ -68,32 +68,32 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
   end
 
   # Maps
-  def decode(<<0xA::4, entries::4>> <> bin, bolt_version) do
+  def decode(<<@tiny_map_marker::4, entries::4>> <> bin, bolt_version) do
     decode_map(bin, entries, bolt_version)
   end
 
-  def decode(<<0xD8, entries::8>> <> bin, bolt_version) do
+  def decode(<<@map8_marker, entries::8>> <> bin, bolt_version) do
     decode_map(bin, entries, bolt_version)
   end
 
-  def decode(<<0xD9, entries::16>> <> bin, bolt_version) do
+  def decode(<<@map16_marker, entries::16>> <> bin, bolt_version) do
     decode_map(bin, entries, bolt_version)
   end
 
-  def decode(<<0xDA, entries::32>> <> bin, bolt_version) do
+  def decode(<<@map32_marker, entries::32>> <> bin, bolt_version) do
     decode_map(bin, entries, bolt_version)
   end
 
   # Struct
-  def decode(<<0xB::4, struct_size::4, sig::8>> <> struct, bolt_version) do
+  def decode(<<@tiny_struct_marker::4, struct_size::4, sig::8>> <> struct, bolt_version) do
     decode_struct(sig, struct, struct_size, bolt_version)
   end
 
-  def decode(<<0xDC, struct_size::8, sig::8>> <> struct, bolt_version) do
+  def decode(<<@struct8_marker, struct_size::8, sig::8>> <> struct, bolt_version) do
     decode_struct(sig, struct, struct_size, bolt_version)
   end
 
-  def decode(<<0xDD, struct_size::16, sig::8>> <> struct, bolt_version) do
+  def decode(<<@struct16_marker, struct_size::16, sig::8>> <> struct, bolt_version) do
     decode_struct(sig, struct, struct_size, bolt_version)
   end
 
@@ -101,19 +101,19 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
   def decode("", _), do: []
 
   # Integers
-  def decode(<<0xC8, int::signed-integer, rest::binary>>, bolt_version) do
+  def decode(<<@int8_marker, int::signed-integer, rest::binary>>, bolt_version) do
     [int | Decoder.decode(rest, bolt_version)]
   end
 
-  def decode(<<0xC9, int::signed-integer-16, rest::binary>>, bolt_version) do
+  def decode(<<@int16_marker, int::signed-integer-16, rest::binary>>, bolt_version) do
     [int | Decoder.decode(rest, bolt_version)]
   end
 
-  def decode(<<0xCA, int::signed-integer-32, rest::binary>>, bolt_version) do
+  def decode(<<@int32_marker, int::signed-integer-32, rest::binary>>, bolt_version) do
     [int | Decoder.decode(rest, bolt_version)]
   end
 
-  def decode(<<0xCB, int::signed-integer-64, rest::binary>>, bolt_version) do
+  def decode(<<@int64_marker, int::signed-integer-64, rest::binary>>, bolt_version) do
     [int | Decoder.decode(rest, bolt_version)]
   end
 
