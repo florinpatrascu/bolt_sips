@@ -17,7 +17,7 @@ defmodule Bolt.Sips.Internals.PackStream.Decoder do
 
   @available_bolt_versions BoltVersionHelper.available_versions()
 
-  @spec decode(binary(), integer()) :: list()
+  @spec decode(binary() | {integer(), binary(), integer()}, integer()) :: list()
   def decode(data, bolt_version)
       when is_integer(bolt_version) and bolt_version in @available_bolt_versions do
     call_decode(data, bolt_version, bolt_version)
@@ -46,7 +46,8 @@ defmodule Bolt.Sips.Internals.PackStream.Decoder do
   # If not, fallback to previous bolt version
   #
   # If decoding function is present in none of the bolt  version, an error will be raised
-  @spec call_decode(binary(), integer(), nil | integer()) :: list() | PackStreamError.t()
+  @spec call_decode(binary() | {integer(), binary(), integer()}, integer(), nil | integer()) ::
+          list() | PackStreamError.t()
   defp call_decode(data, bolt_version, nil) do
     raise PackStreamError,
       data: data,
@@ -59,11 +60,21 @@ defmodule Bolt.Sips.Internals.PackStream.Decoder do
 
     with true <- Code.ensure_loaded?(module),
          true <- Kernel.function_exported?(module, :decode, 2),
-         result <- Kernel.apply(module, :decode, [data, used_version]),
+         result <- Kernel.apply(module, :decode, [data, original_version]),
          true <- is_list(result) do
       result
     else
       _ -> call_decode(data, original_version, BoltVersionHelper.previous(used_version))
     end
+  end
+
+  @doc """
+  Decodes a struct
+  """
+  @spec decode_struct(binary(), integer(), integer()) :: {list(), list()}
+  def decode_struct(struct, struct_size, bolt_version) do
+    struct
+    |> decode(bolt_version)
+    |> Enum.split(struct_size)
   end
 end

@@ -14,7 +14,8 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
   alias Bolt.Sips.Internals.PackStream.Decoder
   alias Bolt.Sips.Types
 
-  @spec decode(binary(), integer()) :: list() | {:error, :not_implemented}
+  @spec decode(binary() | {integer(), binary(), integer()}, integer()) ::
+          list() | {:error, :not_implemented}
   def decode(<<@null_marker, rest::binary>>, bolt_version) do
     [nil | Decoder.decode(rest, bolt_version)]
   end
@@ -86,15 +87,78 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
 
   # Struct
   def decode(<<@tiny_struct_marker::4, struct_size::4, sig::8>> <> struct, bolt_version) do
-    decode_struct(sig, struct, struct_size, bolt_version)
+    Decoder.decode({sig, struct, struct_size}, bolt_version)
   end
 
   def decode(<<@struct8_marker, struct_size::8, sig::8>> <> struct, bolt_version) do
-    decode_struct(sig, struct, struct_size, bolt_version)
+    Decoder.decode({sig, struct, struct_size}, bolt_version)
   end
 
   def decode(<<@struct16_marker, struct_size::16, sig::8>> <> struct, bolt_version) do
-    decode_struct(sig, struct, struct_size, bolt_version)
+    Decoder.decode({sig, struct, struct_size}, bolt_version)
+  end
+
+  ######### SPECIAL STRUCTS
+
+  # Node
+  def decode({@node_marker, struct, struct_size}, bolt_version) do
+    {[id, labels, props], rest} = Decoder.decode_struct(struct, struct_size, bolt_version)
+
+    node = %Types.Node{id: id, labels: labels, properties: props}
+
+    [node | rest]
+  end
+
+  # Relationship
+  def decode({@relationship_marker, struct, struct_size}, bolt_version) do
+    {[id, start_node, end_node, type, props], rest} =
+      Decoder.decode_struct(struct, struct_size, bolt_version)
+
+    relationship = %Types.Relationship{
+      id: id,
+      start: start_node,
+      end: end_node,
+      type: type,
+      properties: props
+    }
+
+    [relationship | rest]
+  end
+
+  # UnboundedRelationship
+  def decode({@unbounded_relationship_marker, struct, struct_size}, bolt_version) do
+    {[id, type, props], rest} = Decoder.decode_struct(struct, struct_size, bolt_version)
+
+    unbounded_relationship = %Types.UnboundRelationship{
+      id: id,
+      type: type,
+      properties: props
+    }
+
+    [unbounded_relationship | rest]
+  end
+
+  # Path
+  def decode({@path_marker, struct, struct_size}, bolt_version) do
+    {[nodes, relationships, sequence], rest} =
+      Decoder.decode_struct(struct, struct_size, bolt_version)
+
+    path = %Types.Path{
+      nodes: nodes,
+      relationships: relationships,
+      sequence: sequence
+    }
+
+    [path | rest]
+  end
+
+  # TODO: All structs are known ones
+  # This function should be useless
+  # Delete it as soon as decoder V2 is implemented!
+  def decode({signature, struct, struct_size}, bolt_version) do
+    {struct, rest} = struct |> Decoder.decode(bolt_version) |> Enum.split(struct_size)
+
+    [[sig: signature, fields: struct] | rest]
   end
 
   # Manage the end of data
@@ -151,72 +215,5 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
     |> Enum.chunk_every(2)
     |> Enum.map(&List.to_tuple/1)
     |> Map.new()
-  end
-
-  ######### SPECIAL STRUCTS
-
-  # Node
-  defp decode_struct(@node_marker, struct, struct_size, bolt_version) do
-    {[id, labels, props], rest} = do_decode_struct(struct, struct_size, bolt_version)
-
-    node = %Types.Node{id: id, labels: labels, properties: props}
-
-    [node | rest]
-  end
-
-  # Relationship
-  defp decode_struct(@relationship_marker, struct, struct_size, bolt_version) do
-    {[id, start_node, end_node, type, props], rest} =
-      do_decode_struct(struct, struct_size, bolt_version)
-
-    relationship = %Types.Relationship{
-      id: id,
-      start: start_node,
-      end: end_node,
-      type: type,
-      properties: props
-    }
-
-    [relationship | rest]
-  end
-
-  # UnboundedRelationship
-  defp decode_struct(@unbounded_relationship_marker, struct, struct_size, bolt_version) do
-    {[id, type, props], rest} = do_decode_struct(struct, struct_size, bolt_version)
-
-    unbounded_relationship = %Types.UnboundRelationship{
-      id: id,
-      type: type,
-      properties: props
-    }
-
-    [unbounded_relationship | rest]
-  end
-
-  # Path
-  defp decode_struct(@path_marker, struct, struct_size, bolt_version) do
-    {[nodes, relationships, sequence], rest} = do_decode_struct(struct, struct_size, bolt_version)
-
-    path = %Types.Path{
-      nodes: nodes,
-      relationships: relationships,
-      sequence: sequence
-    }
-
-    [path | rest]
-  end
-
-  @spec decode_struct(integer(), binary(), integer(), integer()) :: list()
-  defp decode_struct(signature, struct, struct_size, bolt_version) do
-    {struct, rest} = struct |> Decoder.decode(bolt_version) |> Enum.split(struct_size)
-
-    [[sig: signature, fields: struct] | rest]
-  end
-
-  @spec do_decode_struct(binary(), integer(), integer()) :: tuple()
-  defp do_decode_struct(struct, struct_size, bolt_version) do
-    struct
-    |> Decoder.decode(bolt_version)
-    |> Enum.split(struct_size)
   end
 end
