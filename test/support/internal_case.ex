@@ -8,13 +8,13 @@ defmodule Bolt.Sips.InternalCase do
     port_opts = [active: false, mode: :binary, packet: :raw]
     {:ok, port} = :gen_tcp.connect(uri.host, uri.port, port_opts)
     {:ok, bolt_version} = BoltProtocol.handshake(:gen_tcp, port)
-    {:ok, _} = BoltProtocol.init(:gen_tcp, port, uri.userinfo)
+    {:ok, _} = BoltProtocol.init(:gen_tcp, port, bolt_version, uri.userinfo)
 
     on_exit(fn ->
       :gen_tcp.close(port)
     end)
 
-    {:ok, port: port, is_bolt_v2: bolt_version >= 2}
+    {:ok, port: port, is_bolt_v2: bolt_version >= 2, bolt_version: bolt_version}
   end
 
   def neo4j_uri do

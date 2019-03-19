@@ -1,13 +1,13 @@
 defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
-  @moduledoc false
+  @moduledoc """
+  Manages the message encoding.
 
-  # Manages the message encoding.
-
-  # A mesage is a tuple formated as:
-  # `{message_type, data}`
-  # with:
-  #   - message_type: atom amongst the valid message type (:init, :discard_all, :pull_all, :ack_failure, :reset, :run)
-  #   - data: a list of data to be used by the message
+  A mesage is a tuple formated as:
+  `{message_type, data}`
+  with:
+    - message_type: atom amongst the valid message type (:init, :discard_all, :pull_all, :ack_failure, :reset, :run)
+    - data: a list of data to be used by the message
+  """
 
   @client_name "BoltSips/" <> to_string(Application.spec(:bolt_sips, :vsn))
 
@@ -35,36 +35,42 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @doc """
   Encode INIT message without auth token
 
-  ## Example:
+  ## Example
+
+      iex> alias Bolt.Sips.Internals.PackStream.Message
       iex> Message.encode({:init, []})
       <<0, 16, 178, 1, 140, 66, 111, 108, 116, 101, 120, 47, 48, 46, 52, 46, 48, 160,
         0, 0>>
   """
-  @spec encode({Bolt.Sips.Internals.PackStream.Message.out_signature(), list()}) ::
+  @spec encode({Bolt.Sips.Internals.PackStream.Message.out_signature(), list()}, integer()) ::
           Bolt.Sips.Internals.PackStream.Message.encoded()
-  def encode({:init, []}) do
-    encode({:init, [{}]})
+  def encode({:init, []}, bolt_version) do
+    encode({:init, [{}]}, bolt_version)
   end
 
   @doc """
   Encode INIT message with a valid auth token.
   The auth token is tuple formated as: {user, password}
 
-  ## Example:
+  ## Example
+
+      iex> alias Bolt.Sips.Internals.PackStream.Message
       iex(86)> Message.encode({:init, [{"neo4j", "password"}]})
     <<0, 66, 178, 1, 140, 66, 111, 108, 116, 101, 120, 47, 48, 46, 52, 46, 48, 163,
       139, 99, 114, 101, 100, 101, 110, 116, 105, 97, 108, 115, 136, 112, 97, 115,
       115, 119, 111, 114, 100, 137, 112, 114, 105, 110, 99, 105, 112, 97, 108, 133,
       ...>>
   """
-  def encode({:init, [auth]}) do
-    do_encode(:init, [@client_name, auth_params(auth)])
+  def encode({:init, [auth]}, bolt_version) do
+    do_encode(:init, [@client_name, auth_params(auth)], bolt_version)
   end
 
   @doc """
   Encode RUN message with its data: statement and parameters
 
   ## Example
+
+      iex> alias Bolt.Sips.Internals.PackStream.Message
       iex> Message.encode({:run, ["RETURN 1 AS num"]})
       <<0, 19, 178, 16, 143, 82, 69, 84, 85, 82, 78, 32, 49, 32, 65, 83, 32, 110, 117,
       109, 160, 0, 0>>
@@ -74,14 +80,16 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
 
   """
 
-  def encode({:run, [statement]}) do
-    do_encode(:run, [statement, %{}])
+  def encode({:run, [statement]}, bolt_version) do
+    do_encode(:run, [statement, %{}], bolt_version)
   end
 
   @doc """
   Encode all messages without data: ACK_FAILURE, DISCARD_ALL, PULL_ALL, RESET
 
-  ## Examples:
+  ## Example
+
+      iex> alias Bolt.Sips.Internals.PackStream.Message
       iex> Message.encode({:discard_all, []})
       <<0, 2, 176, 47, 0, 0>>
       iex> Message.encode({:ack_failure, []})
@@ -91,18 +99,18 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
       iex> Message.encode({:reset, []})
       <<0, 2, 176, 15, 0, 0>>
   """
-  def encode({message_type, data}) do
-    do_encode(message_type, data)
+  def encode({message_type, data}, bolt_version) do
+    do_encode(message_type, data, bolt_version)
   end
 
-  @spec do_encode(Bolt.Sips.Internals.PackStream.Message.out_signature(), list()) ::
+  @spec do_encode(Bolt.Sips.Internals.PackStream.Message.out_signature(), list(), integer()) ::
           Bolt.Sips.Internals.PackStream.Message.encoded()
-  defp do_encode(message_type, data) do
+  defp do_encode(message_type, data, bolt_version) do
     Bolt.Sips.Internals.Logger.log_message(:client, message_type, data)
 
     encoded =
       {signature(message_type), data}
-      |> Bolt.Sips.Internals.PackStream.encode()
+      |> Bolt.Sips.Internals.PackStream.encode(bolt_version)
       |> generate_chunks()
 
     Bolt.Sips.Internals.Logger.log_message(:client, message_type, encoded, :hex)

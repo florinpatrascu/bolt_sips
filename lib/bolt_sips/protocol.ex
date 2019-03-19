@@ -39,7 +39,7 @@ defmodule Bolt.Sips.Protocol do
 
     with {:ok, sock} <- socket().connect(host, port, socket_opts, timeout),
          {:ok, bolt_version} <- BoltProtocol.handshake(socket(), sock),
-         {:ok, _server_version} <- BoltProtocol.init(socket(), sock, auth),
+         {:ok, _server_version} <- BoltProtocol.init(socket(), sock, bolt_version, auth),
          :ok <- socket().setopts(sock, active: :once) do
       {:ok, %ConnData{sock: sock, bolt_version: bolt_version}}
     else
@@ -150,14 +150,14 @@ defmodule Bolt.Sips.Protocol do
          %QueryStatement{statement: statement} = q,
          params,
          _,
-         %ConnData{sock: sock} = conn_data
+         %ConnData{sock: sock, bolt_version: bolt_version} = conn_data
        ) do
-    case BoltProtocol.run_statement(socket(), sock, statement, params) do
+    case BoltProtocol.run_statement(socket(), sock, bolt_version, statement, params) do
       [{:success, _} | _] = data ->
         {:ok, q, data, conn_data}
 
       %BoltError{type: :cypher_error} = error ->
-        with :ok <- BoltProtocol.ack_failure(socket(), sock) do
+        with :ok <- BoltProtocol.ack_failure(socket(), sock, bolt_version) do
           {:error, error, conn_data}
         else
           error ->

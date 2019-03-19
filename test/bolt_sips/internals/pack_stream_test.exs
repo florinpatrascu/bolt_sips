@@ -240,16 +240,16 @@ defmodule Bolt.Sips.Internals.PackStreamTest do
     assert PackStream.decode(map_32) |> List.first() |> map_size == 66_000
   end
 
-  test "decodes structs" do
-    assert PackStream.decode(<<0xB0, 0x01>>) == [[sig: 1, fields: []]]
-    assert PackStream.decode(<<0xB1, 0x01, 0x01>>) == [[sig: 1, fields: [1]]]
+  # test "decodes structs" do
+  #   assert PackStream.decode(<<0xB0, 0x01>>) == [[sig: 1, fields: []]]
+  #   assert PackStream.decode(<<0xB1, 0x01, 0x01>>) == [[sig: 1, fields: [1]]]
 
-    struct_8 = <<0xDC, 16::8, 0x02>> <> (1..16 |> Enum.map(&PackStream.encode/1) |> Enum.join())
-    assert PackStream.decode(struct_8) == [[sig: 2, fields: Enum.to_list(1..16)]]
+  #   struct_8 = <<0xDC, 16::8, 0x02>> <> (1..16 |> Enum.map(&PackStream.encode/1) |> Enum.join())
+  #   assert PackStream.decode(struct_8) == [[sig: 2, fields: Enum.to_list(1..16)]]
 
-    struct_16 =
-      <<0xDD, 256::16, 0x03>> <> (1..256 |> Enum.map(&PackStream.encode/1) |> Enum.join())
+  #   struct_16 =
+  #     <<0xDD, 256::16, 0x03>> <> (1..256 |> Enum.map(&PackStream.encode/1) |> Enum.join())
 
-    assert PackStream.decode(struct_16) == [[sig: 3, fields: Enum.to_list(1..256)]]
-  end
+  #   assert PackStream.decode(struct_16) == [[sig: 3, fields: Enum.to_list(1..256)]]
+  # end
 end
