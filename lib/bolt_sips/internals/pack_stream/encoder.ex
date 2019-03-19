@@ -1,4 +1,3 @@
-alias Bolt.Sips.Internals.Types
 alias Bolt.Sips.Internals.PackStream
 alias Bolt.Sips.Internals.PackStream.EncoderHelper
 

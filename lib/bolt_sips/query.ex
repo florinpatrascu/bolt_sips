@@ -109,41 +109,6 @@ defmodule Bolt.Sips.Query do
     {name, Types.Duration.format_param(duration)}
   end
 
-  defp format_param({name, %Time{} = time}) do
-    {name, {:ok, Time.to_iso8601(time)}}
-  end
-
-  defp format_param({name, %Date{} = date}) do
-    {name, {:ok, Date.to_iso8601(date)}}
-  end
-
-  defp format_param({name, %DateTime{time_zone: time_zone} = date}) when not is_nil(date) do
-    d = date |> Calendar.DateTime.Format.iso8601()
-
-    datetime_with_zone_id =
-      case time_zone do
-        "Etc/UTC" ->
-          Regex.replace(~r/Z/, d, "[#{time_zone}]")
-
-        _ ->
-          Regex.replace(~r/\+[0-9]{2}:[0-9]{2}/, d, "[#{time_zone}]")
-      end
-
-    {name, {:ok, datetime_with_zone_id}}
-  end
-
-  defp format_param({name, %NaiveDateTime{} = ndt}) do
-    {name, {:ok, ndt |> NaiveDateTime.to_iso8601()}}
-  end
-
-  defp format_param({name, %Types.TimeWithTZOffset{} = timetz}) do
-    {name, Types.TimeWithTZOffset.format_param(timetz)}
-  end
-
-  defp format_param({name, %Types.DateTimeWithTZOffset{} = datetimetz}) do
-    {name, Types.DateTimeWithTZOffset.format_param(datetimetz)}
-  end
-
   defp format_param({name, %Types.Point{} = point}) do
     {name, Types.Point.format_param(point)}
   end
