@@ -1,4 +1,5 @@
 defmodule Bolt.Sips.Internals.PackStream.BoltVersionHelper do
+  @moduledoc false
   @available_bolt_versions [1, 2]
 
   @doc """

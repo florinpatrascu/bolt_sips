@@ -1,5 +1,6 @@
 defmodule Bolt.Sips.Internals.PackStream.DecoderV2 do
-  @moduledoc """
+  @moduledoc false
+  _module_doc = """
   Bolt V2 has specification for decoding:
   - Temporal types:
     - Local Date
@@ -19,6 +20,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV2 do
   Functions from this module are not meant to be used directly.
   Use `Decoder.decode(data, bolt_version)` for all decoding purposes.
   """
+
   use Bolt.Sips.Internals.PackStream.Markers
   alias Bolt.Sips.Internals.PackStream.Decoder
   alias Bolt.Sips.Types.{TimeWithTZOffset, DateTimeWithTZOffset, Duration, Point}

@@ -1,5 +1,6 @@
 defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
-  @moduledoc """
+  @moduledoc false
+  _moduledoc = """
   Bolt V1 can decode:
   - Null
   - Boolean
@@ -13,6 +14,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
   Functions from this module are not meant to be used directly.
   Use `Decoder.decode(data, bolt_version)` for all decoding purposes.
   """
+
   use Bolt.Sips.Internals.PackStream.Markers
   alias Bolt.Sips.Internals.PackStream.Decoder
   alias Bolt.Sips.Types

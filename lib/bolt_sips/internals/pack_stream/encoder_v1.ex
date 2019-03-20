@@ -1,4 +1,5 @@
 defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
+  @moduledoc false
   alias Bolt.Sips.Internals.PackStream.Encoder
   use Bolt.Sips.Internals.PackStream.Markers
 
@@ -24,7 +25,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
   | false | `0xC2` |
   | true | `0xC3` |
 
-  Othe ratoms are converted to string before enco.ding
+  Other atoms are converted to string before encoding.
 
   ## Example
 
@@ -93,18 +94,19 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
 
   |   | Marker |
   |---|--------|
-  | tiny int | 0x2A |
-  | int8 | 0xC8 |
-  | int16 | 0xC9 |
-  | int32 | 0xCA |
-  | int64 | 0xCB |
+  | tiny int | `0x2A` |
+  | int8 | `0xC8` |
+  | int16 | `0xC9` |
+  | int32 | `0xCA` |
+  | int64 | `0xCB` |
 
   ## Example
-    iex> alias Bolt.Sips.Internals.PackStream.EncoderV1
-    iex> EncoderV1.encode_integer(74, 1)
-    <<0x4A>>
-    iex> EncoderV1.encode_integer(-74_789, 1)
-    <<0xCA, 0xFF, 0xFE, 0xDB, 0xDB>>
+
+      iex> alias Bolt.Sips.Internals.PackStream.EncoderV1
+      iex> EncoderV1.encode_integer(74, 1)
+      <<0x4A>>
+      iex> EncoderV1.encode_integer(-74_789, 1)
+      <<0xCA, 0xFF, 0xFE, 0xDB, 0xDB>>
   """
   @spec encode_integer(integer(), integer()) :: Bolt.Sips.Internals.PackStream.value()
   def encode_integer(integer, _bolt_version) when integer in -16..127 do
@@ -134,15 +136,16 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
   Encode a float into Bolt binary format.
 
   Encoding: `Marker` `8 byte Content`.
+
   Marker: `0xC1`
 
-  Formatted according to the IEEE 754 floating-point "double format" bit layout.
+  Formated according to the IEEE 754 floating-point "double format" bit layout.
 
   ## Example
 
-    iex> alias Bolt.Sips.Internals.PackStream.EncoderV1
-    iex> EncoderV1.encode_float(42.42, 1)
-    <<0xC1, 0x40, 0x45, 0x35, 0xC2, 0x8F, 0x5C, 0x28, 0xF6>>
+      iex> alias Bolt.Sips.Internals.PackStream.EncoderV1
+      iex> EncoderV1.encode_float(42.42, 1)
+      <<0xC1, 0x40, 0x45, 0x35, 0xC2, 0x8F, 0x5C, 0x28, 0xF6>>
   """
   @spec encode_float(float(), integer()) :: Bolt.Sips.Internals.PackStream.value()
   def encode_float(number, _bolt_version), do: <<@float_marker, number::float>>
@@ -232,7 +235,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
   end
 
   @spec encode_kv(map(), integer()) :: binary()
-  def encode_kv(map, bolt_version) do
+  defp encode_kv(map, bolt_version) do
     Enum.reduce(map, <<>>, fn data, acc ->
       acc <> do_reduce_kv(data, bolt_version)
     end)

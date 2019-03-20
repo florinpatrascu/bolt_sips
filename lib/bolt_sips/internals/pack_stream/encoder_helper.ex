@@ -1,4 +1,5 @@
 defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
+  @moduledoc false
   alias Bolt.Sips.Internals.PackStreamError
   alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
 

@@ -18,7 +18,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message do
   @doc """
   Encode a message depending on its type
   """
-  # TODO: Make bolt_version mandatory
   @spec encode({Bolt.Sips.Internals.PackStream.Message.out_signature(), list()}, integer()) ::
           Bolt.Sips.Internals.PackStream.Message.encoded()
   def encode(message, bolt_version) do
@@ -28,7 +27,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message do
   @doc """
   Decode a message
   """
-  # TODO: Make bolt_version mandatory
   @spec decode(Bolt.Sips.Internals.PackStream.Message.encoded(), integer()) ::
           Bolt.Sips.Internals.PackStream.Message.decoded()
   def decode(message, bolt_version) do

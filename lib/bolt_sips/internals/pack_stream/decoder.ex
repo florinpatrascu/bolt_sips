@@ -1,5 +1,6 @@
 defmodule Bolt.Sips.Internals.PackStream.Decoder do
-  @moduledoc """
+  @moduledoc false
+  _moduledoc = """
   This module is responsible for dispatching decoding amongst decoder depending on the
   used bolt version.
 
@@ -12,6 +13,7 @@ defmodule Bolt.Sips.Internals.PackStream.Decoder do
   - Unbound relationship
   - Path
   """
+
   alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
   alias Bolt.Sips.Internals.PackStreamError
 
