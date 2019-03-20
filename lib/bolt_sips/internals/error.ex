@@ -10,8 +10,6 @@ defmodule Bolt.Sips.Internals.Error do
           type: atom()
         }
 
-  alias Bolt.Sips.Internals.Utils
-
   @doc false
   # Produce a Bolt.Sips.Internals.Error depending on the context.
   @spec exception(any(), nil | port(), atom()) :: Bolt.Sips.Internals.Error.t()
@@ -56,7 +54,7 @@ defmodule Bolt.Sips.Internals.Error do
   defp message_for(:handshake, bin) when is_binary(bin) do
     """
     Handshake failed.
-    Expected 01:00:00:00 as a result, received: #{Utils.hex_encode(bin)}.
+    Expected 01:00:00:00 as a result, received: #{inspect(bin, base: :hex)}.
     """
   end
 

@@ -233,7 +233,9 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
 
   @spec encode_kv(map(), integer()) :: binary()
   def encode_kv(map, bolt_version) do
-    Bolt.Sips.Internals.Utils.reduce_to_binary(map, &do_reduce_kv(&1, bolt_version))
+    Enum.reduce(map, <<>>, fn data, acc ->
+      acc <> do_reduce_kv(data, bolt_version)
+    end)
   end
 
   @spec do_reduce_kv({atom(), any()}, integer()) :: binary()
