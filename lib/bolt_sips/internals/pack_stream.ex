@@ -22,7 +22,7 @@ defmodule Bolt.Sips.Internals.PackStream do
       <<0x8B, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0x20, 0x77, 0x6F, 0x72, 0x6C, 0x64>>
   """
   @spec encode(any(), integer()) :: Bolt.Sips.Internals.PackStream.value() | <<_::16, _::_*8>>
-  def encode(item, bolt_version \\ 1) do
+  def encode(item, bolt_version) do
     Bolt.Sips.Internals.PackStream.Encoder.encode(item, bolt_version)
   end
 
@@ -35,7 +35,7 @@ defmodule Bolt.Sips.Internals.PackStream do
       [true]
   """
   @spec decode(binary(), integer()) :: list()
-  def decode(data, bolt_version \\ 1) do
+  def decode(data, bolt_version) do
     Bolt.Sips.Internals.PackStream.Decoder.decode(data, bolt_version)
   end
 end

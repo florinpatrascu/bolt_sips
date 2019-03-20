@@ -40,13 +40,15 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1Test do
     assert DecoderV1.decode(<<0x90>>, 1) == [[]]
     assert DecoderV1.decode(<<0x93, 0x01, 0x02, 0x03>>, 1) == [[1, 2, 3]]
 
-    list_8 = <<0xD4, 16::8>> <> (1..16 |> Enum.map(&PackStream.encode/1) |> Enum.join())
+    list_8 = <<0xD4, 16::8>> <> (1..16 |> Enum.map(&PackStream.encode(&1, 1)) |> Enum.join())
     assert DecoderV1.decode(list_8, 1) == [1..16 |> Enum.to_list()]
 
-    list_16 = <<0xD5, 256::16>> <> (1..256 |> Enum.map(&PackStream.encode/1) |> Enum.join())
+    list_16 = <<0xD5, 256::16>> <> (1..256 |> Enum.map(&PackStream.encode(&1, 1)) |> Enum.join())
     assert DecoderV1.decode(list_16, 1) == [1..256 |> Enum.to_list()]
 
-    list_32 = <<0xD6, 66_000::32>> <> (1..66_000 |> Enum.map(&PackStream.encode/1) |> Enum.join())
+    list_32 =
+      <<0xD6, 66_000::32>> <> (1..66_000 |> Enum.map(&PackStream.encode(&1, 1)) |> Enum.join())
+
     assert DecoderV1.decode(list_32, 1) == [1..66_000 |> Enum.to_list()]
 
     ending_0_list = <<0x93, 0x91, 0x1, 0x92, 0x2, 0x0, 0x0>>
@@ -61,7 +63,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1Test do
     map_8 =
       <<0xD8, 16::8>> <>
         (1..16
-         |> Enum.map(fn i -> PackStream.encode("#{i}") <> <<1>> end)
+         |> Enum.map(fn i -> PackStream.encode("#{i}", 1) <> <<1>> end)
          |> Enum.join())
 
     assert DecoderV1.decode(map_8, 1) |> List.first() |> map_size == 16
@@ -69,7 +71,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1Test do
     map_16 =
       <<0xD9, 256::16>> <>
         (1..256
-         |> Enum.map(fn i -> PackStream.encode("#{i}") <> <<1>> end)
+         |> Enum.map(fn i -> PackStream.encode("#{i}", 1) <> <<1>> end)
          |> Enum.join())
 
     assert DecoderV1.decode(map_16, 1) |> List.first() |> map_size == 256
@@ -77,25 +79,10 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1Test do
     map_32 =
       <<0xDA, 66_000::32>> <>
         (1..66_000
-         |> Enum.map(fn i -> PackStream.encode("#{i}") <> <<1>> end)
+         |> Enum.map(fn i -> PackStream.encode("#{i}", 1) <> <<1>> end)
          |> Enum.join())
 
     assert DecoderV1.decode(map_32, 1) |> List.first() |> map_size == 66_000
-  end
-
-  test "decodes structs" do
-    # TODO: delete these tests
-    # Structs and their signatures are all known, these tests are then useless
-    # assert DecoderV1.decode(<<0xB0, 0x01>>, 1) == [[sig: 1, fields: []]]
-    # assert DecoderV1.decode(<<0xB1, 0x01, 0x01>>, 1) == [[sig: 1, fields: [1]]]
-
-    # struct_8 = <<0xDC, 16::8, 0x02>> <> (1..16 |> Enum.map(&PackStream.encode/1) |> Enum.join())
-    # assert DecoderV1.decode(struct_8, 1) == [[sig: 2, fields: Enum.to_list(1..16)]]
-
-    # struct_16 =
-    #   <<0xDD, 256::16, 0x03>> <> (1..256 |> Enum.map(&PackStream.encode/1) |> Enum.join())
-
-    # assert DecoderV1.decode(struct_16, 1) == [[sig: 3, fields: Enum.to_list(1..256)]]
   end
 
   test "decodes integers" do
