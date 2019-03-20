@@ -157,15 +157,6 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
     [path | rest]
   end
 
-  # TODO: All structs are known ones
-  # This function should be useless
-  # Delete it as soon as decoder V2 is implemented!
-  # def decode({signature, struct, struct_size}, bolt_version) do
-  #   {struct, rest} = struct |> Decoder.decode(bolt_version) |> Enum.split(struct_size)
-
-  #   [[sig: signature, fields: struct] | rest]
-  # end
-
   # Manage the end of data
   def decode("", _), do: []
 
