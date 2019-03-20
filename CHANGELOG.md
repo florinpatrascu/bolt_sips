@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.0
+
+- Encoding / Decoding types is now at the lowest possible level
+- Decompose encoders / decoders by bolt version 
+- Expose only public API in docs
+
 ## 1.3.0
 
 - 1.3.0 stable release. Many thanks to Dominique VASSARD, for his awesome contributions.
