@@ -1,4 +1,5 @@
 defmodule Bolt.Sips.QueryStatement do
+  @moduledoc false
   defstruct statement: ""
 end
 

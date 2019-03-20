@@ -1,5 +1,6 @@
 defmodule Bolt.Sips.Utils do
-  @moduledoc "Common utilities"
+  @moduledoc false
+  # Common utilities
 
   @doc """
   Generate a random string.

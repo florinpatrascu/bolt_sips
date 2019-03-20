@@ -1,14 +1,11 @@
 defmodule Bolt.Sips.Protocol do
-  @moduledoc """
-  Implements callbacks required by DBConnection.
-
-  Each callback receives an open connection as a state.
-  """
+  @moduledoc false
+  # Implements callbacks required by DBConnection.
+  # Each callback receives an open connection as a state.
 
   defmodule ConnData do
-    @moduledoc """
-    Defines the state used by DbConnection implementation
-    """
+    @moduledoc false
+    # Defines the state used by DbConnection implementation
     defstruct [:sock, :bolt_version]
 
     @type t :: %__MODULE__{

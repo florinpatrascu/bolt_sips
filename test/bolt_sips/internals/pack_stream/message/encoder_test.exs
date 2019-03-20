@@ -1,7 +1,7 @@
 defmodule Bolt.Sips.Internals.PackStream.Message.EncoderTest do
   use ExUnit.Case, async: true
 
-  # doctest Bolt.Sips.Internals.PackStream.Message.Encoder
+  doctest Bolt.Sips.Internals.PackStream.Message.Encoder
 
   alias Bolt.Sips.Internals.PackStream.Message.Encoder
   alias Bolt.Sips.Internals.PackStream.BoltVersionHelper

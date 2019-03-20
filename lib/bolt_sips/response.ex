@@ -25,9 +25,8 @@ defmodule Bolt.Sips.Response do
   require Logger
   require Integer
 
-  @doc """
-  transform a raw Bolt response to a list of Responses
-  """
+  @doc false
+  # transform a raw Bolt response to a list of Responses
   def transform(raw, _stats \\ :no) do
     # IO.puts("bolt raw response: #{inspect(raw)}")
 

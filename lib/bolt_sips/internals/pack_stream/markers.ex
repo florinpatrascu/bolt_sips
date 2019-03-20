@@ -93,6 +93,7 @@ defmodule Bolt.Sips.Internals.PackStream.Markers do
 end
 
 defmodule Bolt.Sips.Internals.PackStream.MarkersHelper do
+  @moduledoc false
   use Bolt.Sips.Internals.PackStream.Markers
 
   @doc """

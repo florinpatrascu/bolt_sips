@@ -1,7 +1,6 @@
 defmodule Bolt.Sips.ConfigAgent do
-  @moduledoc """
-  just hold the user config and offer some utility for accessing it
-  """
+  @moduledoc false
+  # just hold the user config and offer some utility for accessing it
 
   use Agent
 
