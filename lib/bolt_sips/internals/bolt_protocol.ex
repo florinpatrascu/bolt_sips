@@ -96,7 +96,8 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
 
   See "Shared options" in the documentation of this module.
   """
-  @spec handshake(atom(), port(), Keyword.t()) :: :ok | {:error, Bolt.Sips.Internals.Error.t()}
+  @spec handshake(atom(), port(), Keyword.t()) ::
+          {:ok, integer()} | {:error, Bolt.Sips.Internals.Error.t()}
   def handshake(transport, port, options \\ []) do
     recv_timeout = get_recv_timeout(options)
 
@@ -120,7 +121,7 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
       {:ok, <<version::32>> = packet} when version <= @max_version ->
         Bolt.Sips.Internals.Logger.log_message(:server, :handshake, packet, :hex)
         Bolt.Sips.Internals.Logger.log_message(:server, :handshake, version)
-        :ok
+        {:ok, version}
 
       {:ok, other} ->
         {:error, Error.exception(other, port, :handshake)}
@@ -148,12 +149,12 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
       iex> Bolt.Sips.Internals.BoltProtocol.init :gen_tcp, port, {"username", "password"}
       {:ok, info}
   """
-  @spec init(atom(), port(), tuple(), Keyword.t()) ::
+  @spec init(atom(), port(), integer(), tuple(), Keyword.t()) ::
           {:ok, any()} | {:error, Bolt.Sips.Internals.Error.t()}
-  def init(transport, port, auth \\ {}, options \\ []) do
-    send_message(transport, port, {:init, [auth]})
+  def init(transport, port, bolt_version, auth \\ {}, options \\ []) do
+    send_message(transport, port, bolt_version, {:init, [auth]})
 
-    case receive_data(transport, port, options) do
+    case receive_data(transport, port, bolt_version, options) do
       {:success, info} ->
         {:ok, info}
 
@@ -169,11 +170,11 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
   # Sends a message using the Bolt protocol and PackStream encoding.
   #
   # Message have to be in the form of {message_type, [data]}.
-  @spec send_message(atom(), port(), Bolt.Sips.Internals.PackStream.Message.raw()) ::
+  @spec send_message(atom(), port(), integer(), Bolt.Sips.Internals.PackStream.Message.raw()) ::
           :ok | {:error, any()}
-  def send_message(transport, port, message) do
+  def send_message(transport, port, bolt_version, message) do
     message
-    |> Message.encode()
+    |> Message.encode(bolt_version)
     |> (fn data -> transport.send(port, data) end).()
   end
 
@@ -197,18 +198,18 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
         {:success, %{"type" => "r"}}
       ]
   """
-  @spec run_statement(atom(), port(), String.t(), map(), Keyword.t()) ::
+  @spec run_statement(atom(), port(), integer(), String.t(), map(), Keyword.t()) ::
           [
             Bolt.Sips.Internals.PackStream.Message.decoded()
           ]
           | Bolt.Sips.Internals.Error.t()
-  def run_statement(transport, port, statement, params \\ %{}, options \\ []) do
+  def run_statement(transport, port, bolt_version, statement, params \\ %{}, options \\ []) do
     data = [statement, params]
 
-    with :ok <- send_message(transport, port, {:run, data}),
-         {:success, _} = data <- receive_data(transport, port, options),
-         :ok <- send_message(transport, port, {:pull_all, []}),
-         more_data <- receive_data(transport, port, options),
+    with :ok <- send_message(transport, port, bolt_version, {:run, data}),
+         {:success, _} = data <- receive_data(transport, port, bolt_version, options),
+         :ok <- send_message(transport, port, bolt_version, {:pull_all, []}),
+         more_data <- receive_data(transport, port, bolt_version, options),
          more_data = List.wrap(more_data),
          {:success, _} <- List.last(more_data) do
       [data | more_data]
@@ -234,11 +235,11 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
 
   See "Shared options" in the documentation of this module.
   """
-  @spec ack_failure(atom(), port(), Keyword.t()) :: :ok | Bolt.Sips.Internals.Error.t()
-  def ack_failure(transport, port, options \\ []) do
-    send_message(transport, port, {:ack_failure, []})
+  @spec ack_failure(atom(), port(), integer(), Keyword.t()) :: :ok | Bolt.Sips.Internals.Error.t()
+  def ack_failure(transport, port, bolt_version, options \\ []) do
+    send_message(transport, port, bolt_version, {:ack_failure, []})
 
-    case receive_data(transport, port, options) do
+    case receive_data(transport, port, bolt_version, options) do
       {:success, %{}} -> :ok
       error -> Error.exception(error, port, :ack_failure)
     end
@@ -254,11 +255,11 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
 
   See "Shared options" in the documentation of this module.
   """
-  @spec reset(atom(), port(), Keyword.t()) :: :ok | Bolt.Sips.Internals.Error.t()
-  def reset(transport, port, options \\ []) do
-    send_message(transport, port, {:reset, []})
+  @spec reset(atom(), port(), integer(), Keyword.t()) :: :ok | Bolt.Sips.Internals.Error.t()
+  def reset(transport, port, bolt_version, options \\ []) do
+    send_message(transport, port, bolt_version, {:reset, []})
 
-    case receive_data(transport, port, options) do
+    case receive_data(transport, port, bolt_version, options) do
       {:success, %{}} -> :ok
       error -> Error.exception(error, port, :reset)
     end
@@ -290,13 +291,13 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
   # ## Options
   #
   # See "Shared options" in the documentation of this module.
-  @spec receive_data(atom(), port(), Keyword.t(), list()) ::
+  @spec receive_data(atom(), port(), integer(), Keyword.t(), list()) ::
           {atom(), Bolt.Sips.Internals.PackStream.value()} | {:error, any()}
-  def receive_data(transport, port, options \\ [], previous \\ []) do
+  def receive_data(transport, port, bolt_version, options \\ [], previous \\ []) do
     with {:ok, data} <- do_receive_data(transport, port, options) do
-      case Message.decode(data) do
+      case Message.decode(data, bolt_version) do
         {:record, _} = data ->
-          receive_data(transport, port, options, [data | previous])
+          receive_data(transport, port, bolt_version, options, [data | previous])
 
         {status, _} = data when status in @summary and previous == [] ->
           data

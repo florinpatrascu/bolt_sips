@@ -4,6 +4,10 @@ defmodule Bolt.Sips.ConnCase do
   setup_all do
     conn = Bolt.Sips.conn()
 
+    on_exit(fn ->
+      Bolt.Sips.Test.Support.Database.clear(conn)
+    end)
+
     {:ok, conn: conn}
   end
 end

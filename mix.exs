@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "1.3.0"
+  @version "1.4.0"
 
   def project do
     [
@@ -16,6 +16,7 @@ defmodule BoltSips.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       docs: [
+        main: "readme",
         extras: ["README.md", "CHANGELOG.md"],
         source_ref: "v#{@version}",
         source_url: "https://github.com/florinpatrascu/bolt_sips"

@@ -1,44 +1,15 @@
 defmodule Query.Test do
-  use ExUnit.Case, async: true
+  use Bolt.Sips.ConnCase, async: true
   alias Query.Test
 
   defmodule TestUser do
     defstruct name: "", bolt_sips: true
   end
 
-  setup_all do
-    # reuse the same connection for all the tests in the suite
-    # MATCH (n {bolt_sips: TRUE}) OPTIONAL MATCH (n)-[r]-() DELETE n,r;
+  setup_all(%{conn: conn} = context) do
+    Bolt.Sips.Fixture.create_graph(conn, :bolt_sips)
 
-    conn = Bolt.Sips.conn()
-
-    # assert {:ok, _r} = Bolt.Sips.query(conn, "MATCH (n:Friend {star_friend: true}) OPTIONAL MATCH (n)-[r]-() DELETE n,r")
-
-    cypher = """
-    MATCH (n {bolt_sips: true}) OPTIONAL MATCH (n)-[r]-() DELETE n,r;
-
-    CREATE (BoltSips:BoltSips {title:'Elixir sipping from Neo4j, using Bolt', released:2016, license:'MIT', bolt_sips: true})
-    CREATE (TNOTW:Book {title:'The Name of the Wind', released:2007, genre:'fantasy', bolt_sips: true})
-    CREATE (Patrick:Person {name:'Patrick Rothfuss', bolt_sips: true})
-    CREATE (Kvothe:Person {name:'Kote', bolt_sips: true})
-    CREATE (Denna:Person {name:'Denna', bolt_sips: true})
-    CREATE (Chandrian:Deamon {name:'Chandrian', bolt_sips: true})
-
-    CREATE
-      (Kvothe)-[:ACTED_IN {roles:['sword fighter', 'magician', 'musician']}]->(TNOTW),
-      (Denna)-[:ACTED_IN {roles:['many talents']}]->(TNOTW),
-      (Chandrian)-[:ACTED_IN {roles:['killer']}]->(TNOTW),
-      (Patrick)-[:WROTE]->(TNOTW)
-    """
-
-    assert {:ok, _r} = Bolt.Sips.query(conn, cypher)
-
-    # on_exit fn ->
-    #   Bolt.Sips.query!(conn, "MATCH (n:Friend {star_friend: true}) OPTIONAL MATCH (n)-[r]-() DELETE n,r")
-    #   IO.puts "This is invoked once the test is done"
-    # end
-
-    {:ok, [conn: conn]}
+    {:ok, context}
   end
 
   test "a simple query that should work", context do
@@ -259,5 +230,78 @@ defmodule Query.Test do
   test "negative numbers are returned as negative numbers", context do
     conn = context[:conn]
     assert {:ok, [%{"n" => -1}]} = Bolt.Sips.query(conn, "RETURN -1 as n")
+  end
+
+  test "return a simple node", context do
+    conn = context[:conn]
+
+    assert [
+             %{
+               "p" => %Bolt.Sips.Types.Node{
+                 id: _,
+                 labels: ["Person"],
+                 properties: %{"bolt_sips" => true, "name" => "Patrick Rothfuss"}
+               }
+             }
+           ] = Bolt.Sips.query!(conn, "MATCH (p:Person {name: 'Patrick Rothfuss'}) RETURN p")
+  end
+
+  test "Simple relationship", context do
+    conn = context[:conn]
+
+    cypher = """
+      MATCH (p:Person)-[r:WROTE]->(b:Book {title: 'The Name of the Wind'})
+      RETURN r
+    """
+
+    assert [
+             %{
+               "r" => %Bolt.Sips.Types.Relationship{
+                 end: _,
+                 id: _,
+                 properties: %{},
+                 start: _,
+                 type: "WROTE"
+               }
+             }
+           ] = Bolt.Sips.query!(conn, cypher)
+  end
+
+  test "simple path", context do
+    conn = context[:conn]
+
+    cypher = """
+    MERGE p = ({name:'Alice', bolt_sips: true})-[:KNOWS]->({name:'Bob', bolt_sips: true})
+    RETURN p
+    """
+
+    assert [
+             %{
+               "p" => %Bolt.Sips.Types.Path{
+                 nodes: [
+                   %Bolt.Sips.Types.Node{
+                     id: _,
+                     labels: [],
+                     properties: %{"bolt_sips" => true, "name" => "Alice"}
+                   },
+                   %Bolt.Sips.Types.Node{
+                     id: _,
+                     labels: [],
+                     properties: %{"bolt_sips" => true, "name" => "Bob"}
+                   }
+                 ],
+                 relationships: [
+                   %Bolt.Sips.Types.UnboundRelationship{
+                     end: nil,
+                     id: _,
+                     properties: %{},
+                     start: nil,
+                     type: "KNOWS"
+                   }
+                 ],
+                 sequence: [1, 1]
+               }
+             }
+           ] = Bolt.Sips.query!(conn, cypher)
   end
 end

@@ -18,18 +18,18 @@ defmodule Bolt.Sips.Internals.PackStream.Message do
   @doc """
   Encode a message depending on its type
   """
-  @spec encode({Bolt.Sips.Internals.PackStream.Message.out_signature(), list()}) ::
+  @spec encode({Bolt.Sips.Internals.PackStream.Message.out_signature(), list()}, integer()) ::
           Bolt.Sips.Internals.PackStream.Message.encoded()
-  def encode(message) do
-    Encoder.encode(message)
+  def encode(message, bolt_version) do
+    Encoder.encode(message, bolt_version)
   end
 
   @doc """
   Decode a message
   """
-  @spec decode(Bolt.Sips.Internals.PackStream.Message.encoded()) ::
+  @spec decode(Bolt.Sips.Internals.PackStream.Message.encoded(), integer()) ::
           Bolt.Sips.Internals.PackStream.Message.decoded()
-  def decode(message) do
-    Decoder.decode(message)
+  def decode(message, bolt_version) do
+    Decoder.decode(message, bolt_version)
   end
 end
