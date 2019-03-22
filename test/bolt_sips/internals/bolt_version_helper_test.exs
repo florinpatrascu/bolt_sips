@@ -1,9 +1,9 @@
-defmodule Bolt.Sips.Internals.PackStream.HelperTest do
+defmodule Bolt.Sips.Internals.BoltVersionHelperTest do
   use ExUnit.Case, async: true
 
-  doctest Bolt.Sips.Internals.PackStream.BoltVersionHelper
+  doctest Bolt.Sips.Internals.BoltVersionHelper
 
-  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
+  alias Bolt.Sips.Internals.BoltVersionHelper
 
   test "available_bolt_versions/0 returns a list" do
     assert [_ | _] = BoltVersionHelper.available_versions()

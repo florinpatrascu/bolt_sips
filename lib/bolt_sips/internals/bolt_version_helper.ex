@@ -1,4 +1,4 @@
-defmodule Bolt.Sips.Internals.PackStream.BoltVersionHelper do
+defmodule Bolt.Sips.Internals.BoltVersionHelper do
   @moduledoc false
   @available_bolt_versions [1, 2]
 
@@ -16,11 +16,11 @@ defmodule Bolt.Sips.Internals.PackStream.BoltVersionHelper do
 
   ## Example
 
-      iex> Bolt.Sips.Internals.PackStream.BoltVersionHelper.previous(2)
+      iex> Bolt.Sips.Internals.BoltVersionHelper.previous(2)
       1
-      iex> Bolt.Sips.Internals.PackStream.BoltVersionHelper.previous(1)
+      iex> Bolt.Sips.Internals.BoltVersionHelper.previous(1)
       nil
-      iex> Bolt.Sips.Internals.PackStream.BoltVersionHelper.previous(15)
+      iex> Bolt.Sips.Internals.BoltVersionHelper.previous(15)
       2
   """
   @spec previous(integer()) :: nil | integer()
@@ -35,7 +35,7 @@ defmodule Bolt.Sips.Internals.PackStream.BoltVersionHelper do
 
   ## Example:
 
-      iex> Bolt.Sips.Internals.PackStream.BoltVersionHelper.last()
+      iex> Bolt.Sips.Internals.BoltVersionHelper.last()
       2
   """
   def last() do

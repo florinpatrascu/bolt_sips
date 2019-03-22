@@ -3,7 +3,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderTest do
 
   alias Bolt.Sips.Internals.PackStream.Decoder
   alias Bolt.Sips.Internals.PackStreamError
-  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
+  alias Bolt.Sips.Internals.BoltVersionHelper
   alias Bolt.Sips.Types
 
   describe "Decode common types" do

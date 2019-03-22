@@ -4,7 +4,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderTest do
   doctest Bolt.Sips.Internals.PackStream.Message.Encoder
 
   alias Bolt.Sips.Internals.PackStream.Message.Encoder
-  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
+  alias Bolt.Sips.Internals.BoltVersionHelper
 
   defmodule TestUser do
     defstruct name: "", bolt_sips: true
