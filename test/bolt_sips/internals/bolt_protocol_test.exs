@@ -196,7 +196,9 @@ defmodule Bolt.Sips.Internals.BoltProtocolTest do
 
     :ok = BoltProtocol.ack_failure(:gen_tcp, port, bolt_version)
 
-    assert %Bolt.Sips.Internals.Error{type: :cypher_error} =
+    # Point has a diferrent than other becasue it is formated as query level,
+    # not at encoding level, therefore it fails when query is treated by server
+    assert %Bolt.Sips.Internals.Error{type: :protocol_error} =
              BoltProtocol.run_statement(
                :gen_tcp,
                port,
@@ -206,7 +208,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolTest do
 
     :ok = BoltProtocol.ack_failure(:gen_tcp, port, bolt_version)
 
-    assert %Bolt.Sips.Internals.Error{type: :cypher_error} =
+    assert %Bolt.Sips.Internals.Error{type: :protocol_error} =
              BoltProtocol.run_statement(
                :gen_tcp,
                port,
@@ -216,7 +218,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolTest do
 
     :ok = BoltProtocol.ack_failure(:gen_tcp, port, bolt_version)
 
-    assert %Bolt.Sips.Internals.Error{type: :cypher_error} =
+    assert %Bolt.Sips.Internals.Error{type: :protocol_error} =
              BoltProtocol.run_statement(
                :gen_tcp,
                port,
@@ -226,7 +228,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolTest do
 
     :ok = BoltProtocol.ack_failure(:gen_tcp, port, bolt_version)
 
-    assert %Bolt.Sips.Internals.Error{type: :cypher_error} =
+    assert %Bolt.Sips.Internals.Error{type: :protocol_error} =
              BoltProtocol.run_statement(
                :gen_tcp,
                port,
