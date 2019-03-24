@@ -3,8 +3,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderV1 do
   use Bolt.Sips.Internals.PackStream.Message.Signatures
   alias Bolt.Sips.Internals.PackStream.Message.Encoder
 
-  @client_name "BoltSips/" <> to_string(Application.spec(:bolt_sips, :vsn))
-
   @valid_signatures [
     @ack_failure_signature,
     @discard_all_signature,
@@ -53,7 +51,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderV1 do
   The auth token is tuple formated as: {user, password}
   """
   def encode({:init, [auth]}, bolt_version) do
-    do_encode(:init, [@client_name, auth_params(auth)], bolt_version)
+    do_encode(:init, [Encoder.client_name(), auth_params(auth)], bolt_version)
   end
 
   @doc """

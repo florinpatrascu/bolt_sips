@@ -37,10 +37,17 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @available_bolt_versions BoltVersionHelper.available_versions()
 
   @doc """
+  Return client name (based on bolt_sips version)
+  """
+  def client_name() do
+    "BoltSips/" <> to_string(Application.spec(:bolt_sips, :vsn))
+  end
+
+  @doc """
   Return the valid message signatures depending on the Bolt version
   """
-  @spec valid_signatures() :: [integer()]
-  def valid_signatures() do
+  @spec valid_signatures(integer()) :: [integer()]
+  def valid_signatures(bolt_version) when bolt_version <= 2 do
     Bolt.Sips.Internals.PackStream.Message.EncoderV1.valid_signatures()
   end
 
