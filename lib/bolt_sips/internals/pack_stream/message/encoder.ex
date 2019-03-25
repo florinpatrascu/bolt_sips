@@ -51,6 +51,10 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     Bolt.Sips.Internals.PackStream.Message.EncoderV1.valid_signatures()
   end
 
+  def valid_signatures(3) do
+    Bolt.Sips.Internals.PackStream.Message.EncoderV3.valid_signatures()
+  end
+
   @doc """
   Check if the encoder for the given bolt version is capable of encoding the given message
   If it is the case, the encoding function will be called
@@ -82,10 +86,13 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
       message: "[Message] Unsupported encoder version"
   end
 
-  defp call_encode(data, bolt_version, nil) do
+  @spec call_encode({atom(), list()}, integer(), nil | integer()) ::
+          binary() | PackStreamError.t()
+  defp call_encode(data, original_bolt_version, used_bolt_version)
+       when used_bolt_version not in @available_bolt_versions do
     raise(PackStreamError,
       data: data,
-      bolt_version: bolt_version,
+      bolt_version: original_bolt_version,
       message: "[Message] Encoder not implemented for"
     )
   end
@@ -96,11 +103,25 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     with true <- Code.ensure_loaded?(module),
          true <- Kernel.function_exported?(module, :encode, 2),
          result <- Kernel.apply(module, :encode, [data, original_version]),
-         true <- is_binary(result) do
+         {:ok, result} <- ok_result(result) do
       result
     else
-      _ -> call_encode(data, original_version, BoltVersionHelper.previous(used_version))
+      {:error, :not_implemented} ->
+        call_encode(data, original_version, BoltVersionHelper.previous(used_version))
+
+      _ ->
+        call_encode(data, original_version, -1)
     end
+  end
+
+  # Wrap result in a ok-tuple if valid
+  # This ease the error pattern matching with a `with| statement
+  defp ok_result(result) when is_binary(result) do
+    {:ok, result}
+  end
+
+  defp ok_result(result) do
+    result
   end
 
   @doc """

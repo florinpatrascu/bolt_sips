@@ -13,7 +13,7 @@ defmodule Bolt.Sips.Internals.BoltVersionHelperTest do
     test "successfully return the previous version" do
       assert 1 == BoltVersionHelper.previous(2)
       assert 2 == BoltVersionHelper.previous(3)
-      assert 2 == BoltVersionHelper.previous(4)
+      assert 3 == BoltVersionHelper.previous(4)
     end
 
     test "return nil if there is no previous version" do

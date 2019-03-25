@@ -41,7 +41,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderV1 do
   Encode INIT message without auth token
   """
   @spec encode({Bolt.Sips.Internals.PackStream.Message.out_signature(), list()}, integer()) ::
-          Bolt.Sips.Internals.PackStream.Message.encoded()
+          Bolt.Sips.Internals.PackStream.Message.encoded() | {:error, :not_implemented}
   def encode({:init, []}, bolt_version) do
     encode({:init, [{}]}, bolt_version)
   end
