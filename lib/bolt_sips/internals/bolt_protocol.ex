@@ -73,27 +73,150 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
   #   * `recv_timeout`: The timeout for receiving a response from the Neo4J s
   #     server (default: #{@recv_timeout})
 
+  alias Bolt.Sips.Metadata
   alias Bolt.Sips.Internals.BoltProtocolV1
+  alias Bolt.Sips.Internals.BoltProtocolV3
 
   defdelegate handshake(transport, port, options \\ []), to: BoltProtocolV1
   defdelegate init(transport, port, version, auth \\ {}, options \\ []), to: BoltProtocolV1
+  defdelegate hello(transport, port, version, auth \\ {}, options \\ []), to: BoltProtocolV3
+  defdelegate goodbye(transport, port, version), to: BoltProtocolV3
 
   defdelegate ack_failure(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
   defdelegate reset(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
   defdelegate discard_all(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
 
-  defdelegate run(transport, port, bolt_version, statement, params \\ %{}, options \\ []),
-    to: BoltProtocolV1
+  defdelegate begin(transport, port, bolt_version, metadata \\ %Metadata{}, options \\ []),
+    to: BoltProtocolV3
+
+  defdelegate commit(transport, port, bolt_version, options \\ []), to: BoltProtocolV3
+  defdelegate rollback(transport, port, bolt_version, options \\ []), to: BoltProtocolV3
 
   defdelegate pull_all(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
 
-  defdelegate run_statement(
-                transport,
-                port,
-                bolt_version,
-                statement,
-                params \\ %{},
-                options \\ []
-              ),
-              to: BoltProtocolV1
+  @doc """
+  run for all Bolt version, but call differs.
+  For Bolt <= 2, use: run_statement(transport, port, bolt_version, statement, params, options)
+  For Bolt >=3: run_statement(transport, port, bolt_version, statement, params, metadata, options)
+
+  Note that Bolt V2 calls works with Bolt V3, but it is preferrable to update them.
+  """
+  @spec run(
+          atom(),
+          port(),
+          integer(),
+          String.t(),
+          map(),
+          nil | Keyword.t() | Bolt.Sips.Metadata.t(),
+          nil | Keyword.t()
+        ) ::
+          {:ok, tuple()}
+          | Bolt.Sips.Internals.Error.t()
+  def run(
+        transport,
+        port,
+        bolt_version,
+        statement,
+        params \\ %{},
+        options_or_metadata \\ [],
+        options \\ []
+      )
+
+  def run(transport, port, bolt_version, statement, params, options_or_metadata, _)
+      when bolt_version <= 2 do
+    BoltProtocolV1.run(
+      transport,
+      port,
+      bolt_version,
+      statement,
+      params,
+      options_or_metadata || []
+    )
+  end
+
+  def run(transport, port, bolt_version, statement, params, metadata, options)
+      when bolt_version >= 2 do
+    metadata =
+      case metadata do
+        [] -> %{}
+        metadata -> metadata
+      end
+
+    {metadata, options} = manage_metadata_and_options(metadata, options)
+
+    BoltProtocolV3.run(transport, port, bolt_version, statement, params, metadata, options)
+  end
+
+  defp manage_metadata_and_options([], options) do
+    {:ok, empty_metadata} = Metadata.new(%{})
+    {empty_metadata, options}
+  end
+
+  defp manage_metadata_and_options([_ | _] = metadata, options) do
+    {:ok, empty_metadata} = Metadata.new(%{})
+    {empty_metadata, metadata ++ options}
+  end
+
+  defp manage_metadata_and_options(metadata, options) do
+    {metadata, options}
+  end
+
+  @doc """
+  run_statement for all Bolt version, but call differs.
+  For Bolt <= 2, use: run_statement(transport, port, bolt_version, statement, params, options)
+  For Bolt >=3: run_statement(transport, port, bolt_version, statement, params, metadata, options)
+
+  Note that Bolt V2 calls works with Bolt V3, but it is preferrable to update them.
+  """
+  @spec run_statement(
+          atom(),
+          port(),
+          integer(),
+          String.t(),
+          map(),
+          nil | Keyword.t() | Bolt.Sips.Metadata.t(),
+          nil | Keyword.t()
+        ) ::
+          list()
+          | Bolt.Sips.Internals.Error.t()
+  def run_statement(
+        transport,
+        port,
+        bolt_version,
+        statement,
+        params \\ %{},
+        options_v2_or_metadata_v3 \\ [],
+        options_v3 \\ []
+      )
+
+  def run_statement(transport, port, bolt_version, statement, params, options_or_metadata, _)
+      when bolt_version <= 2 do
+    BoltProtocolV1.run_statement(
+      transport,
+      port,
+      bolt_version,
+      statement,
+      params,
+      options_or_metadata || []
+    )
+  end
+
+  def run_statement(transport, port, bolt_version, statement, params, metadata, options)
+      when bolt_version >= 2 do
+    metadata =
+      case metadata do
+        [] -> %{}
+        metadata -> metadata
+      end
+
+    BoltProtocolV3.run_statement(
+      transport,
+      port,
+      bolt_version,
+      statement,
+      params,
+      metadata,
+      options
+    )
+  end
 end

@@ -11,6 +11,10 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderV3Test do
       assert <<0x0, 0x3, 0xB1, 0x11, 0xA0, 0x0, 0x0>> == EncoderV3.encode({:begin, []}, 3)
     end
 
+    test "with empty params" do
+      assert <<0x0, 0x3, 0xB1, 0x11, 0xA0, 0x0, 0x0>> == EncoderV3.encode({:begin, [%{}]}, 3)
+    end
+
     test "with params" do
       {:ok, metadata} = Metadata.new(%{tx_timeout: 5000})
 

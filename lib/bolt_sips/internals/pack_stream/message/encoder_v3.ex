@@ -70,8 +70,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderV3 do
   BEGIN is used to open a transaction.
   """
   def encode({:begin, []}, bolt_version) do
-    {:ok, metadata} = Metadata.new(%{})
-    encode({:begin, [metadata]}, bolt_version)
+    encode({:begin, [%{}]}, bolt_version)
   end
 
   @doc """
@@ -79,6 +78,11 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderV3 do
   """
   def encode({:begin, [%Metadata{} = metadata]}, bolt_version) do
     do_encode(:begin, [Metadata.to_map(metadata)], bolt_version)
+  end
+
+  def encode({:begin, [%{} = map]}, bolt_version) when map_size(map) == 0 do
+    {:ok, metadata} = Metadata.new(%{})
+    encode({:begin, [metadata]}, bolt_version)
   end
 
   def encode({:begin, _}, _) do
@@ -184,23 +188,23 @@ defmodule Bolt.Sips.Internals.PackStream.Message.EncoderV3 do
   Example
 
       # without metadata
-      iex> alias Bolt.Sips.Internals.PackStream.Message.EncoderV3
-      iex> EncoderV3.encode({:begin, []}, 3)
-      <<0x0, 0x3, 0xB1, 0x11, 0xA0, 0x0, 0x0>>
+      # iex> alias Bolt.Sips.Internals.PackStream.Message.EncoderV3
+      # iex> EncoderV3.encode({:begin, []}, 3)
+      # <<0x0, 0x3, 0xB1, 0x11, 0xA0, 0x0, 0x0>>
 
-      # with metadata
-      iex> alias Bolt.Sips.Internals.PackStream.Message.EncoderV3
-      iex> alias Bolt.Sips.Metadata
-      iex> {:ok, metadata} = Metadata.new(%{tx_timeout: 5000})
-      {:ok,
-      %Bolt.Sips.Metadata{
-        bookmarks: nil,
-        metadata: nil,
-        tx_timeout: 5000
-      }}
-      iex> EncoderV3.encode({:begin, [metadata]}, 3)
-      <<0x0, 0x11, 0xB1, 0x11, 0xA1, 0x8A, 0x74, 0x78, 0x5F, 0x74, 0x69, 0x6D, 0x65, 0x6F, 0x75,
-      0x74, 0xC9, 0x13, 0x88, 0x0, 0x0>>
+      # # with metadata
+      # iex> alias Bolt.Sips.Internals.PackStream.Message.EncoderV3
+      # iex> alias Bolt.Sips.Metadata
+      # iex> {:ok, metadata} = Metadata.new(%{tx_timeout: 5000})
+      # {:ok,
+      # %Bolt.Sips.Metadata{
+      #   bookmarks: nil,
+      #   metadata: nil,
+      #   tx_timeout: 5000
+      # }}
+      # iex> EncoderV3.encode({:begin, [metadata]}, 3)
+      # <<0x0, 0x11, 0xB1, 0x11, 0xA1, 0x8A, 0x74, 0x78, 0x5F, 0x74, 0x69, 0x6D, 0x65, 0x6F, 0x75,
+      # 0x74, 0xC9, 0x13, 0x88, 0x0, 0x0>>
 
   ## COMMIT
   Usage: commit the currently open transaction

@@ -3,23 +3,28 @@ defmodule Bolt.Sips.ProtocolTest do
 
   alias Bolt.Sips.Protocol
 
-  test "Happy tests..." do
+  # Transactions are not tested as BEGIN fails
+  # But works fine from Bolt.Sips.transaction
+
+  test "connect/1 - disconnect/1 successful" do
+    assert {:ok, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} = Protocol.connect([])
+    assert :ok = Protocol.disconnect(:stop, conn_data)
+  end
+
+  test "checkout/1 successful" do
     {:ok, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} = Protocol.connect([])
 
-    {:ok, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} = Protocol.checkout(conn_data)
-    {:ok, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} = Protocol.checkin(conn_data)
+    assert {:ok, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} =
+             Protocol.checkout(conn_data)
 
-    {:ok, :began, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} =
-      Protocol.handle_begin([], conn_data)
+    :ok = Protocol.disconnect(:stop, conn_data)
+  end
 
-    {:ok, :rolledback, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} =
-      Protocol.handle_rollback([], conn_data)
+  test "checkin/1 successful" do
+    {:ok, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} = Protocol.connect([])
 
-    {:ok, :began, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} =
-      Protocol.handle_begin([], conn_data)
-
-    {:ok, :committed, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} =
-      Protocol.handle_commit([], conn_data)
+    assert {:ok, %Protocol.ConnData{sock: _, bolt_version: _} = conn_data} =
+             Protocol.checkin(conn_data)
 
     :ok = Protocol.disconnect(:stop, conn_data)
   end

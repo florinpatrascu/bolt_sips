@@ -1,5 +1,6 @@
 defmodule BoltProtocolV1.Sips.Internals.BoltProtocolV1Test do
   use ExUnit.Case, async: true
+  @moduletag :bolt_v1
 
   alias Bolt.Sips.Internals.BoltProtocolV1
   alias Bolt.Sips.Internals.BoltVersionHelper

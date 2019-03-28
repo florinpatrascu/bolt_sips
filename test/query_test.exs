@@ -1,14 +1,20 @@
 defmodule Query.Test do
   use Bolt.Sips.ConnCase, async: true
+
   alias Query.Test
+  alias Bolt.Sips.Test.Support.Database
 
   defmodule TestUser do
     defstruct name: "", bolt_sips: true
   end
 
-  setup_all(%{conn: conn} = context) do
+  defp rebuild_fixtures(conn) do
+    Database.clear(conn)
     Bolt.Sips.Fixture.create_graph(conn, :bolt_sips)
+  end
 
+  setup(%{conn: conn} = context) do
+    rebuild_fixtures(conn)
     {:ok, context}
   end
 
@@ -303,5 +309,43 @@ defmodule Query.Test do
                }
              }
            ] = Bolt.Sips.query!(conn, cypher)
+  end
+
+  test "transaction (commit)", context do
+    conn = context[:conn]
+
+    Bolt.Sips.transaction(conn, fn conn ->
+      book =
+        Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b")
+        |> List.first()
+
+      assert %{"b" => g_o_t} = book
+      assert g_o_t.properties["title"] == "The Game Of Trolls"
+    end)
+
+    books = Bolt.Sips.query!(conn, "MATCH (b:Book {title: \"The Game Of Trolls\"}) return b")
+    assert length(books) == 1
+
+    # Clean data
+
+    rem_books = "MATCH (b:Book {title: \"The Game Of Trolls\"}) DELETE b"
+    Bolt.Sips.query!(conn, rem_books)
+  end
+
+  test "transaction (rollback)", context do
+    conn = context[:conn]
+
+    Bolt.Sips.transaction(conn, fn conn ->
+      book =
+        Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b")
+        |> List.first()
+
+      assert %{"b" => g_o_t} = book
+      assert g_o_t.properties["title"] == "The Game Of Trolls"
+      Bolt.Sips.rollback(conn, :changed_my_mind)
+    end)
+
+    books = Bolt.Sips.query!(conn, "MATCH (b:Book {title: \"The Game Of Trolls\"}) return b")
+    assert length(books) == 0
   end
 end
