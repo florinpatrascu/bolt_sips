@@ -45,7 +45,7 @@ defmodule BoltSips.Mixfile do
   defp aliases do
     [
       test: [
-        "test --exclude bolt_v1 --exclude entreprise_only"
+        "test --exclude bolt_v1 --exclude enterprise_only"
       ]
     ]
   end

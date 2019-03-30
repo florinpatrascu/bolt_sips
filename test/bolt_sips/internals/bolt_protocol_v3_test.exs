@@ -168,8 +168,8 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3Test do
       {:ok, _} = BoltProtocolV3.begin(:gen_tcp, port, 3, %{}, [])
     end
 
-    # Work only with Neo4j Entreprise
-    @tag :entreprise_only
+    # Work only with Neo4j Enterprise
+    @tag :enterprise_only
     test "Open a transaction with metadata", %{config: config, port: port} do
       assert {:ok, _} = BoltProtocolV3.hello(:gen_tcp, port, 3, config[:auth], [])
       {:ok, metadata} = Metadata.new(%{bookmarks: ["neo4j:bookmark:v1:tx234"], tx_timeout: 1_000})
@@ -201,8 +201,8 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3Test do
       assert :ok = BoltProtocolV3.rollback(:gen_tcp, port, 3, [])
     end
 
-    # Work only with Neo4j Entreprise
-    @tag :entreprise_only
+    # Work only with Neo4j Enterprise
+    @tag :enterprise_only
     test "With socket instead of gent_tcp", %{config: config, port: port} do
       assert {:ok, _} = BoltProtocolV3.hello(Bolt.Sips.Socket, port, 3, config[:auth], [])
       {:ok, metadata} = Metadata.new(%{bookmarks: ["neo4j:bookmark:v1:tx234"], tx_timeout: 1_000})
