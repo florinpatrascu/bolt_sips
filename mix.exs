@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "1.5.0"
+  @version "1.5.1"
 
   def project do
     [
@@ -21,7 +21,8 @@ defmodule BoltSips.Mixfile do
         source_ref: "v#{@version}",
         source_url: "https://github.com/florinpatrascu/bolt_sips"
       ],
-      dialyzer: [plt_add_apps: [:jason, :poison, :mix], ignore_warnings: ".dialyzer_ignore.exs"]
+      dialyzer: [plt_add_apps: [:jason, :poison, :mix], ignore_warnings: ".dialyzer_ignore.exs"],
+      aliases: aliases()
     ]
   end
 
@@ -36,6 +37,15 @@ defmodule BoltSips.Mixfile do
         :db_connection,
         :retry,
         :fuzzyurl
+      ]
+    ]
+  end
+
+  # See the documentation for `Mix` for more info on aliases.
+  defp aliases do
+    [
+      test: [
+        "test --exclude bolt_v1 --exclude entreprise_only"
       ]
     ]
   end

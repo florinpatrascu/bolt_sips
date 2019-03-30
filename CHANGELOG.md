@@ -1,6 +1,13 @@
 # Changelog
 
+## 1.5.1
+
+- add a test alias for running the tests compatible with the most recent Neo4j server while
+  disabling the older/legacy ones
+- cleanup some warning about unused aliases
+
 ## 1.5.0
+
 - Bolt V3 support
 - Decompose tests by bolt version
 - Important note about transaction
@@ -8,7 +15,7 @@
 ## 1.4.0
 
 - Encoding / Decoding types is now at the lowest possible level
-- Decompose encoders / decoders by bolt version 
+- Decompose encoders / decoders by bolt version
 - Expose only public API in docs
 
 ## 1.3.0

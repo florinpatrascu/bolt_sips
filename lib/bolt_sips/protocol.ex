@@ -23,7 +23,6 @@ defmodule Bolt.Sips.Protocol do
   alias Bolt.Sips.QueryStatement
   alias Bolt.Sips.Internals.Error, as: BoltError
   alias Bolt.Sips.Internals.BoltProtocol
-  alias Bolt.Sips.Metadata
 
   @doc "Callback for DBConnection.connect/1"
   def connect(_opts) do
