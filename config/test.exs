@@ -32,3 +32,5 @@ config :logger, :console,
 
 config :mix_test_watch,
   clear: true
+
+config :tzdata, :autoupdate, :disabled
