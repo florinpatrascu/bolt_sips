@@ -8,7 +8,7 @@ defmodule Bolt.Sips.InternalCase do
     port_opts = [active: false, mode: :binary, packet: :raw]
     {:ok, port} = :gen_tcp.connect(uri.host, uri.port, port_opts)
     {:ok, bolt_version} = BoltProtocol.handshake(:gen_tcp, port)
-    {:ok, _} = BoltProtocol.init(:gen_tcp, port, bolt_version, uri.userinfo)
+    {:ok, _} = init(:gen_tcp, port, bolt_version, uri.userinfo)
 
     on_exit(fn ->
       :gen_tcp.close(port)
@@ -17,7 +17,7 @@ defmodule Bolt.Sips.InternalCase do
     {:ok, port: port, is_bolt_v2: bolt_version >= 2, bolt_version: bolt_version}
   end
 
-  def neo4j_uri do
+  defp neo4j_uri do
     "bolt://neo4j:test@localhost:7687"
     |> URI.merge(System.get_env("NEO4J_TEST_URL") || "")
     |> URI.parse()
@@ -31,5 +31,13 @@ defmodule Bolt.Sips.InternalCase do
         |> String.split(":")
         |> List.to_tuple()
     end)
+  end
+
+  defp init(transport, port, 3, auth) do
+    BoltProtocol.hello(transport, port, 3, auth)
+  end
+
+  defp init(transport, port, bolt_version, auth) do
+    BoltProtocol.init(transport, port, bolt_version, auth)
   end
 end

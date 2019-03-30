@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.5.0
+- Bolt V3 support
+- Decompose tests by bolt version
+- Important note about transaction
+
 ## 1.4.0
 
 - Encoding / Decoding types is now at the lowest possible level

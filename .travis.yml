@@ -7,42 +7,58 @@ matrix:
       otp_release: 19.3
       env:
         - NEO4J_VERSION=3.0
+        - BOLT_V1_EXCLUDED=false
         - BOLT_V2_EXCLUDED=true
+        - BOLT_V3_EXCLUDED=true
     - elixir: 1.6.5
       otp_release: 19.3
       env:
         - NEO4J_VERSION=3.1
+        - BOLT_V1_EXCLUDED=false
         - BOLT_V2_EXCLUDED=true
+        - BOLT_V3_EXCLUDED=true
     - elixir: 1.6.5
       otp_release: 19.3
       env:
         - NEO4J_VERSION=3.4
+        - BOLT_V1_EXCLUDED=false
         - BOLT_V2_EXCLUDED=false
+        - BOLT_V3_EXCLUDED=true
     - elixir: 1.6.5
       otp_release: 19.3
       env:
         - NEO4J_VERSION=3.5
+        - BOLT_V1_EXCLUDED=true
         - BOLT_V2_EXCLUDED=false
+        - BOLT_V3_EXCLUDED=false
     - elixir: 1.6.5
       otp_release: 20.3
       env:
         - NEO4J_VERSION=3.0
+        - BOLT_V1_EXCLUDED=false
         - BOLT_V2_EXCLUDED=true
+        - BOLT_V3_EXCLUDED=true
     - elixir: 1.6.5
       otp_release: 20.3
       env:
         - NEO4J_VERSION=3.1
+        - BOLT_V1_EXCLUDED=false
         - BOLT_V2_EXCLUDED=true
+        - BOLT_V3_EXCLUDED=true
     - elixir: 1.6.5
       otp_release: 20.3
       env:
         - NEO4J_VERSION=3.4
+        - BOLT_V1_EXCLUDED=false
         - BOLT_V2_EXCLUDED=false
+        - BOLT_V3_EXCLUDED=true
     - elixir: 1.6.5
       otp_release: 20.3
       env:
         - NEO4J_VERSION=3.5
+        - BOLT_V1_EXCLUDED=true
         - BOLT_V2_EXCLUDED=false
+        - BOLT_V3_EXCLUDED=false
 addons:
   apt:
     sources:
@@ -64,8 +80,8 @@ env:
 
 before_install:
   - if [ ! -d "$HOME/cmake/bin" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh && sh cmake-3.5.2-Linux-x86_64.sh --prefix=$HOME/cmake --exclude-subdir; fi
-  - docker run --name neo4j -d -p 7687:7687 -e 'NEO4J_AUTH=none' neo4j:$NEO4J_VERSION
+  - docker run --name neo4j -d -p 7687:7687 -e 'NEO4J_AUTH=neo4j/test' neo4j:$NEO4J_VERSION
   - docker logs -f neo4j | sed /Bolt\ enabled/q
 
 script:
-  - mix test --exclude bolt_v2:$BOLT_V2_EXCLUDED
+  - mix test --exclude entreprise_only --exclude bolt_v1:$BOLT_V1_EXCLUDED --exclude bolt_v2:$BOLT_V2_EXCLUDED --exclude bolt_v3:$BOLT_V3_EXCLUDED

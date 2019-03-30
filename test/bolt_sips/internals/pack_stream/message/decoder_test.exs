@@ -1,7 +1,7 @@
 defmodule Bolt.Sips.Internals.PackStream.Message.DecoderTest do
   use ExUnit.Case, async: true
   alias Bolt.Sips.Internals.PackStream.Message.Decoder
-  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
+  alias Bolt.Sips.Internals.BoltVersionHelper
 
   describe "Decode common messages" do
     Enum.each(BoltVersionHelper.available_versions(), fn bolt_version ->

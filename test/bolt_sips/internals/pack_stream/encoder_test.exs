@@ -2,7 +2,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderTest do
   use ExUnit.Case, async: false
 
   alias Bolt.Sips.Internals.PackStream.Encoder
-  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
+  alias Bolt.Sips.Internals.BoltVersionHelper
   alias Bolt.Sips.Types
   alias Bolt.Sips.TypesHelper
 

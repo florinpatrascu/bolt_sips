@@ -10,7 +10,18 @@ defmodule Bolt.Sips.Internals.PackStream.Message do
   alias Bolt.Sips.Internals.PackStream.Message.Decoder
 
   @type in_signature :: :failure | :ignored | :record | :success
-  @type out_signature :: :init | :run | :ack_failure | :discard_all | :pull_all | :reset
+  @type out_signature ::
+          :ack_failure
+          | :begin
+          | :commit
+          | :discard_all
+          | :goodbye
+          | :hello
+          | :init
+          | :pull_all
+          | :reset
+          | :rollback
+          | :run
   @type raw :: {out_signature, list()}
   @type decoded :: {in_signature(), any()}
   @type encoded :: <<_::16, _::_*8>>

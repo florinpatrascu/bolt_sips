@@ -2,27 +2,14 @@ defmodule Bolt.Sips.Internals.PackStream.MessageTest do
   use ExUnit.Case, async: true
 
   alias Bolt.Sips.Internals.PackStream.Message
-  alias Bolt.Sips.Internals.PackStream.BoltVersionHelper
+  alias Bolt.Sips.Metadata
+  alias Bolt.Sips.Internals.BoltVersionHelper
 
   describe "Encode all-bolt-version-compliant message:" do
     Enum.each(BoltVersionHelper.available_versions(), fn bolt_version ->
-      test "ACK_FAILURE (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x0E, _::binary>> =
-                 Message.encode({:ack_failure, []}, unquote(bolt_version))
-      end
-
       test "DISCARD_ALL (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x2F, _::binary>> =
                  Message.encode({:discard_all, []}, unquote(bolt_version))
-      end
-
-      test "INIT without auth (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x01, _::binary>> = Message.encode({:init, []}, unquote(bolt_version))
-      end
-
-      test "INIT with auth (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x01, _::binary>> =
-                 Message.encode({:init, [{"neo4j", "password"}]}, unquote(bolt_version))
       end
 
       test "PULL_ALL (bolt_version: #{bolt_version})" do
@@ -42,6 +29,86 @@ defmodule Bolt.Sips.Internals.PackStream.MessageTest do
       test "RUN with params (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x10, _::binary>> =
                  Message.encode({:run, ["RETURN {num} AS num", %{num: 5}]}, unquote(bolt_version))
+      end
+    end)
+  end
+
+  describe "Encode Bolt <= 2 only message:" do
+    BoltVersionHelper.available_versions()
+    |> Enum.filter(&(&1 <= 2))
+    |> Enum.each(fn bolt_version ->
+      test "ACK_FAILURE (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x0E, _::binary>> =
+                 Message.encode({:ack_failure, []}, unquote(bolt_version))
+      end
+
+      test "INIT without auth (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x01, _::binary>> = Message.encode({:init, []}, unquote(bolt_version))
+      end
+
+      test "INIT with auth (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x01, _::binary>> =
+                 Message.encode({:init, [{"neo4j", "password"}]}, unquote(bolt_version))
+      end
+    end)
+  end
+
+  describe "Encode Bolt >= 3 only message" do
+    BoltVersionHelper.available_versions()
+    |> Enum.filter(&(&1 >= 3))
+    |> Enum.each(fn bolt_version ->
+      test "HELLO without auth (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x01, _::binary>> = Message.encode({:hello, []}, unquote(bolt_version))
+      end
+
+      test "HELLO with auth (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x01, _::binary>> =
+                 Message.encode({:hello, [{"neo4j", "password"}]}, unquote(bolt_version))
+      end
+
+      test "GOODBYE (bolt_version: #{bolt_version})" do
+        assert assert <<_, _, _, 0x02, _::binary>> =
+                        Message.encode({:goodbye, []}, unquote(bolt_version))
+      end
+
+      test "BEGIN without params (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x11, _::binary>> = Message.encode({:begin, []}, unquote(bolt_version))
+      end
+
+      test "BEGIN with params (bolt_version: #{bolt_version})" do
+        {:ok, metadata} = Metadata.new(%{tx_timeout: 15000})
+
+        assert <<_, _, _, 0x11, _::binary>> =
+                 Message.encode({:begin, [metadata]}, unquote(bolt_version))
+      end
+
+      test "COMMIT (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x12, _::binary>> = Message.encode({:commit, []}, unquote(bolt_version))
+      end
+
+      test "ROLLBACK (bolt_version: #{bolt_version})" do
+        assert <<_, _, _, 0x13, _::binary>> =
+                 Message.encode({:rollback, []}, unquote(bolt_version))
+      end
+
+      test "RUN without params but with metadata (bolt_version: #{bolt_version})" do
+        {:ok, metadata} = Metadata.new(%{tx_timeout: 15000})
+
+        assert <<_, _, _, 0x10, _::binary>> =
+                 Message.encode(
+                   {:run, ["RETURN 16 AS num", %{}, metadata]},
+                   unquote(bolt_version)
+                 )
+      end
+
+      test "RUN with params and  metadata (bolt_version: #{bolt_version})" do
+        {:ok, metadata} = Metadata.new(%{tx_timeout: 15000})
+
+        assert <<_, _, _, 0x10, _::binary>> =
+                 Message.encode(
+                   {:run, ["RETURN {num} AS num", %{num: 16}, metadata]},
+                   unquote(bolt_version)
+                 )
       end
     end)
   end

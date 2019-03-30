@@ -1,20 +1,5 @@
 defmodule Bolt.Sips.Internals.BoltProtocol do
-  alias Bolt.Sips.Internals.Error
-  alias Bolt.Sips.Internals.PackStream.Message
-  require Logger
-
-  @recv_timeout 10_000
-
-  @hs_magic <<0x60, 0x60, 0xB0, 0x17>>
-
-  @zero_chunk <<0x00, 0x00>>
-
-  @max_version 2
-
-  @summary ~w(success ignored failure)a
-
   @moduledoc false
-
   # A library that handles Bolt Protocol (v1 and v2).
   # Note that for now, only Neo4j implements Bolt v2.
 
@@ -37,8 +22,7 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
   #     log: true,
   #     log_hex: true
   # ```
-
-  # #### Examples of logging (without log_hex)
+  #   # #### Examples of logging (without log_hex)
 
   #     iex> Bolt.Sips.Internals.test('localhost', 7687, "RETURN 1 as num", %{}, {"neo4j", "password"})
   #     C: HANDSHAKE ~ "<<0x60, 0x60, 0xB0, 0x17>> [2, 1, 0, 0]"
@@ -89,269 +73,150 @@ defmodule Bolt.Sips.Internals.BoltProtocol do
   #   * `recv_timeout`: The timeout for receiving a response from the Neo4J s
   #     server (default: #{@recv_timeout})
 
-  @doc """
-  Initiates the handshake between the client and the server.
+  alias Bolt.Sips.Metadata
+  alias Bolt.Sips.Internals.BoltProtocolV1
+  alias Bolt.Sips.Internals.BoltProtocolV3
 
-  ## Options
+  defdelegate handshake(transport, port, options \\ []), to: BoltProtocolV1
+  defdelegate init(transport, port, version, auth \\ {}, options \\ []), to: BoltProtocolV1
+  defdelegate hello(transport, port, version, auth \\ {}, options \\ []), to: BoltProtocolV3
+  defdelegate goodbye(transport, port, version), to: BoltProtocolV3
 
-  See "Shared options" in the documentation of this module.
-  """
-  @spec handshake(atom(), port(), Keyword.t()) ::
-          {:ok, integer()} | {:error, Bolt.Sips.Internals.Error.t()}
-  def handshake(transport, port, options \\ []) do
-    recv_timeout = get_recv_timeout(options)
+  defdelegate ack_failure(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
+  defdelegate reset(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
+  defdelegate discard_all(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
 
-    # Define version list. Should be a 4 integer list
-    # Example: [1, 0, 0, 0]
-    versions =
-      ((@max_version..0
-        |> Enum.into([])) ++ [0, 0, 0])
-      |> Enum.take(4)
+  defdelegate begin(transport, port, bolt_version, metadata \\ %Metadata{}, options \\ []),
+    to: BoltProtocolV3
 
-    Bolt.Sips.Internals.Logger.log_message(
-      :client,
-      :handshake,
-      "#{inspect(@hs_magic, base: :hex)} #{inspect(versions)}"
-    )
+  defdelegate commit(transport, port, bolt_version, options \\ []), to: BoltProtocolV3
+  defdelegate rollback(transport, port, bolt_version, options \\ []), to: BoltProtocolV3
 
-    data = @hs_magic <> Enum.into(versions, <<>>, fn version_ -> <<version_::32>> end)
-    transport.send(port, data)
-
-    case transport.recv(port, 4, recv_timeout) do
-      {:ok, <<version::32>> = packet} when version <= @max_version ->
-        Bolt.Sips.Internals.Logger.log_message(:server, :handshake, packet, :hex)
-        Bolt.Sips.Internals.Logger.log_message(:server, :handshake, version)
-        {:ok, version}
-
-      {:ok, other} ->
-        {:error, Error.exception(other, port, :handshake)}
-
-      other ->
-        {:error, Error.exception(other, port, :handshake)}
-    end
-  end
+  defdelegate pull_all(transport, port, bolt_version, options \\ []), to: BoltProtocolV1
 
   @doc """
-  Initialises the connection.
+  run for all Bolt version, but call differs.
+  For Bolt <= 2, use: run_statement(transport, port, bolt_version, statement, params, options)
+  For Bolt >=3: run_statement(transport, port, bolt_version, statement, params, metadata, options)
 
-  Expects a transport module (i.e. `gen_tcp`) and a `Port`. Accepts
-  authorisation params in the form of {username, password}.
-
-  ## Options
-
-  See "Shared options" in the documentation of this module.
-
-  ## Examples
-
-      iex> Bolt.Sips.Internals.BoltProtocol.init :gen_tcp, port
-      {:ok, info}
-
-      iex> Bolt.Sips.Internals.BoltProtocol.init :gen_tcp, port, {"username", "password"}
-      {:ok, info}
+  Note that Bolt V2 calls works with Bolt V3, but it is preferrable to update them.
   """
-  @spec init(atom(), port(), integer(), tuple(), Keyword.t()) ::
-          {:ok, any()} | {:error, Bolt.Sips.Internals.Error.t()}
-  def init(transport, port, bolt_version, auth \\ {}, options \\ []) do
-    send_message(transport, port, bolt_version, {:init, [auth]})
-
-    case receive_data(transport, port, bolt_version, options) do
-      {:success, info} ->
-        {:ok, info}
-
-      {:failure, response} ->
-        {:error, Error.exception(response, port, :init)}
-
-      other ->
-        {:error, Error.exception(other, port, :init)}
-    end
-  end
-
-  @doc false
-  # Sends a message using the Bolt protocol and PackStream encoding.
-  #
-  # Message have to be in the form of {message_type, [data]}.
-  @spec send_message(atom(), port(), integer(), Bolt.Sips.Internals.PackStream.Message.raw()) ::
-          :ok | {:error, any()}
-  def send_message(transport, port, bolt_version, message) do
-    message
-    |> Message.encode(bolt_version)
-    |> (fn data -> transport.send(port, data) end).()
-  end
-
-  @doc """
-  Runs a statement (most likely Cypher statement) and returns a list of the
-  records and a summary (Act as as a RUN + PULL_ALL).
-
-  Records are represented using PackStream's record data type. Their Elixir
-  representation is a Keyword with the indexes `:sig` and `:fields`.
-
-  ## Options
-
-  See "Shared options" in the documentation of this module.
-
-  ## Examples
-
-      iex> Bolt.Sips.Internals.BoltProtocol.run_statement("MATCH (n) RETURN n")
-      [
-        {:success, %{"fields" => ["n"]}},
-        {:record, [sig: 1, fields: [1, "Example", "Labels", %{"some_attribute" => "some_value"}]]},
-        {:success, %{"type" => "r"}}
-      ]
-  """
-  @spec run_statement(atom(), port(), integer(), String.t(), map(), Keyword.t()) ::
-          [
-            Bolt.Sips.Internals.PackStream.Message.decoded()
-          ]
+  @spec run(
+          atom(),
+          port(),
+          integer(),
+          String.t(),
+          map(),
+          nil | Keyword.t() | Bolt.Sips.Metadata.t(),
+          nil | Keyword.t()
+        ) ::
+          {:ok, tuple()}
           | Bolt.Sips.Internals.Error.t()
-  def run_statement(transport, port, bolt_version, statement, params \\ %{}, options \\ []) do
-    data = [statement, params]
+  def run(
+        transport,
+        port,
+        bolt_version,
+        statement,
+        params \\ %{},
+        options_or_metadata \\ [],
+        options \\ []
+      )
 
-    with :ok <- send_message(transport, port, bolt_version, {:run, data}),
-         {:success, _} = data <- receive_data(transport, port, bolt_version, options),
-         :ok <- send_message(transport, port, bolt_version, {:pull_all, []}),
-         more_data <- receive_data(transport, port, bolt_version, options),
-         more_data = List.wrap(more_data),
-         {:success, _} <- List.last(more_data) do
-      [data | more_data]
-    else
-      {:failure, map} ->
-        Bolt.Sips.Internals.Error.exception(map, port, :run_statement)
+  def run(transport, port, bolt_version, statement, params, options_or_metadata, _)
+      when bolt_version <= 2 do
+    BoltProtocolV1.run(
+      transport,
+      port,
+      bolt_version,
+      statement,
+      params,
+      options_or_metadata || []
+    )
+  end
 
-      error = %Error{} ->
-        error
+  def run(transport, port, bolt_version, statement, params, metadata, options)
+      when bolt_version >= 2 do
+    metadata =
+      case metadata do
+        [] -> %{}
+        metadata -> metadata
+      end
 
-      error ->
-        Error.exception(error, port, :run_statement)
-    end
+    {metadata, options} = manage_metadata_and_options(metadata, options)
+
+    BoltProtocolV3.run(transport, port, bolt_version, statement, params, metadata, options)
+  end
+
+  defp manage_metadata_and_options([], options) do
+    {:ok, empty_metadata} = Metadata.new(%{})
+    {empty_metadata, options}
+  end
+
+  defp manage_metadata_and_options([_ | _] = metadata, options) do
+    {:ok, empty_metadata} = Metadata.new(%{})
+    {empty_metadata, metadata ++ options}
+  end
+
+  defp manage_metadata_and_options(metadata, options) do
+    {metadata, options}
   end
 
   @doc """
-  Implementation of Bolt's ACK_FAILURE. It acknowledges a failure while keeping
-  transactions alive.
+  run_statement for all Bolt version, but call differs.
+  For Bolt <= 2, use: run_statement(transport, port, bolt_version, statement, params, options)
+  For Bolt >=3: run_statement(transport, port, bolt_version, statement, params, metadata, options)
 
-  See http://boltprotocol.org/v1/#message-ack-failure
-
-  ## Options
-
-  See "Shared options" in the documentation of this module.
+  Note that Bolt V2 calls works with Bolt V3, but it is preferrable to update them.
   """
-  @spec ack_failure(atom(), port(), integer(), Keyword.t()) :: :ok | Bolt.Sips.Internals.Error.t()
-  def ack_failure(transport, port, bolt_version, options \\ []) do
-    send_message(transport, port, bolt_version, {:ack_failure, []})
+  @spec run_statement(
+          atom(),
+          port(),
+          integer(),
+          String.t(),
+          map(),
+          nil | Keyword.t() | Bolt.Sips.Metadata.t(),
+          nil | Keyword.t()
+        ) ::
+          list()
+          | Bolt.Sips.Internals.Error.t()
+  def run_statement(
+        transport,
+        port,
+        bolt_version,
+        statement,
+        params \\ %{},
+        options_v2_or_metadata_v3 \\ [],
+        options_v3 \\ []
+      )
 
-    case receive_data(transport, port, bolt_version, options) do
-      {:success, %{}} -> :ok
-      error -> Error.exception(error, port, :ack_failure)
-    end
+  def run_statement(transport, port, bolt_version, statement, params, options_or_metadata, _)
+      when bolt_version <= 2 do
+    BoltProtocolV1.run_statement(
+      transport,
+      port,
+      bolt_version,
+      statement,
+      params,
+      options_or_metadata || []
+    )
   end
 
-  @doc """
-  Implementation of Bolt's RESET message. It resets a session to a "clean"
-  state.
-
-  See http://boltprotocol.org/v1/#message-reset
-
-  ## Options
-
-  See "Shared options" in the documentation of this module.
-  """
-  @spec reset(atom(), port(), integer(), Keyword.t()) :: :ok | Bolt.Sips.Internals.Error.t()
-  def reset(transport, port, bolt_version, options \\ []) do
-    send_message(transport, port, bolt_version, {:reset, []})
-
-    case receive_data(transport, port, bolt_version, options) do
-      {:success, %{}} -> :ok
-      error -> Error.exception(error, port, :reset)
-    end
-  end
-
-  @doc false
-  # Receives data.
-  #
-  # This function is supposed to be called after a request to the server has been
-  # made. It receives data chunks, mends them (if they were split between frames)
-  # and decodes them using PackStream.
-  #
-  # When just a single message is received (i.e. to acknowledge a command), this
-  # function returns a tuple with two items, the first being the signature and the
-  # second being the message(s) itself. If a list of messages is received it will
-  # return a list of the former.
-  #
-  # The same goes for the messages: If there was a single data point in a message
-  # said data point will be returned by itself. If there were multiple data
-  # points, the list will be returned.
-  #
-  # The signature is represented as one of the following:
-  #
-  # * `:success`
-  # * `:record`
-  # * `:ignored`
-  # * `:failure`
-  #
-  # ## Options
-  #
-  # See "Shared options" in the documentation of this module.
-  @spec receive_data(atom(), port(), integer(), Keyword.t(), list()) ::
-          {atom(), Bolt.Sips.Internals.PackStream.value()} | {:error, any()}
-  def receive_data(transport, port, bolt_version, options \\ [], previous \\ []) do
-    with {:ok, data} <- do_receive_data(transport, port, options) do
-      case Message.decode(data, bolt_version) do
-        {:record, _} = data ->
-          receive_data(transport, port, bolt_version, options, [data | previous])
-
-        {status, _} = data when status in @summary and previous == [] ->
-          data
-
-        {status, _} = data when status in @summary ->
-          Enum.reverse([data | previous])
-
-        other ->
-          {:error, Error.exception(other, port, :receive_data)}
+  def run_statement(transport, port, bolt_version, statement, params, metadata, options)
+      when bolt_version >= 2 do
+    metadata =
+      case metadata do
+        [] -> %{}
+        metadata -> metadata
       end
-    else
-      other ->
-        # Should be the line below to have a cleaner typespec
-        # Keep the old return value to not break usage
-        # {:error, Error.exception(other, port, :receive_data)}
-        Error.exception(other, port, :receive_data)
-    end
-  end
 
-  @spec do_receive_data(atom(), port(), Keyword.t()) :: {:ok, binary()}
-  defp do_receive_data(transport, port, options) do
-    recv_timeout = get_recv_timeout(options)
-
-    case transport.recv(port, 2, recv_timeout) do
-      {:ok, <<chunk_size::16>>} ->
-        do_receive_data_(transport, port, chunk_size, options, <<>>)
-
-      other ->
-        other
-    end
-  end
-
-  @spec do_receive_data_(atom(), port(), integer(), Keyword.t(), binary()) :: {:ok, binary()}
-  defp do_receive_data_(transport, port, chunk_size, options, old_data) do
-    recv_timeout = get_recv_timeout(options)
-
-    with {:ok, data} <- transport.recv(port, chunk_size, recv_timeout),
-         {:ok, marker} <- transport.recv(port, 2, recv_timeout) do
-      case marker do
-        @zero_chunk ->
-          {:ok, old_data <> data}
-
-        <<chunk_size::16>> ->
-          data = old_data <> data
-          do_receive_data_(transport, port, chunk_size, options, data)
-      end
-    else
-      other ->
-        Error.exception(other, port, :recv)
-    end
-  end
-
-  @spec get_recv_timeout(Keyword.t()) :: integer()
-  defp get_recv_timeout(options) do
-    Keyword.get(options, :recv_timeout, @recv_timeout)
+    BoltProtocolV3.run_statement(
+      transport,
+      port,
+      bolt_version,
+      statement,
+      params,
+      metadata,
+      options
+    )
   end
 end

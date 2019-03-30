@@ -87,14 +87,21 @@ defimpl PackStream.Encoder, for: Bolt.Sips.Types.Point do
 end
 
 defimpl PackStream.Encoder, for: Any do
-  @valid_signatures PackStream.Message.Encoder.valid_signatures() ++
-                      Bolt.Sips.Internals.PackStream.MarkersHelper.valid_signatures()
-
   @spec encode({integer(), list()} | %{:__struct__ => String.t()}, integer()) ::
           Bolt.Sips.Internals.PackStream.value() | <<_::16, _::_*8>>
-  def encode({signature, data}, bolt_version)
-      when signature in @valid_signatures and is_list(data) do
-    EncoderHelper.call_encode(:struct, {signature, data}, bolt_version)
+  def encode({signature, data}, bolt_version) when is_list(data) do
+    valid_signatures =
+      PackStream.Message.Encoder.valid_signatures(bolt_version) ++
+        Bolt.Sips.Internals.PackStream.MarkersHelper.valid_signatures()
+
+    if signature in valid_signatures do
+      EncoderHelper.call_encode(:struct, {signature, data}, bolt_version)
+    else
+      raise Bolt.Sips.Internals.PackStreamError,
+        message: "Unable to encode",
+        data: data,
+        bolt_version: bolt_version
+    end
   end
 
   # Elixir structs just need to be convertedd to map befoare being encoded
