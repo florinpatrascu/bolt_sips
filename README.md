@@ -39,26 +39,36 @@ It works with Neo4j 3.5.x but not with the new bolt v3 but with bolt v2. However
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 1.0"}]
+  [{:bolt_sips, "~> 1.5"}]
 end
 ```
 
-#### 2. Ensure bolt_sips is started before your application:
+#### 2. Ensure bolt_sips is part of your supervision tree, example:
 
 ```elixir
-def application do
-  [applications: [:bolt_sips], mod: {Bolt.Sips.Application, []}]
+defmodule MoviesElixirPhoenix.Application do
+  @moduledoc false
+
+  use Application
+
+  def start(_type, _args) do
+    import Supervisor.Spec
+    children = [
+      {Bolt.Sips, Application.get_env(:bolt_sips, Bolt)},
+      MoviesElixirPhoenixWeb.Endpoint
+    ]
+
+    opts = [strategy: :one_for_one, name: MoviesElixirPhoenix.Supervisor]
+    Supervisor.start_link(children, opts)
+  end
 end
+
 ```
 
-You can also specify custom configuration settings in you app's mix config file. These may overwrite your config file:
+Please observe this line:
 
 ```elixir
-def application do
-  [extra_applications: [:logger], mod:
-    {Bolt.Sips.Application, [url: 'localhost', pool_size: 15]}
-  ]
-end
+{Bolt.Sips, Application.get_env(:bolt_sips, Bolt)},
 ```
 
 ### Usage
