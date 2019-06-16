@@ -1,0 +1,8 @@
+!: AUTO INIT
+!: AUTO RESET
+
+C: RUN "CALL dbms.cluster.routing.getRoutingTable({context})" {"context": {}}
+S: FAILURE {"code": "Neo.ClientError.Procedure.ProcedureNotFound", "message": "Not a router"}
+   IGNORED
+C: RESET
+S: SUCCESS {}

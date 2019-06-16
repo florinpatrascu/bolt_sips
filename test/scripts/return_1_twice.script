@@ -1,0 +1,12 @@
+!: AUTO INIT
+!: AUTO RESET
+
+C: RUN "RETURN $x" {"x": 1}
+S: SUCCESS {"fields": ["x"]}
+   RECORD [1]
+   SUCCESS {}
+
+C: RUN "RETURN $x" {"x": 1}
+S: SUCCESS {"fields": ["x"]}
+   RECORD [1]
+   SUCCESS {}

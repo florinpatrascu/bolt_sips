@@ -1,0 +1,5 @@
+boto==2.48.0
+certifi
+click<8,>=7
+docker
+urllib3

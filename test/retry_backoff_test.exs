@@ -14,7 +14,7 @@ defmodule Rety.Backoff.Test do
 
     {elapsed, _} =
       :timer.tc(fn ->
-        {:error, [code: "Neo.ClientError.Statement.SyntaxError", message: message]} =
+        {:error, %Bolt.Sips.Error{message: message}} =
           retry with: lin_backoff(500, 1) |> take(5) do
             Bolt.Sips.query(conn, "INVALID CYPHER")
           end

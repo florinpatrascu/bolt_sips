@@ -2,15 +2,14 @@ use Mix.Config
 
 config :bolt_sips, Bolt,
   # default port considered to be: 7687
-  url: 'localhost',
+  url: "bolt://localhost",
   basic_auth: [username: "neo4j", password: "test"],
-  pool_size: 5,
-  max_overflow: 1,
-  # retry the request, in case of error - in the example below the retry will
-  # linearly increase the delay from 150ms following a Fibonacci pattern,
-  # cap the delay at 15 seconds (the value defined by the default `:timeout`
-  # parameter) and giving up after 3 attempts
-  retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
+  pool_size: 10,
+  max_overflow: 2,
+  queue_interval: 500,
+  queue_target: 1500,
+  retry_linear_backoff: [delay: 150, factor: 2, tries: 2],
+  prefix: :default
 
 # the `retry_linear_backoff` values above are also the default driver values,
 # re-defined here mostly as a reminder
@@ -32,3 +31,6 @@ config :logger, :console,
 
 config :mix_test_watch,
   clear: true
+
+config :tzdata, :autoupdate, :disabled
+config :porcelain, driver: Porcelain.Driver.Basic

@@ -46,32 +46,45 @@ defmodule Bolt.Sips.Query do
   See the various tests, or more examples and implementation details.
 
   """
-  alias Bolt.Sips
-  alias Bolt.Sips.{QueryStatement, Response, Types, Exception}
+  alias Bolt.Sips.{QueryStatement, Response, Types, Error, Exception}
 
   @cypher_seps ~r/;(.){0,1}\n/
 
+  @spec query!(Bolt.Sips.conn(), String.t()) :: Response.t() | Exception.t()
   def query!(conn, statement), do: query!(conn, statement, %{})
 
+  @spec query!(Bolt.Sips.conn(), String.t(), map) :: Response.t() | Exception.t()
   def query!(conn, statement, params) when is_map(params) do
-    case query_commit(conn, statement, params) do
-      {:error, f} ->
-        raise Exception, code: f.code, message: f.message
+    with {:ok, r} <- query_commit(conn, statement, params) do
+      r
+    else
+      {:error, msg} ->
+        raise Exception, message: msg
 
-      r ->
-        r
+      e ->
+        raise Exception, message: "unexpected error: #{inspect(e)}"
     end
   end
 
+  @spec query(Bolt.Sips.conn(), String.t()) :: {:error, Error.t()} | {:ok, Response.t()}
   def query(conn, statement), do: query(conn, statement, %{})
 
+  @spec query(Bolt.Sips.conn(), String.t(), map) :: {:error, Error.t()} | {:ok, Response.t()}
   def query(conn, statement, params) when is_map(params) do
     case query_commit(conn, statement, params) do
-      {:error, f} -> {:error, code: f.code, message: f.message}
-      r -> {:ok, r}
+      {:error, message} -> {:error, %Error{message: message}}
+      r -> r
     end
+  rescue
+    e in Bolt.Sips.Exception ->
+      {:error, %Bolt.Sips.Error{code: e.code, message: e.message}}
   end
 
+  ###########
+  # Private #
+  ###########
+  @spec query_commit(Bolt.Sips.conn(), String.t(), map) ::
+          {:error, Error.t()} | {:ok, Response.t()}
   defp query_commit(conn, statement, params) do
     statements =
       String.split(statement, @cypher_seps, trim: true)
@@ -94,59 +107,58 @@ defmodule Bolt.Sips.Query do
       end)
       |> Enum.map(fn {k, {:error, error}} -> {k, error} end)
 
-    if length(errors) == 0 do
-      tx(conn, statements, formated_params)
-    else
-      {:error, %Sips.Error{message: "Unable to format params: #{inspect(errors)}"}}
+    {:ok, commit!(errors, conn, statements, formated_params)}
+  rescue
+    e in [RuntimeError, DBConnection.ConnectionError] ->
+      {:error, Bolt.Sips.Error.new(e.message)}
+
+    e in Exception ->
+      reraise e, __STACKTRACE__
+
+    e ->
+      {:error, e}
+  end
+
+  defp commit!([], conn, statements, formated_params), do: tx!(conn, statements, formated_params)
+
+  defp commit!(errors, _conn, _statements, _formated_params),
+    do: raise(Exception, message: "Unable to format params: #{inspect(errors)}")
+
+  defp tx!(conn, [statement], params), do: hd(send!(conn, statement, params))
+
+  # todo It returns [Response.t] !!!
+  defp tx!(conn, statements, params) when is_list(statements),
+    do: Enum.reduce(statements, [], &send!(conn, &1, params, &2))
+
+  defp send!(conn, statement, params, acc \\ [])
+
+  @spec send!(Bolt.Sips.conn(), String.t(), map, list) ::
+          {:error, Exception.t()} | [Response.t()] | RuntimeError
+  defp send!(conn, statement, params, acc) do
+    case DBConnection.execute(conn, %QueryStatement{statement: statement}, params) do
+      {:ok, _query, resp} ->
+        with {:ok, %Response{} = r} <- Response.transform(resp) do
+          acc ++ [r]
+        else
+          {:error, e} -> raise DBConnection.ConnectionError, message: e
+        end
+
+      {:error, %Bolt.Sips.Internals.Error{code: code, message: msg}} ->
+        raise Exception, code: code, message: msg
+
+      {:error, %{message: message}} ->
+        raise DBConnection.ConnectionError, message: message
     end
   end
 
   # Format the param to be used in query
   # must return a tuple of the form: {:ok, param} or {:error, param}
-  # In order to let querey_commit handle the error
+  # In order to let query_commit handle the error
   @spec format_param({String.t(), any()}) :: {String.t(), {:ok | :error, any()}}
-  defp format_param({name, %Types.Duration{} = duration}) do
-    {name, Types.Duration.format_param(duration)}
-  end
+  defp format_param({name, %Types.Duration{} = duration}),
+    do: {name, Types.Duration.format_param(duration)}
 
-  defp format_param({name, %Types.Point{} = point}) do
-    {name, Types.Point.format_param(point)}
-  end
+  defp format_param({name, %Types.Point{} = point}), do: {name, Types.Point.format_param(point)}
 
   defp format_param({name, value}), do: {name, {:ok, value}}
-
-  defp tx(conn, statements, params) when length(statements) == 1 do
-    exec = fn conn ->
-      q = %QueryStatement{statement: hd(statements)}
-
-      case DBConnection.execute(conn, q, params) do
-        {:ok, _query, resp} -> resp
-        other -> other
-      end
-    end
-
-    Response.transform(DBConnection.run(conn, exec, run_opts()))
-  end
-
-  defp tx(conn, statements, params) do
-    exec = fn conn ->
-      Enum.reduce(statements, [], &send!(conn, &1, params, &2))
-    end
-
-    DBConnection.run(conn, exec, run_opts())
-  rescue
-    e in RuntimeError ->
-      {:error, e}
-  end
-
-  defp send!(conn, statement, params, acc) do
-    case DBConnection.execute(conn, %QueryStatement{statement: statement}, params) do
-      {:ok, _query, resp} -> acc ++ [Response.transform(resp)]
-      {:error, error} -> raise RuntimeError, error
-    end
-  end
-
-  defp run_opts do
-    [pool: Sips.config(:pool)]
-  end
 end

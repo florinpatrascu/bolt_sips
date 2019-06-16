@@ -5,15 +5,15 @@ defmodule Bolt.Sips do
 
   use Supervisor
 
-  @pool_name :bolt_sips_pool
+  @registry_name :bolt_sips_registry
+
   @timeout 15_000
   # @max_rows     500
 
-  alias Bolt.Sips.{Query, Utils, ConfigAgent}
+  alias Bolt.Sips.{Query, ConnectionSupervisor, Router, Error, Response, Exception}
 
   @type conn :: DBConnection.conn()
   @type transaction :: DBConnection.t()
-  @type result :: {:ok, result :: any} | {:error, Exception.t()}
 
   @doc """
   Start the connection process and connect to Neo4j
@@ -59,55 +59,79 @@ defmodule Bolt.Sips do
   """
   @spec start_link(Keyword.t()) :: Supervisor.on_start()
   def start_link(opts) do
-    Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
+    with nil <- Process.whereis(__MODULE__) do
+      Supervisor.start_link(__MODULE__, opts, name: __MODULE__)
+    else
+      pid ->
+        Router.configure(opts)
+        {:ok, pid}
+
+      {pid, node} ->
+        Router.configure(opts)
+        {:ok, {pid, node}}
+    end
   end
 
   @doc false
   def init(opts) do
-    options = Utils.default_config(opts)
-    ssl_or_sock = if(Keyword.get(options, :ssl), do: :ssl, else: Keyword.get(options, :socket))
-    config = Keyword.put(options, :socket, ssl_or_sock)
-
-    children = [
-      {Bolt.Sips.ConfigAgent, config},
-      DBConnection.child_spec(Bolt.Sips.Protocol, pool_config(config))
+    [
+      Registry.child_spec(keys: :unique, name: registry_name()),
+      ConnectionSupervisor,
+      {Router, opts}
     ]
-
-    Supervisor.init(children, strategy: :one_for_one)
+    |> Supervisor.init(strategy: :one_for_one)
   end
 
   @doc """
-  Returns a pool name which can be used to acquire a connection.
+  Returns a pool name which can be used to acquire a connection from a pool of servers
+  responsible with a specific type of operations: read, write and route, or all of the above: "direct"
   """
-  def conn, do: pool_name()
+  @spec conn(atom, keyword) :: conn
+  def conn(role \\ :direct, opts \\ [prefix: :default])
+  def conn(role, opts)
+
+  def conn(role, opts) do
+    prefix = Keyword.get(opts, :prefix, :default)
+
+    with {:ok, conn} <- Router.get_connection(role, prefix) do
+      conn
+    else
+      {:error, e} ->
+        raise Exception, e
+
+      e ->
+        {:error, e}
+    end
+  end
 
   ## Query
   ########################
 
   @doc """
-  sends the query (and its parameters) to the server and returns `{:ok, Bolt.Sips.Response}` or
-  `{:error, error}` otherwise
+  sends the query (and its parameters) to the server and returns `{:ok, Response.t()}` or
+  `{:error, Error}` otherwise
   """
-  @spec query(conn, String.t()) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
+  @spec query(conn, String.t()) :: {:ok, Response.t() | [Response.t()]} | {:error, Error.t()}
   defdelegate query(conn, statement), to: Query
 
   @doc """
-  The same as query/2 but raises a Bolt.Sips.Exception if it fails.
+  The same as query/2 but raises a Exception if it fails.
   Returns the server response otherwise.
   """
-  @spec query!(conn, String.t()) :: Bolt.Sips.Response | Bolt.Sips.Exception
+  @spec query!(conn, String.t()) :: Response.t() | [Response.t()] | Exception.t()
   defdelegate query!(conn, statement), to: Query
 
   @doc """
   send a query and an associated map of parameters. Returns the server response or an error
   """
-  @spec query(conn, String.t(), map()) :: {:ok, Bolt.Sips.Response} | {:error, Bolt.Sips.Error}
+  @spec query(conn, String.t(), map()) ::
+          {:ok, Response.t() | [Response.t()]} | {:error, Error.t()}
   defdelegate query(conn, statement, params), to: Query
 
   @doc """
-  The same as query/3 but raises a Bolt.Sips.Exception if it fails.
+  The same as query/3 but raises a Exception if it fails.
   """
-  @spec query!(conn, String.t(), map()) :: Bolt.Sips.Response | Bolt.Sips.Exception
+  @spec query!(conn, String.t(), map()) :: Response.t() | [Response.t()] | Exception.t()
   defdelegate query!(conn, statement, params), to: Query
 
   ## Transaction
@@ -138,9 +162,6 @@ defmodule Bolt.Sips do
     ```
   """
 
-  @spec transaction(DBConnection.t(), (DBConnection.t() -> result), opts :: Keyword.t()) ::
-          {:ok, result} | {:error, reason :: any}
-        when result: var
   defdelegate transaction(conn, fun, opts \\ []), to: DBConnection
 
   @doc """
@@ -162,31 +183,32 @@ defmodule Bolt.Sips do
   defdelegate rollback(conn, opts), to: DBConnection
 
   @doc """
-  returns an environment specific Bolt.Sips configuration.
+  terminate a pool of connections with the role specified
   """
-  def config, do: ConfigAgent.get_config()
+  defdelegate terminate_connections(role), to: Router
 
-  @doc false
-  def config(key), do: Keyword.get(config(), key)
-
-  @doc false
-  def config(key, default) do
-    Keyword.get(config(), key, default)
-  rescue
-    _ -> default
+  @doc """
+  peek into the main Router state, and return the internal state controlling the connections
+  to the server/server. Mostly for internal use or for helping driver developers.
+  """
+  @spec info() :: map
+  def info() do
+    Bolt.Sips.Router.info()
   end
 
-  @doc false
-  def pool_name, do: @pool_name
+  @doc """
+  extract the routing table from the router
+  """
+  @spec routing_table(any) :: map
+  def routing_table(prefix \\ :default)
 
-  ## Helpers
-  ######################
-
-  defp pool_config(cnf) do
-    [
-      name: pool_name(),
-      pool_size: Keyword.get(cnf, :pool_size),
-      pool_overflow: Keyword.get(cnf, :max_overflow)
-    ]
+  def routing_table(prefix) do
+    Bolt.Sips.Router.routing_table(prefix)
   end
+
+  @doc """
+  the registry name used across the various driver components
+  """
+  @spec registry_name() :: :bolt_sips_registry
+  def registry_name(), do: @registry_name
 end

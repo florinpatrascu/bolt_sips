@@ -1,0 +1,80 @@
+version: "3.0"
+
+networks:
+  lan:
+
+services:
+  core1:
+    container_name: core1
+    image: neo4j:3.5.3-enterprise
+    networks:
+      - lan
+    ports:
+      - 7474:7474
+      - 6477:6477
+      - 7687:7687
+    environment:
+      - NEO4J_AUTH=neo4j/test
+      - NEO4J_dbms_mode=CORE
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_causalClustering_expectedCoreClusterSize=3
+      - NEO4J_causalClustering_initialDiscoveryMembers=core1:5000,core2:5000,core3:5000
+      - NEO4J_dbms_connector_http_listen__address=:7474
+      - NEO4J_dbms_connector_https_listen__address=:6477
+      - NEO4J_dbms_connector_bolt_listen__address=:7687
+      - NEO4J_dbms_memory_heap_initial__size=300m
+      - NEO4J_dbms_memory_heap_max__size=300m
+      - NEO4J_dbms_logs_query_enabled=true
+      - NEO4J_dbms_logs_query_page__logging__enabled=false
+      - NEO4J_dbms_logs_query_parameter__logging__enabled=true
+      - NEO4J_dbms_logs_query_threshold=0
+
+  core2:
+    container_name: core2
+    image: neo4j:3.5.3-enterprise
+    networks:
+      - lan
+    ports:
+      - 7475:7475
+      - 6478:6478
+      - 7688:7688
+    environment:
+      - NEO4J_AUTH=neo4j/test
+      - NEO4J_dbms_mode=CORE
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_causalClustering_expectedCoreClusterSize=3
+      - NEO4J_causalClustering_initialDiscoveryMembers=core1:5000,core2:5000,core3:5000
+      - NEO4J_dbms_connector_http_listen__address=:7475
+      - NEO4J_dbms_connector_https_listen__address=:6478
+      - NEO4J_dbms_connector_bolt_listen__address=:7688
+      - NEO4J_dbms_memory_heap_initial__size=300m
+      - NEO4J_dbms_memory_heap_max__size=300m
+      - NEO4J_dbms_logs_query_enabled=true
+      - NEO4J_dbms_logs_query_page__logging__enabled=false
+      - NEO4J_dbms_logs_query_parameter__logging__enabled=true
+      - NEO4J_dbms_logs_query_threshold=0
+
+  core3:
+    container_name: core3
+    image: neo4j:3.5.3-enterprise
+    networks:
+      - lan
+    ports:
+      - 7476:7476
+      - 6479:6479
+      - 7689:7689
+    environment:
+      - NEO4J_AUTH=neo4j/test
+      - NEO4J_dbms_mode=CORE
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_causalClustering_expectedCoreClusterSize=3
+      - NEO4J_causalClustering_initialDiscoveryMembers=core1:5000,core2:5000,core3:5000
+      - NEO4J_dbms_connector_http_listen__address=:7476
+      - NEO4J_dbms_connector_https_listen__address=:6479
+      - NEO4J_dbms_connector_bolt_listen__address=:7689
+      - NEO4J_dbms_memory_heap_initial__size=300m
+      - NEO4J_dbms_memory_heap_max__size=300m
+      - NEO4J_dbms_logs_query_enabled=true
+      - NEO4J_dbms_logs_query_page__logging__enabled=false
+      - NEO4J_dbms_logs_query_parameter__logging__enabled=true
+      - NEO4J_dbms_logs_query_threshold=0

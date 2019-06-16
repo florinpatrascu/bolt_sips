@@ -50,9 +50,8 @@ defmodule Mix.Tasks.Bolt.Cypher do
       response |> log_response
     else
       {:error, [code: code, message: message]} ->
-        log_error(
-          inspect(code) <> " - cannot execute the command, see error above.Details" <> message
-        )
+        "#{inspect(code)} - cannot execute the command, see error above. Details: #{message}"
+        |> log_error()
 
       e ->
         log_error("Unknown error: #{inspect(e)}")

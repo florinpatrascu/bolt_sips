@@ -17,3 +17,5 @@ config :bolt_sips,
 config :logger, :console,
   level: level,
   format: "$date $time [$level] $metadata$message\n"
+
+config :tzdata, :autoupdate, :disabled
