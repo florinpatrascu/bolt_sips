@@ -4,6 +4,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
 
   alias Bolt.Sips.Internals.BoltProtocol
   alias Bolt.Sips.Metadata
+  alias Bolt.Sips.Utils
 
   setup do
     app_config = Application.get_env(:bolt_sips, Bolt)
@@ -15,9 +16,16 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
       app_config
       |> Keyword.put(:port, port)
       |> Keyword.put(:auth, auth)
+      |> Utils.default_config()
 
     {:ok, port} =
-      :gen_tcp.connect(config[:url], config[:port], active: false, mode: :binary, packet: :raw)
+      config[:hostname]
+      |> String.to_charlist()
+      |> :gen_tcp.connect(config[:port],
+        active: false,
+        mode: :binary,
+        packet: :raw
+      )
 
     {:ok, bolt_version} = BoltProtocol.handshake(:gen_tcp, port, [])
     {:ok, _} = BoltProtocol.hello(:gen_tcp, port, bolt_version, auth)

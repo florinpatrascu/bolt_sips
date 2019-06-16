@@ -1,0 +1,18 @@
+!: AUTO INIT
+!: AUTO RESET
+!: AUTO PULL_ALL
+
+C: RUN "UNWIND range(1, 10) AS n RETURN n" {}
+S: SUCCESS {"fields": ["n"]}
+C: PULL_ALL
+S: RECORD [1]
+   RECORD [2]
+   RECORD [3]
+   RECORD [4]
+   RECORD [5]
+   RECORD [6]
+   RECORD [7]
+   RECORD [8]
+   RECORD [9]
+   RECORD [10]
+   SUCCESS {"type": "r"}

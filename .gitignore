@@ -122,3 +122,10 @@ rel/example_project
 logs/
 .vscode/
 .elixir_ls/
+
+# py related
+*~
+*.py[co]
+__pycache__
+.pytest_cache
+*.egg-info

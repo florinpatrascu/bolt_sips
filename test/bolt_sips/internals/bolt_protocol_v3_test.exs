@@ -16,9 +16,16 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3Test do
       app_config
       |> Keyword.put(:port, port)
       |> Keyword.put(:auth, auth)
+      |> Bolt.Sips.Utils.default_config()
 
     {:ok, port} =
-      :gen_tcp.connect(config[:url], config[:port], active: false, mode: :binary, packet: :raw)
+      config[:hostname]
+      |> String.to_charlist()
+      |> :gen_tcp.connect(config[:port],
+        active: false,
+        mode: :binary,
+        packet: :raw
+      )
 
     {:ok, _} = BoltProtocol.handshake(:gen_tcp, port, [])
 
@@ -169,7 +176,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3Test do
     end
 
     # Work only with Neo4j Enterprise
-    @tag :enterprise_only
+    @tag :enterprise
     test "Open a transaction with metadata", %{config: config, port: port} do
       assert {:ok, _} = BoltProtocolV3.hello(:gen_tcp, port, 3, config[:auth], [])
       {:ok, metadata} = Metadata.new(%{bookmarks: ["neo4j:bookmark:v1:tx234"], tx_timeout: 1_000})
@@ -201,8 +208,8 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3Test do
       assert :ok = BoltProtocolV3.rollback(:gen_tcp, port, 3, [])
     end
 
-    # Work only with Neo4j Enterprise
-    @tag :enterprise_only
+    # It works with Neo4j Enterprise only
+    @tag :enterprise
     test "With socket instead of gent_tcp", %{config: config, port: port} do
       assert {:ok, _} = BoltProtocolV3.hello(Bolt.Sips.Socket, port, 3, config[:auth], [])
       {:ok, metadata} = Metadata.new(%{bookmarks: ["neo4j:bookmark:v1:tx234"], tx_timeout: 1_000})

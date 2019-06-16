@@ -1,7 +1,9 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "1.5.1"
+  @version "2.0.0-rc"
+  @url_docs "https://hexdocs.pm/bolt_sips"
+  @url_github "https://github.com/florinpatrascu/bolt_sips"
 
   def project do
     [
@@ -16,12 +18,43 @@ defmodule BoltSips.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       docs: [
-        main: "readme",
-        extras: ["README.md", "CHANGELOG.md"],
         source_ref: "v#{@version}",
-        source_url: "https://github.com/florinpatrascu/bolt_sips"
+        source_url: @url_github,
+        main: "getting-started",
+        extra_section: "guides",
+        extras: [
+          "README.md",
+          "CHANGELOG.md",
+          "docs/getting-started.md#Starting-the-Driver",
+          "docs/getting-started.md#usage",
+          "docs/features/configuration.md",
+          "docs/features/configuration.md#direct-mode",
+          "docs/features/configuration#routing-mode",
+          "docs/features/configuration#role-based-connections",
+          "docs/features/configuration#multi-tenancy",
+          "docs/features/using-cypher.md",
+          "docs/features/using-temporal-and-spatial-types.md",
+          "docs/features/about-transactions.md",
+          "docs/features/about-encoding.md",
+          "docs/features/routing.md",
+          "docs/features/multi-tenancy.md",
+          "docs/features/using-with-phoenix.md",
+          "docs/examples/readme.md"
+        ]
       ],
       dialyzer: [plt_add_apps: [:jason, :poison, :mix], ignore_warnings: ".dialyzer_ignore.exs"],
+      test_coverage: [
+        tool: ExCoveralls
+      ],
+      preferred_cli_env: [
+        docs: :docs,
+        bench: :bench,
+        credo: :dev,
+        bolt_sips: :test,
+        coveralls: :test,
+        "coveralls.html": :test,
+        "coveralls.travis": :test
+      ],
       aliases: aliases()
     ]
   end
@@ -35,8 +68,7 @@ defmodule BoltSips.Mixfile do
         :logger,
         :calendar,
         :db_connection,
-        :retry,
-        :fuzzyurl
+        :retry
       ]
     ]
   end
@@ -45,7 +77,7 @@ defmodule BoltSips.Mixfile do
   defp aliases do
     [
       test: [
-        "test --exclude bolt_v1 --exclude enterprise_only"
+        "test --exclude bolt_v1 --exclude routing --exclude boltkit --exclude enterprise"
       ]
     ]
   end
@@ -55,9 +87,17 @@ defmodule BoltSips.Mixfile do
 
   defp package do
     %{
+      files: [
+        "lib",
+        "mix.exs",
+        "LICENSE"
+      ],
       licenses: ["Apache 2.0"],
       maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk", "Dominique VASSARD"],
-      links: %{"Github" => "https://github.com/florinpatrascu/bolt_sips"}
+      links: %{
+        "Docs" => @url_docs,
+        "Github" => @url_github
+      }
     }
   end
 
@@ -65,16 +105,28 @@ defmodule BoltSips.Mixfile do
   defp deps do
     [
       {:db_connection, "~> 2.0"},
-      {:fuzzyurl, "~> 1.0"},
       {:retry, "0.9.1"},
       {:calendar, "~> 0.17.2"},
       {:jason, "~> 1.1"},
       {:poison, "~> 3.1"},
-      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
+
+      # Testing dependencies
+      {:excoveralls, "~> 0.11", optional: true, only: [:test, :dev]},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
-      {:benchee, "~> 0.14", only: :dev},
-      {:credo, "~> 1.0", only: [:dev, :test]},
-      {:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false}
+      {:porcelain, "~> 2.0", only: [:test, :dev], runtime: false},
+      {:fixex, "~> 0.1", only: [:test, :dev], runtime: false},
+      {:uuid, "~> 1.1.8", only: [:test, :dev], runtime: false},
+
+      # Benchmarking dependencies
+      {:benchee, "~> 1.0", optional: true, only: [:bench]},
+      {:benchee_html, "~> 1.0", optional: true, only: [:bench]},
+
+      # Linting dependencies
+      {:credo, "~> 1.0", only: [:dev]},
+      {:dialyxir, "1.0.0-rc.6", only: [:dev], runtime: false},
+
+      # Documentation dependencies
+      {:ex_doc, "~> 0.19", optional: true, only: [:docs]}
     ]
   end
 end

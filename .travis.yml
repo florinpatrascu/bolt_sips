@@ -83,4 +83,4 @@ before_install:
   - docker logs -f neo4j | sed /Bolt\ enabled/q
 
 script:
-  - mix test --exclude enterprise_only --exclude bolt_v1:$BOLT_V1_EXCLUDED --exclude bolt_v2:$BOLT_V2_EXCLUDED --exclude bolt_v3:$BOLT_V3_EXCLUDED
+  - mix test --exclude routing --exclude bolt_v1:$BOLT_V1_EXCLUDED --exclude bolt_v2:$BOLT_V2_EXCLUDED --exclude bolt_v3:$BOLT_V3_EXCLUDED

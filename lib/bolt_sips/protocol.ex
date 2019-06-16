@@ -6,11 +6,12 @@ defmodule Bolt.Sips.Protocol do
   defmodule ConnData do
     @moduledoc false
     # Defines the state used by DbConnection implementation
-    defstruct [:sock, :bolt_version]
+    defstruct [:sock, :bolt_version, :configuration]
 
     @type t :: %__MODULE__{
             sock: port(),
-            bolt_version: integer()
+            bolt_version: integer(),
+            configuration: Keyword.t()
           }
   end
 
@@ -19,26 +20,34 @@ defmodule Bolt.Sips.Protocol do
 
   require Logger
 
-  alias Bolt.Sips
   alias Bolt.Sips.QueryStatement
   alias Bolt.Sips.Internals.Error, as: BoltError
   alias Bolt.Sips.Internals.BoltProtocol
 
   @doc "Callback for DBConnection.connect/1"
-  def connect(_opts) do
-    host = to_charlist(Sips.config(:hostname))
-    port = Sips.config(:port)
-    auth = extract_auth(Sips.config(:basic_auth))
 
-    timeout = Sips.config(:timeout)
+  def connect(opts \\ [])
+  def connect([]), do: connect(Bolt.Sips.Utils.default_config())
 
+  def connect(opts) do
+    conf = opts |> Bolt.Sips.Utils.default_config()
+    host = _to_hostname(conf[:hostname])
+    port = conf[:port]
+    auth = extract_auth(conf[:basic_auth])
+    timeout = conf[:timeout]
+    socket = conf[:socket]
     socket_opts = [packet: :raw, mode: :binary, active: false]
 
-    with {:ok, sock} <- socket().connect(host, port, socket_opts, timeout),
-         {:ok, bolt_version} <- BoltProtocol.handshake(socket(), sock),
-         {:ok, _info} <- do_init(socket(), sock, bolt_version, auth),
-         :ok <- socket().setopts(sock, active: :once) do
-      {:ok, %ConnData{sock: sock, bolt_version: bolt_version}}
+    with {:ok, sock} <- socket.connect(host, port, socket_opts, timeout),
+         {:ok, bolt_version} <- BoltProtocol.handshake(socket, sock),
+         {:ok, server_version} <- do_init(socket, sock, bolt_version, auth),
+         :ok <- socket.setopts(sock, active: :once) do
+      {:ok,
+       %ConnData{
+         sock: sock,
+         bolt_version: bolt_version,
+         configuration: Keyword.merge(conf, server_version: server_version)
+       }}
     else
       {:error, %BoltError{}} = error ->
         error
@@ -57,87 +66,89 @@ defmodule Bolt.Sips.Protocol do
   end
 
   @doc "Callback for DBConnection.checkout/1"
-  def checkout(%ConnData{sock: sock} = conn_data) do
-    case socket().setopts(sock, active: false) do
+  def checkout(%ConnData{sock: sock, configuration: conf} = conn_data) do
+    case conf[:socket].setopts(sock, active: false) do
       :ok -> {:ok, conn_data}
       other -> other
     end
   end
 
   @doc "Callback for DBConnection.checkin/1"
-  def checkin(%ConnData{sock: sock} = conn_data) do
-    case socket().setopts(sock, active: :once) do
+  def checkin(%ConnData{sock: sock, configuration: conf} = conn_data) do
+    case conf[:socket].setopts(sock, active: :once) do
       :ok -> {:ok, conn_data}
       other -> other
     end
   end
 
-  def disconnect(_err, %ConnData{sock: sock, bolt_version: 3} = conn_data) do
-    :ok = BoltProtocol.goodbye(socket(), sock, conn_data.bolt_version)
-    socket().close(sock)
+  def disconnect(_err, %ConnData{sock: sock, bolt_version: 3, configuration: conf} = conn_data) do
+    socket = conf[:socket]
+    :ok = BoltProtocol.goodbye(socket, sock, conn_data.bolt_version)
+    socket.close(sock)
 
     :ok
   end
 
   @doc "Callback for DBConnection.disconnect/1"
-  def disconnect(_err, %ConnData{sock: sock}) do
-    socket().close(sock)
+  def disconnect(_err, %ConnData{sock: sock, configuration: conf}) do
+    conf[:socket].close(sock)
 
     :ok
   end
 
   @doc "Callback for DBConnection.handle_begin/1"
-  def handle_begin(_, %ConnData{sock: sock, bolt_version: 3} = conn_data) do
-    {:ok, _} = BoltProtocol.begin(socket(), sock, conn_data.bolt_version)
+  def handle_begin(_, %ConnData{sock: sock, bolt_version: 3, configuration: conf} = conn_data) do
+    {:ok, _} = BoltProtocol.begin(conf[:socket], sock, conn_data.bolt_version)
     {:ok, :began, conn_data}
   end
 
   def handle_begin(_opts, conn_data) do
-    q = %QueryStatement{statement: "BEGIN"}
-
-    handle_execute(q, %{}, [], conn_data)
+    %QueryStatement{statement: "BEGIN"}
+    |> handle_execute(%{}, [], conn_data)
 
     {:ok, :began, conn_data}
   end
 
   @doc "Callback for DBConnection.handle_rollback/1"
-  def handle_rollback(_opts, %ConnData{sock: sock, bolt_version: 3} = conn_data) do
-    :ok = BoltProtocol.rollback(socket(), sock, conn_data.bolt_version)
+  def handle_rollback(_, %ConnData{sock: sock, bolt_version: 3, configuration: conf} = conn_data) do
+    :ok = BoltProtocol.rollback(conf[:socket], sock, conn_data.bolt_version)
     {:ok, :rolledback, conn_data}
   end
 
   def handle_rollback(_opts, conn_data) do
-    q = %QueryStatement{statement: "ROLLBACK"}
-    handle_execute(q, %{}, [], conn_data)
+    %QueryStatement{statement: "ROLLBACK"}
+    |> handle_execute(%{}, [], conn_data)
+
     {:ok, :rolledback, conn_data}
   end
 
   @doc "Callback for DBConnection.handle_commit/1"
-  def handle_commit(_opts, %ConnData{sock: sock, bolt_version: 3} = conn_data) do
-    {:ok, _} = BoltProtocol.commit(socket(), sock, conn_data.bolt_version)
+  def handle_commit(_, %ConnData{sock: sock, bolt_version: 3, configuration: conf} = conn_data) do
+    {:ok, _} = BoltProtocol.commit(conf[:socket], sock, conn_data.bolt_version)
     {:ok, :committed, conn_data}
   end
 
   def handle_commit(_opts, conn_data) do
-    q = %QueryStatement{statement: "COMMIT"}
-    handle_execute(q, %{}, [], conn_data)
+    %QueryStatement{statement: "COMMIT"}
+    |> handle_execute(%{}, [], conn_data)
+
     {:ok, :committed, conn_data}
   end
 
   @doc "Callback for DBConnection.handle_execute/1"
-  def handle_execute(query, params, opts, conn_data) do
+  def handle_execute(query, params, opts, %ConnData{configuration: conf} = conn_data) do
     # only try to reconnect if the error is about the broken connection
     with {:disconnect, _, _} <- execute(query, params, opts, conn_data) do
       [
         delay: delay,
         factor: factor,
         tries: tries
-      ] = Sips.config(:retry_linear_backoff)
+      ] = conf[:retry_linear_backoff]
 
       delay_stream =
         delay
         |> lin_backoff(factor)
-        |> cap(Sips.config(:timeout))
+        |> cap(conf[:timeout])
         |> Stream.take(tries)
 
       retry with: delay_stream do
@@ -171,26 +182,18 @@ defmodule Bolt.Sips.Protocol do
 
   defp extract_auth(basic_auth), do: {basic_auth[:username], basic_auth[:password]}
 
-  defp socket, do: Sips.config(:socket)
+  defp execute(q, params, _, conn_data) do
+    %QueryStatement{statement: statement} = q
+    %ConnData{sock: sock, bolt_version: bolt_version, configuration: conf} = conn_data
+    socket = conf |> Keyword.get(:socket)
 
-  defp execute(
-         %QueryStatement{statement: statement} = q,
-         params,
-         _,
-         %ConnData{sock: sock, bolt_version: bolt_version} = conn_data
-       ) do
-    case BoltProtocol.run_statement(socket(), sock, bolt_version, statement, params) do
+    case BoltProtocol.run_statement(socket, sock, bolt_version, statement, params) do
       [{:success, _} | _] = data ->
         {:ok, q, data, conn_data}
 
       %BoltError{type: :cypher_error} = error ->
-        with :ok <- BoltProtocol.reset(socket(), sock, bolt_version) do
-          {:error, error, conn_data}
-        else
-          error ->
-            # we cannot handle this failure, so disconnect
-            {:disconnect, error, conn_data}
-        end
+        BoltProtocol.reset(socket, sock, bolt_version)
+        {:error, error, conn_data}
 
       %BoltError{type: :connection_error} = error ->
         {:disconnect, error, conn_data}
@@ -214,4 +217,8 @@ defmodule Bolt.Sips.Protocol do
 
       {:error, %{code: :failure, message: msg}, conn_data}
   end
+
+  defp _to_hostname(hostname) when is_binary(hostname), do: String.to_charlist(hostname)
+  defp _to_hostname(hostname) when is_list(hostname), do: hostname
+  defp _to_hostname(hostname), do: hostname
 end

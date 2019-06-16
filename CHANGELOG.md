@@ -1,5 +1,50 @@
 # Changelog
 
+## === 2.0.0-rc ===
+
+## What's New?
+
+### `bolt+routing://` is now supported
+
+Read more what this schema is, as defined by the [Neo4j team](https://neo4j.com/developer/kb/how-neo4j-browser-bolt-routing/)
+
+### Role-based connections
+
+Until this version, Bolt.Sips was used for connecting to a single Neo4j server, aka: the "direct" mode. Basically you configure the driver with a url to a Neo4j server and Bolt.Sips will use that to attach itself to it, using a single configuration, remaining attached to that server until it is restarted (or reconfigured). In direct mode, bolt_sips "knows" only one server.
+
+Starting with this version you can have as many distinct connection configurations, each of them dedicated to different Neo4j servers, as/if needed. We call these connections: "role-based connections". For example, when you'll connect to a Neo4j cluster using the new protocol, i.e. by using a configuration like this:
+
+    config :bolt_sips, Bolt,
+      # default port considered to be: 7687
+      url: "bolt+routing://localhost",
+      basic_auth: [username: "neo4j", password: "test"],
+      pool_size: 10
+
+Bolt.Sips will automatically create three pools of size 10, with the following **reserved** names: `:read`, `:write` and `:route`. Now you can specify what type of connection you want to use, by its name (role). For example:
+
+    wconn = Bolt.Sips.conn(:write)
+    ... = Bolt.Sips.query!(wconn, "CREATE (a:Person {name:'Bob'})")
+
+    rconn = Bolt.Sips.conn(:read)
+    ... = Bolt.Sips.query!(rconn, "MATCH (a:Person {name: 'Bob'}) RETURN a.name AS name")
+
+The roles above: `:read`, `:write` and `:route`, are reserved. Please do not name custom connections using the same names (atoms). And as you just realized, yes: now you can create as many Bolt.Sips **direct** "driver instances" as you want, or as many as your app/hardware supports.
+
+Please see the documentation for much more details.
+
+### Main breaking changes introduced in version 2.x
+
+- the `hostname` config parameter is a string; used to be a charlist
+- the `url` config parameter must start with a valid schema i.e. `bolt`, `bolt+routing` or `neo4j`.
+  Examples:
+
+      url: "bolt://localhost"
+      url: "bolt+routing://neo4j:password@neo01.graph.example.com:123456?policy=europe"
+
+- Bolt.Sips.Query, will return a Bolt.Sips.Response now; it used to be a simple data structure.
+
+## === 1.5 ===
+
 ## 1.5.1
 
 - add a test alias for running the tests compatible with the most recent Neo4j server while
@@ -46,7 +91,7 @@
 
 ## 1.0.0-rc2
 
-### Breaking changes
+### Breaking changes introduced in version 1.x
 
 - non-closure based transactions are not supported anymore. This is a change introduced in DBConnection 2.x. `Bolt.Sips` version tagged `v0.5.10` is the last version supporting open transactions.
 - the support for ETLS was dropped. It was mostly used for development or hand-crafted deployments

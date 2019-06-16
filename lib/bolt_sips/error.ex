@@ -15,19 +15,19 @@ defmodule Bolt.Sips.Error do
         type: t
       }) do
     {:error,
-     struct(Error, %{
+     %Error{
        code: code,
        message:
          "Details: #{message}; connection_id: #{inspect(cid)}, function: #{inspect(f)}, type: #{
            inspect(t)
          }"
-     })}
+     }}
   end
 
   def new({:ignored, f} = _r), do: new({:error, f})
 
   def new({:failure, %{"code" => code, "message" => message}} = _r) do
-    {:error, struct(Error, %{code: code, message: message})}
+    {:error, %Error{code: code, message: message}}
   end
 
   def new(r), do: r
