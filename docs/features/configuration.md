@@ -100,18 +100,53 @@ This is the only rule you must observe, when using the `Bolt.Sips` driver with a
 
 ## Role based connections
 
-When we implemented the routing mode, we realized we could extend this ability to letting you define any number of connections, identified by a role name of your choice. For example:
+When we implemented the routing mode, we realized we could extend this ability to letting you define any number of connections, identified by a role name of your choice. For example, say your default configuration for `Bolt.Sips` looks like this:
 
 ```elixir
 config :bolt_sips, Bolt,
-  url: "bolt://localhost",
+  url: "bolt://localhost:7687",
   basic_auth: [username: "neo4j", password: "test"],
   pool_size: 10,
   max_overflow: 2,
-  role: :zorba
 ```
 
-(in progress)
+`Bolt.Sips` will load it by default, when your application starts. And with a configuration like that, the default mode, you will continue to obtain connections using the default `Bolt.Sips.conn()` function.
+
+However, if you require to have different connections, say: to a different Neo4j server that has some specific role, you could add a new configuration, for example:
+
+```elixir
+config :bolt_sips, :hidden_gems,
+  url: "bolt://localhost:1234",
+  pool_size: 50,
+  role: :hidden_gems
+```
+
+You'd have to load this config separately, after the starting the `Bolt.Sips`driver. Like this:
+
+```elixir
+iex» Bolt.Sips.start_link(Application.get_env(:bolt_sips, :hidden_gems))
+{:ok, #PID<0.266.0>}
+```
+
+and the you can use connections from this new configuration, as easy as this:
+
+```elixir
+iex» conn = Bolt.Sips.conn(:hidden_gems)
+#PID<0.324.0>
+```
+
+while for obtaing the connections from your default configuration, is business as usual:
+
+```elixir
+iex» conn = Bolt.Sips.conn()
+#PID<0.309.0>
+```
+
+The new connection pool is supervised by the main `Bolt.Sips.ConnectionSupervisor`, you don't have to do anythings special for that.
+
+![](../images/role_based_connections.png?raw=true)
+
+In the final release, we'll add a friendlier api for adding role-based connections.
 
 ## Multi tenancy
 
