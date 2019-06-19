@@ -58,7 +58,7 @@ We'll spend more ink on talking about the `routing` mode, next.
 
 ## Routing mode
 
-With the 2.0 version, `Bolt.Sips` is implementing the ability to connct your app to a Neo4j causal cluster. You can read more about this, here: [Neo4j Causal Clustering](https://neo4j.com/docs/operations-manual/current/clustering/introduction/)
+With the 2.0 version, `Bolt.Sips` is implementing the ability to connect your app to a Neo4j causal cluster. You can read more about this, here: [Neo4j Causal Clustering](https://neo4j.com/docs/operations-manual/current/clustering/introduction/)
 
 The features of using a causal cluster, in Neo4j's own words:
 
@@ -76,27 +76,7 @@ or:
 
     url: "neo4j://localhost:7687"
 
-Prefer the latter, since `bolt+routing` appears to be soon deprecated, by Neo4j. We'll use `neo4j://` throughout the docs for referring to the `routing` mode, for brevity.
-
-### The particularities of this new connection mode.
-
-When connecting to a Neo4j cluster, `Bolt.Sips` will create 3 distinct connection pools, each of them dedicated to one of the following connection types (**connection roles**):
-
-- `:route` - used for getting information from the Neo4j router, such as: routing details about which server is handling what type of role: read/write, and more.
-- `:read` - used for read-only connections
-- `:write` - used for write-only connections.
-
-Having the `Bolt.Sips` configured in `routing` mode, will enforce your code to clarify what type of connections you want, type you **must** specify when requesting a `Bolt.Sips` connection. Example:
-
-```elixir
-rconn = Bolt.Sips.conn(:read)
-wconn = Bolt.Sips.conn(:write)
-router_conn = Bolt.Sips.conn(:route)
-```
-
-Without being explicit about the connection type, you will receive errors, in case you'll attempt to execute a query that will say: create new nodes, on a server having the role: `read` or `route`.
-
-This is the only rule you must observe, when using the `Bolt.Sips` driver with a causal cluster.
+Prefer the latter, since `bolt+routing` appears to be soon deprecated, by Neo4j. We'll use `neo4j://` throughout the docs for referring to the `routing` mode, for brevity. Read more about `routing`, [here](routing.md).
 
 ## Role based connections
 
@@ -146,7 +126,7 @@ The new connection pool is supervised by the main `Bolt.Sips.ConnectionSuperviso
 
 ![](../images/role_based_connections.png?raw=true)
 
-In the final release, we'll add a friendlier api for adding role-based connections.
+In the final release, we'll add a friendlier api for adding role-based connections. More details about role-based-connections, [here](role-based-connections.md)
 
 ## Multi tenancy
 
@@ -176,4 +156,4 @@ conn = Bolt.Sips.conn(:write, prefix: :secret_cluster)
 
 And you can start as many connections as needed, for as long as the `:prefix` has different names. These connections can be used for connecting to the same or different Neo4j servers.
 
-(in progress)
+More details about multi-tenancy, [here](multi-tenancy.md)
