@@ -1,6 +1,6 @@
 # About encoding
 
-Bolt.Sips povides solution for encoding your query result in different format.
+Bolt.Sips provides support for encoding your query result in different formats.
 For now, only JSON is supported.
 
 There is two way of encoding data to json:

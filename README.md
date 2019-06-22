@@ -1,6 +1,6 @@
 ![](docs/icon-60x60@3x.png)
 
-**Bolt.Sips**, the Neo4j driver for Elixir.
+Neo4j driver for Elixir.
 
 ## IMPORTANT
 
@@ -37,9 +37,9 @@ Contributions and feedback, are very welcome. Thank you!
   - [Basic usage](docs/getting-started.md#usage)
   - [Configuration](docs/features/configuration.md)
     - [Direct mode](docs/features/configuration.md#direct-mode)
-    - [Routing](docs/features/configuration#routing-mode)
-    - [Role-based connections](docs/features/configuration#role-based-connections)
-    - [Multi tenancy](docs/features/configuration#multi-tenancy)
+    - [Routing](docs/features/configuration.md#routing-mode)
+    - [Role-based connections](docs/features/configuration.md#role-based-connections)
+    - [Multi tenancy](docs/features/configuration.md#multi-tenancy)
 - [Using Cypher](docs/features/using-cypher.md)
 - [Temporal and spatial types](docs/features/using-temporal-and-spatial-types.md)
 - [Transactions](docs/features/about-transactions.md)
