@@ -2,7 +2,8 @@
 
 Transaction management in Neo4j 3.5+ differs from what it was in prior versions.
 The cypher keyword `BEGIN`, `COMMIT` and `ROLLBACK` are no longer available.
-In order to have query that runs fine in all versions, it is encouraged to use the following transaction pattern:
+
+In order to have a query that runs fine in all versions, you should use the following pattern:
 
 ```elixir
 # Commit is performed automatically if everythings went fine

@@ -1,6 +1,6 @@
 ![](docs/icon-60x60@3x.png)
 
-**Bolt.Sips**, the Neo4j driver for Elixir.
+Neo4j driver for Elixir.
 
 ## IMPORTANT
 

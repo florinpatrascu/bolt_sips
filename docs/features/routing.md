@@ -1,6 +1,24 @@
 # Routing
 
-Let's walkthrough a simple experiment with using `Bolt.Sips` in routing mode and a Neo4j cluster.
+When connecting to a Neo4j cluster, `Bolt.Sips` will create 3 distinct connection pools, each of them dedicated to one of the following connection types (**connection roles**):
+
+- `:route` - used for getting information from the Neo4j router, such as: routing details about which server is handling what type of role: read/write, and more.
+- `:read` - used for read-only connections
+- `:write` - used for write-only connections.
+
+Having the `Bolt.Sips` configured in `routing` mode, will enforce your code to clarify what type of connections you want, type you **must** specify when requesting a `Bolt.Sips` connection. Example:
+
+```elixir
+rconn = Bolt.Sips.conn(:read)
+wconn = Bolt.Sips.conn(:write)
+router_conn = Bolt.Sips.conn(:route)
+```
+
+Without being explicit about the connection type, you will receive errors, in case you'll attempt to execute a query that will say: create new nodes, on a server having the role: `read` or `route`. This is the only rule you must observe, when using the `Bolt.Sips` driver with a causal cluster.
+
+## Routing walk-through
+
+Let's walk-through a simple experiment with using `Bolt.Sips` in routing mode and a Neo4j cluster.
 
 If you don't have a local server, or a remote Neo4j cluster available for your tests, you can easily setup your own local playground. All you need is Docker.
 
@@ -51,7 +69,7 @@ core2    | 2019-06-17 12:37:59.078+0000 INFO  Remote interface available at http
 core3    | 2019-06-17 12:37:59.165+0000 INFO  Remote interface available at http://localhost:7476/
 ```
 
-Check to see if you can connect to your local Neo4j cluster, as simple as pointing your Internet browser to this url: `http://localhost:7474`, and if everything was executed succesfully, you'll be seeing the familiar Neo4j web interface.
+Check to see if you can connect to your local Neo4j cluster, as simple as pointing your Internet browser to this url: `http://localhost:7474`, and if everything was executed successfully, you'll be seeing the familiar Neo4j web interface.
 
 Now let's play with the `Bolt.Sips`driver and our local Neo4j cluster.
 

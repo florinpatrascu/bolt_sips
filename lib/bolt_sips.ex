@@ -1,6 +1,13 @@
 defmodule Bolt.Sips do
   @moduledoc """
-  A Neo4j Elixir driver wrapped around the Bolt protocol.
+  A Neo4j driver for Elixir providing many useful features:
+
+  - using the Bolt protocol, the Elixir implementation - the Neo4j's newest network protocol, designed for high-performance; latest Bolt versions, are supported.
+  - Can connect to a standalone Neo4j server (`:direct` mode) or to a Neo4j causal cluster, using the `bolt+routing` or the newer `neo4j` schemes; connecting in `:routing` mode.
+  - Provides the user with the ability to create and manage distinct ad-hoc `role-based` connections to one or more Neo4j servers/databases
+  - Supports transactions, simple and complex Cypher queries with or w/o parameters
+  - Multi-tenancy
+  - Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x
   """
 
   use Supervisor
@@ -16,24 +23,25 @@ defmodule Bolt.Sips do
   @type transaction :: DBConnection.t()
 
   @doc """
-  Start the connection process and connect to Neo4j
+  Start or add a new Neo4j connection
 
   ## Options:
-    - `:url` - If present, it will be used for extracting the host name, the port and the authentication details and will override the: hostname, port, username and the password, if these were already defined! Since this driver is devoted to the Bolt protocol only, the protocol if present in the url will be ignored and considered by default `bolt://`
-    - `:hostname` - Server hostname (default: NEO4J_HOST env variable, then localhost);
-    - `:port` - Server port (default: NEO4J_PORT env variable, then 7687);
-    - `:username` - Username;
-    - `:password` - User password;
-    - `:pool_size` - maximum pool size;
-    - `:max_overflow` - maximum number of workers created if pool is empty
-    - `:timeout` - Connect timeout in milliseconds (default: `#{@timeout}`)
-    - `:retry_linear_backoff` -  with Bolt, the initial handshake sequence (happening before sending any commands to the server) is represented by two important calls, executed in sequence: `handshake` and `init`, and they must both succeed, before sending any (Cypher) requests. You can see the details in the [Bolt protocol](http://boltprotocol.org/v1/#handshake) specs. This sequence is also sensitive to latencies, such as: network latencies, busy servers, etc., and because of that we're introducing a simple support for retrying the handshake (and the subsequent requests) with a linear backoff, and try the handshake sequence (or the request) a couple of times before giving up. See examples below.
+
+  - `:url`- a full url to pointing to a running Neo4j server. Please remember you must specify the scheme used to connect to the server. Valid schemes:`bolt`,`bolt+routing`and`neo4j` - the last two being used for connecting to a Neo4j causal cluster.
+  - `:pool_size` - the size of the connection pool. Default: 15
+  - `:timeout` - a timeout value defined in milliseconds. Default: 15_000
+  - `:ssl`-`true`, if the connection must be encrypted. Default:`false`
+  - `:retry_linear_backoff`- the retry mechanism parameters. Also expected, the following parameters:`:delay`,`:factor`and`:tries`. Default value:`retry_linear_backoff: [delay: 150, factor: 2, tries: 3]`
+  - `:prefix`- used for differentiating between multiple connections available in the same app. Default:`:default`
 
   ## Example of valid configurations (i.e. defined in config/dev.exs) and usage:
 
+  This is the most basic configuration:
+
       config :bolt_sips, Bolt,
-        url: 'bolt://demo:demo@hobby-wowsoeasy.dbs.graphenedb.com:24786',
-        ssl: true
+        url: "bolt://localhost:7687"
+
+  and if you need to connect to remote servers:
 
       config :bolt_sips, Bolt,
         url: "bolt://Bilbo:Baggins@hobby-hobbits.dbs.graphenedb.com:24786",
@@ -41,14 +49,7 @@ defmodule Bolt.Sips do
         timeout: 15_000,
         retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
 
-      config :bolt_sips, Bolt,
-        hostname: 'localhost',
-        basic_auth: [username: "neo4j", password: "*********"],
-        port: 7687,
-        pool_size: 5,
-        max_overflow: 1
-
-  Sample code:
+  Example with a configuration defined in the `config/dev.exs`:
 
       opts = Application.get_env(:bolt_sips, Bolt)
       {:ok, pid} = Bolt.Sips.start_link(opts)
@@ -56,6 +57,16 @@ defmodule Bolt.Sips do
       Bolt.Sips.query!(pid, "CREATE (a:Person {name:'Bob'})")
       Bolt.Sips.query!(pid, "MATCH (a:Person) RETURN a.name AS name")
       |> Enum.map(&(&1["name"]))
+
+  Or defining an ad-hoc configuration:
+
+  Example with a configuration defined in the `config/dev.exs`:
+
+      {:ok, _neo} = Bolt.Sips.start_link(url: "bolt://neo4j:test@localhost")
+
+      conn = Bolt.Sips.conn()
+      Bolt.Sips.query!(conn, "return 1 as n")
+
   """
   @spec start_link(Keyword.t()) :: Supervisor.on_start()
   def start_link(opts) do
@@ -149,7 +160,7 @@ defmodule Bolt.Sips do
       Bolt.Sips.transaction(main_conn, fn conn ->
         book =
           Bolt.Sips.query!(conn, "CREATE (b:Book {title: \"The Game Of Trolls\"}) return b")
-          |> List.first()
+          |> Response.first()
 
         assert %{"b" => g_o_t} = book
         assert g_o_t.properties["title"] == "The Game Of Trolls"
@@ -157,7 +168,7 @@ defmodule Bolt.Sips do
       end)
 
       books = Bolt.Sips.query!(main_conn, "MATCH (b:Book {title: \"The Game Of Trolls\"}) return b")
-      assert length(books) == 0
+      assert Enum.count(books) == 0
     end
     ```
   """
@@ -175,7 +186,7 @@ defmodule Bolt.Sips do
 
   ### Example
 
-      {:error, :oops} = Bolt.Sips.transaction(pool, fun(conn) ->
+      {:error, :oops} = Bolt.Sips.transaction(pool, fn(conn) ->
         Bolt.Sips.rollback(conn, :oops)
       end)
   """
