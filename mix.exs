@@ -18,28 +18,24 @@ defmodule BoltSips.Mixfile do
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       docs: [
+        name: "Bolt.Sips",
+        logo: "docs/icon-60x60@3x.png",
         source_ref: "v#{@version}",
         source_url: @url_github,
-        main: "getting-started",
+        main: "README",
         extra_section: "guides",
         extras: [
           "README.md",
           "CHANGELOG.md",
-          "docs/getting-started.md#Starting-the-Driver",
-          "docs/getting-started.md#usage",
+          "docs/getting-started.md",
           "docs/features/configuration.md",
-          "docs/features/configuration.md#direct-mode",
-          "docs/features/configuration#routing-mode",
-          "docs/features/configuration#role-based-connections",
-          "docs/features/configuration#multi-tenancy",
           "docs/features/using-cypher.md",
           "docs/features/using-temporal-and-spatial-types.md",
           "docs/features/about-transactions.md",
           "docs/features/about-encoding.md",
           "docs/features/routing.md",
           "docs/features/multi-tenancy.md",
-          "docs/features/using-with-phoenix.md",
-          "docs/examples/readme.md"
+          "docs/features/using-with-phoenix.md"
         ]
       ],
       dialyzer: [plt_add_apps: [:jason, :poison, :mix], ignore_warnings: ".dialyzer_ignore.exs"],
@@ -47,7 +43,6 @@ defmodule BoltSips.Mixfile do
         tool: ExCoveralls
       ],
       preferred_cli_env: [
-        docs: :docs,
         bench: :bench,
         credo: :dev,
         bolt_sips: :test,
@@ -104,7 +99,7 @@ defmodule BoltSips.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:db_connection, "~> 2.0"},
+      {:db_connection, "~> 2.1"},
       {:retry, "0.9.1"},
       {:calendar, "~> 0.17.2"},
       {:jason, "~> 1.1"},
@@ -122,11 +117,12 @@ defmodule BoltSips.Mixfile do
       {:benchee_html, "~> 1.0", optional: true, only: [:bench]},
 
       # Linting dependencies
-      {:credo, "~> 1.0", only: [:dev]},
+      {:credo, "~> 1.1", only: [:dev]},
       {:dialyxir, "1.0.0-rc.6", only: [:dev], runtime: false},
 
       # Documentation dependencies
-      {:ex_doc, "~> 0.19", optional: true, only: [:docs]}
+      # Run me like this: `mix docs`
+      {:ex_doc, "~> 0.20", only: :dev, runtime: false}
     ]
   end
 end

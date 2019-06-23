@@ -4,7 +4,7 @@ rescue
   Code.LoadError -> :rescued
 end
 
-alias Bolt.Sips.{Utils, Protocol, Router, ConnectionSupervisor}
+alias Bolt.Sips.{Utils, Protocol, Router, ConnectionSupervisor, Response}
 alias Bolt.Sips
 
 Application.put_env(:tzdata, :autoupdate, :disabled)
@@ -29,10 +29,12 @@ Mix.shell().info([
   :green,
   """
   Optional, if needed for development (Sips is the alias for Bolt.Sips):
-  {:ok, _neo} = Sips.start_link(url: "bolt://neo4j:test@localhost")
-  conn = Sips.conn()
-  Sips.query!(conn, "return 1 as n")
-  --- ✄ -----------------------
+    {:ok, _neo} = Sips.start_link(url: "bolt://neo4j:test@localhost")
+    conn = Sips.conn()
+  Examples:
+    Sips.query!(conn, "UNWIND range(1, 10) AS n RETURN n")
+    Sips.query!(conn, "RETURN 1 as n")
+  --- ✄  -------------------------------------------------
 
   """
 ])
