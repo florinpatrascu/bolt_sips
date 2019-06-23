@@ -2,7 +2,7 @@ defmodule ResponseTest do
   use ExUnit.Case
 
   alias Bolt.Sips.Response
-  import ExUnit.CaptureLog
+  # import ExUnit.CaptureLog
 
   @explain [
     success: %{"fields" => ["n"], "t_first" => 1},
@@ -129,6 +129,32 @@ defmodule ResponseTest do
       assert 1 = response |> Enum.count()
       assert [%{"r" => 300}] = response |> Enum.take(1)
       assert %{"r" => 300} = response |> Response.first()
+    end
+
+    @unwind %Bolt.Sips.Response{
+      records: [[1], [2], [3], [4], [5], [6], '\a', '\b', '\t', '\n'],
+      results: [
+        %{"n" => 1},
+        %{"n" => 2},
+        %{"n" => 3},
+        %{"n" => 4},
+        %{"n" => 5},
+        %{"n" => 6},
+        %{"n" => 7},
+        %{"n" => 8},
+        %{"n" => 9},
+        %{"n" => 10}
+      ]
+    }
+
+    test "reduce: UNWIND range(1, 10) AS n RETURN n" do
+      sum = Enum.reduce(@unwind, 0, &(&1["n"] + &2))
+      assert 55 == sum
+    end
+
+    test "slice: UNWIND range(1, 10) AS n RETURN n" do
+      slice = Enum.slice(@unwind, 0..2)
+      assert [%{"n" => 1}, %{"n" => 2}, %{"n" => 3}] == slice
     end
   end
 

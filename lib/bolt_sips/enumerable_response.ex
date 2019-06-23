@@ -8,15 +8,15 @@ defimpl Enumerable, for: Bolt.Sips.Response do
   def member?(%Response{fields: fields}, field), do: {:ok, Enum.member?(fields, field)}
   def slice(_response), do: {:error, __MODULE__}
 
-  def reduce(_response, {:halt, acc}, _fun), do: {:halted, acc}
+  def reduce(%Response{results: []}, acc, _fun), do: acc
 
-  def reduce(%Response{results: list}, {:suspend, acc}, fun),
-    do: {:suspended, acc, &reduce(list, &1, fun)}
+  def reduce(%Response{results: results}, acc, fun) when is_list(results),
+    do: reduce_list(results, acc, fun)
 
-  def reduce([], {:cont, acc}, _fun), do: {:done, acc}
-
-  def reduce(%Response{results: [head | tail]}, {:cont, acc}, fun),
-    do: reduce(tail, fun.(head, acc), fun)
+  defp reduce_list(_, {:halt, acc}, _fun), do: {:halted, acc}
+  defp reduce_list(list, {:suspend, acc}, fun), do: {:suspended, acc, &reduce_list(list, &1, fun)}
+  defp reduce_list([], {:cont, acc}, _fun), do: {:done, acc}
+  defp reduce_list([h | t], {:cont, acc}, fun), do: reduce_list(t, fun.(h, acc), fun)
 
   @doc false
   def slice(%Response{results: []}, _start, _count), do: []

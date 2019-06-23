@@ -59,6 +59,28 @@ matrix:
         - BOLT_V1_EXCLUDED=true
         - BOLT_V2_EXCLUDED=false
         - BOLT_V3_EXCLUDED=false
+  exclude:
+    - elixir: 1.8
+      otp_release: 19.3
+    - elixir: 1.8
+      otp_release: 18.3
+    - elixir: 1.7
+      otp_release: 18.3
+    - elixir: 1.6
+      otp_release: 18.3
+    - elixir: 1.5
+      otp_release: 21.2
+    - elixir: 1.4
+      otp_release: 21.2
+    - elixir: 1.3
+      otp_release: 21.2
+    - elixir: 1.3
+      otp_release: 20.3
+    - elixir: 1.2
+      otp_release: 21.2
+    - elixir: 1.2
+      otp_release: 20.3
+
 addons:
   apt:
     sources:
@@ -77,10 +99,12 @@ env:
     - CXX=g++-6
     - CC=gcc-6
 
+branches:
+  only:
+    - master
 before_install:
   - if [ ! -d "$HOME/cmake/bin" ]; then wget --no-check-certificate https://cmake.org/files/v3.5/cmake-3.5.2-Linux-x86_64.sh && sh cmake-3.5.2-Linux-x86_64.sh --prefix=$HOME/cmake --exclude-subdir; fi
   - docker run --name neo4j -d -p 7687:7687 -e 'NEO4J_AUTH=neo4j/test' neo4j:$NEO4J_VERSION
   - docker logs -f neo4j | sed /Bolt\ enabled/q
-
 script:
   - mix test --exclude routing --exclude bolt_v1:$BOLT_V1_EXCLUDED --exclude bolt_v2:$BOLT_V2_EXCLUDED --exclude bolt_v3:$BOLT_V3_EXCLUDED
