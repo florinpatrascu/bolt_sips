@@ -109,7 +109,6 @@ defmodule BoltSips.Mixfile do
       {:excoveralls, "~> 0.11", optional: true, only: [:test, :dev]},
       {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
       {:porcelain, "~> 2.0", only: [:test, :dev], runtime: false},
-      {:fixex, "~> 0.1", only: [:test, :dev], runtime: false},
       {:uuid, "~> 1.1.8", only: [:test, :dev], runtime: false},
 
       # Benchmarking dependencies
