@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.0-rc.1
+
+- more documentation
+- fix the TravisCi build
+
 ## === 2.0.0-rc ===
 
 ## What's New?
