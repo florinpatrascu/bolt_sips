@@ -4,7 +4,7 @@
 
 ## IMPORTANT
 
-> the `master` branch is observing the development of the 2.0 version! While the new driver architecture is considered stable, this branch should be considered as work in progress! For production, please use the `Bolt.Sips` driver `v1.5.x`, from hex.pm. This branch, while in development, is not yet available on hex.pm!
+> the `master` branch is observing the development of the 2.0 version! While the new driver architecture is considered stable, this branch should be considered as work in progress! For production, please use the `Bolt.Sips` driver `v1.5.x`, from hex.pm. This branch, while in development, will be available on hex.pm, but please use it with care!
 
 We moved the development in the public area, for offering our users an early preview of what is coming. The documentation for functions and modules, including the new `docs/` sections, is work in progress, pretty much. However, the code is stable and can be used for experimenting with the new features introduced in this version:
 
@@ -54,11 +54,9 @@ Contributions and feedback, are very welcome. Thank you!
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 2.0"}]
+  [{:bolt_sips, "~> 2.0.0-rc}]
 end
 ```
-
-(^^^ _not published yet, while in development ^^^_)
 
 ### Basic usage
 
