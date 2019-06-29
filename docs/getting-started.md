@@ -114,8 +114,9 @@ iex» Neo.info()
   }
 }
 
-# in direct mode, our current configuration, all the operations: read/write or delete, are sent using a
-# a common connection (pool). Let's obtain a connection:
+# in direct mode, our current configuration, all the operations such as: read/write or
+# delete, are sent to the Neo4j server using a common connection (pool).
+# Let's obtain a connection:
 
 iex» conn = Neo.conn()
 #PID<0.308.0>
@@ -142,14 +143,24 @@ iex» response = Neo.query!(conn, "CREATE (p:Person)-[:LIKES]->(t:Technology)")
 # query with undirected relationship unless sure of direction
 %Bolt.Sips.Response{results: results} = response =  Neo.query!(conn, "MATCH (p:Person)-[:LIKES]-(t:Technology) RETURN p")
 
-# where `results` contain this:
+# where `results` contain:
 [%{"p" => %Bolt.Sips.Types.Node{id: 355, labels: ["Person"], properties: %{}}}]
 
-# we can encode the results to json, as simple as this
-iex» Jason.encode!(results)                                                                          "[{\"p\":{\"id\":355,\"labels\":[\"Person\"],\"properties\":{}}}]"
+# and we can also encode them to json, as simple as this:
 
+iex» Jason.encode!(results)
+"[{\"p\":{\"id\":355,\"labels\":[\"Person\"],\"properties\":{}}}]"
+
+# of course you can do more:
+
+iex» Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr") |>
+...» Enum.reduce(0, &(Enum.sum(&1["arr"]) + &2))
+42
+
+# see more examples and the tests, for getting familiar with what is possible.
+
+# Enjoy!
 ```
 
-Follow this link: [Cypher Basics](https://neo4j.com/developer/cypher-query-language/), for a gentle introduction to Cypher; Neo4j's query language.
 
-The Cypher queries we used above are taken from the page above.
+Follow this link: [Cypher Basics](https://neo4j.com/developer/cypher-query-language/), for a gentle introduction to Cypher; Neo4j's query language. Throughout the code snippets we are often using examples copied from the original documentation published by Neo4j, so that you can feel comfortable with them.
