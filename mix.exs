@@ -19,10 +19,10 @@ defmodule BoltSips.Mixfile do
       start_permanent: Mix.env() == :prod,
       docs: [
         name: "Bolt.Sips",
-        logo: "docs/icon-60x60@3x.png",
+        logo: "docs/bolt_sips_white_transparent.png",
         source_ref: "v#{@version}",
         source_url: @url_github,
-        main: "README",
+        main: "Bolt.Sips",
         extra_section: "guides",
         extras: [
           "README.md",

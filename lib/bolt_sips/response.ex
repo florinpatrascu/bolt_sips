@@ -1,21 +1,60 @@
 defmodule Bolt.Sips.Response do
   @moduledoc """
   Support for transforming a Bolt response to a list of Bolt.Sips.Types or arbitrary values.
+  A Bolt.Sips.Response is used for mapping any response received from a Neo4j server into a an Elixir struct.
+
+  You'll interact with this module every time you're needing to get and manipulate the data resulting from your queries.
 
   For example, a simple Cypher query like this:
 
-      RETURN [10,11,21] AS arr
+      Bolt.Sips.query(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr")
 
-  will return: `%{"arr" => [10,11,21]}`, while a more complex one, say:
+
+  will return:
+
+      {:ok,
+       %Bolt.Sips.Response{
+        bookmark: "neo4j:bookmark:v1:tx21868",
+        fields: ["arr"],
+        notifications: [],
+        plan: nil,
+        profile: nil,
+        records: [[[10, 11, 21]]],
+        results: [%{"arr" => [10, 11, 21]}],
+        stats: [],
+        type: "r"
+       }}
+
+  and while you have now access to the full data returned by Neo4j, most of the times you'll just want the results:
+
+      iex» %Bolt.Sips.Response{results: results} = Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr")
+      iex» results
+      [%{"arr" => [10, 11, 21]}]
+
+  More complex queries, i.e.:
 
       MATCH p=({name:'Alice'})-[r:KNOWS]->({name:'Bob'}) RETURN r
 
-  will return the following list:
+  will return `results` like this:
 
       [%{"r" => %Bolt.Sips.Types.Relationship{end: 647, id: 495,
        properties: %{}, start: 646, type: "KNOWS"}}]
 
   Note: the `Path` has also functionality for "drawing" a graph, from a given node-relationship path
+
+  Our Bolt.Sips.Response is implementing Elixir's [Enumerable Protocol](https://hexdocs.pm/elixir/Enumerable.html), to help you accessing the results. Hence something like this, is possible:
+
+      iex» Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr") |>
+      ...» Enum.reduce(0, &(Enum.sum(&1["arr"]) + &2))
+      42
+
+  an overly complicated example, but you get the point?! :)
+
+  You can also quickly get the `first` of the results, returned by Neo4j. Example:
+
+      iex» Bolt.Sips.query!(Bolt.Sips.conn(), "UNWIND range(1, 10) AS n RETURN n") |>
+      ...» Bolt.Sips.Response.first()
+      %{"n" => 1}
   """
 
   @type t :: %__MODULE__{

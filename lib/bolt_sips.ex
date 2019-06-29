@@ -8,13 +8,27 @@ defmodule Bolt.Sips do
   - Supports transactions, simple and complex Cypher queries with or w/o parameters
   - Multi-tenancy
   - Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x
+
+  To start, add the `:bolt_sips` dependency to you project, run `mix do deps.get, compile` on it and then you can quickly start experimenting with Neo4j from the convenience of your IEx shell. Example:
+
+      iex» {:ok, _neo} = Bolt.Sips.start_link(url: "bolt://neo4j:test@localhost")
+      {:ok, #PID<0.250.0>}
+      iex»   conn = Bolt.Sips.conn()
+      #PID<0.256.0>
+      iex» Bolt.Sips.query!(conn, "RETURN 1 as n")
+      %Bolt.Sips.Response{
+        records: [[1]],
+        results: [%{"n" => 1}]
+      }
+
+  the example above presumes that you have a Neo4j server available locally, using the Bolt protocol and requiring authentication.
   """
 
   use Supervisor
 
   @registry_name :bolt_sips_registry
 
-  @timeout 15_000
+  # @timeout 15_000
   # @max_rows     500
 
   alias Bolt.Sips.{Query, ConnectionSupervisor, Router, Error, Response, Exception}

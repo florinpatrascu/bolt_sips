@@ -1,6 +1,6 @@
-![](docs/icon-60x60@3x.png)
+<img src="docs/logo_transparent.png" alt="logo" width="240"/>
 
-Neo4j driver for Elixir.
+# Neo4j driver for Elixir.
 
 ## IMPORTANT
 
@@ -17,11 +17,10 @@ We moved the development in the public area, for offering our users an early pre
 Contributions and feedback, are very welcome. Thank you!
 
 [![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)](https://travis-ci.org/florinpatrascu/bolt_sips)
-[![Ebert](https://ebertapp.io/github/florinpatrascu/bolt_sips.svg)](https://ebertapp.io/github/florinpatrascu/bolt_sips)
 [![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
 [![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/bolt_sips)
 
-`Bolt.Sips` is an Elixir driver for Neo4j, providing many useful features:
+`Bolt.Sips` is an Elixir driver for [Neo4j](https://neo4j.com/developer/graph-database/), providing many useful features:
 
 - using the Bolt protocol, the Elixir implementation - the Neo4j's newest network protocol, designed for high-performance; latest Bolt versions, are supported.
 - Can connect to a standalone Neo4j server (`:direct` mode) or to a Neo4j causal cluster, using the `bolt+routing` or the newer `neo4j` schemes; connecting in `:routing` mode.

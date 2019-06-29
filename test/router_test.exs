@@ -1,30 +1,30 @@
 defmodule Bolt.Sips.Routing.RouterTest do
   use ExUnit.Case
 
-  alias Bolt.Sips.{Router, Response}
+  alias Bolt.Sips.Response
 
-  @routing_table %{
-    "servers" => [
-      %{"addresses" => ["localhost:7687"], "role" => "WRITE"},
-      %{"addresses" => ["localhost:7688", "localhost:7689"], "role" => "READ"},
-      %{
-        "addresses" => ["localhost:7688", "localhost:7687", "localhost:7689"],
-        "role" => "ROUTE"
-      }
-    ],
-    "ttl" => 300
-  }
+  # @routing_table %{
+  #   "servers" => [
+  #     %{"addresses" => ["localhost:7687"], "role" => "WRITE"},
+  #     %{"addresses" => ["localhost:7688", "localhost:7689"], "role" => "READ"},
+  #     %{
+  #       "addresses" => ["localhost:7688", "localhost:7687", "localhost:7689"],
+  #       "role" => "ROUTE"
+  #     }
+  #   ],
+  #   "ttl" => 300
+  # }
 
-  @connections %{
-    read: %{"localhost:7688" => 0, "localhost:7689" => 0},
-    route: %{
-      "localhost:7687" => 0,
-      "localhost:7688" => 0,
-      "localhost:7689" => 0
-    },
-    write: %{"localhost:7687" => 0},
-    ttl: 300
-  }
+  # @connections %{
+  #   read: %{"localhost:7688" => 0, "localhost:7689" => 0},
+  #   route: %{
+  #     "localhost:7687" => 0,
+  #     "localhost:7688" => 0,
+  #     "localhost:7689" => 0
+  #   },
+  #   write: %{"localhost:7687" => 0},
+  #   ttl: 300
+  # }
 
   @router_address "bolt+routing://localhost:7687?key=value,foo=bar;policy=EU"
 

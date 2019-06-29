@@ -2,8 +2,6 @@ defmodule Bolt.Sips.Routing.TransactionTest do
   use Bolt.Sips.RoutingConnCase
   @moduletag :routing
 
-  alias Bolt.Sips
-
   setup do
     {:ok, [write_conn: Bolt.Sips.conn(:write)]}
   end
