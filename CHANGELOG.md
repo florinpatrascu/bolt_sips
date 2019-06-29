@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0-rc.1
+
+- more documentation
+- fix the TravisCi build
+- min versions
+    erlang 21.2
+    elixir 1.7
+
 ## === 2.0.0-rc ===
 
 ## What's New?

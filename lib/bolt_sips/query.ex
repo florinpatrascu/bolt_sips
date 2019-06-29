@@ -113,7 +113,13 @@ defmodule Bolt.Sips.Query do
       {:error, Bolt.Sips.Error.new(e.message)}
 
     e in Exception ->
-      reraise e, __STACKTRACE__
+      {:current_stacktrace, stacktrace} = Process.info(self(), :current_stacktrace)
+
+      # n/a in newer Elixir version:
+      # reraise e, __STACKTRACE__
+
+      # using a safe call, for backward compatibility
+      reraise e, stacktrace
 
     e ->
       {:error, e}
