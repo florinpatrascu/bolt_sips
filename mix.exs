@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.0-rc"
+  @version "2.0.0-rc.1"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
@@ -9,7 +9,7 @@ defmodule BoltSips.Mixfile do
     [
       app: :bolt_sips,
       version: @version,
-      elixir: "~> 1.6",
+      elixir: "~> 1.7",
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       package: package(),
