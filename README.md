@@ -1,4 +1,4 @@
-<img src="docs/logo_transparent.png" alt="logo" width="240"/>
+<img src="assets/logo_transparent.png" alt="logo" width="240"/>
 
 # Neo4j driver for Elixir.
 

@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.0-rc.1"
+  @version "2.0.0-rc.2"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
@@ -19,7 +19,8 @@ defmodule BoltSips.Mixfile do
       start_permanent: Mix.env() == :prod,
       docs: [
         name: "Bolt.Sips",
-        logo: "docs/bolt_sips_white_transparent.png",
+        logo: "assets/bolt_sips_white_transparent.png",
+        assets: "assets",
         source_ref: "v#{@version}",
         source_url: @url_github,
         main: "Bolt.Sips",
@@ -118,6 +119,8 @@ defmodule BoltSips.Mixfile do
       # Linting dependencies
       {:credo, "~> 1.1", only: [:dev]},
       {:dialyxir, "1.0.0-rc.6", only: [:dev], runtime: false},
+      # mix eye_drops
+      {:eye_drops, github: "florinpatrascu/eye_drops", only: [:dev, :test], runtime: false},
 
       # Documentation dependencies
       # Run me like this: `mix docs`

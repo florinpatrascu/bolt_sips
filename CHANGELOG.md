@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.0-rc.2
+
+- swapping the assets around, for better organizing the docs
+
 ## 2.0.0-rc.1
 
 - more documentation

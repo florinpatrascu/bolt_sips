@@ -124,7 +124,7 @@ iex» conn = Bolt.Sips.conn()
 
 The new connection pool is supervised by the main `Bolt.Sips.ConnectionSupervisor`, you don't have to do anythings special for that.
 
-![](../images/role_based_connections.png?raw=true)
+![](assets/role_based_connections.png?raw=true)
 
 In the final release, we'll add a friendlier api for adding role-based connections. More details about role-based-connections, [here](role-based-connections.md)
 
