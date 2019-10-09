@@ -30,6 +30,6 @@ defmodule Bolt.Sips.PerformanceTest do
       )
 
     # Query should take less than 50ms in average
-    assert Enum.at(output.scenarios, 0).run_time_data.statistics.average < 50_000_000
+    assert Enum.at(output.scenarios, 0).run_time_data.statistics.average < 125_000_000
   end
 end
