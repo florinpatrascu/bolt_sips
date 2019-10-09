@@ -54,11 +54,10 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
     module = Module.concat(["Bolt.Sips.Internals.PackStream", "EncoderV#{used_version}"])
     func_atom = String.to_atom("encode_#{data_type}")
 
-    with true <- Code.ensure_loaded?(module),
-         true <- Kernel.function_exported?(module, func_atom, 2) do
+    try do
       Kernel.apply(module, func_atom, [data, original_version])
-    else
-      _ ->
+    rescue
+      _ in UndefinedFunctionError ->
         do_call_encode(
           data_type,
           data,

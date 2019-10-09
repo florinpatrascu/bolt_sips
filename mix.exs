@@ -113,8 +113,8 @@ defmodule BoltSips.Mixfile do
       {:uuid, "~> 1.1.8", only: [:test, :dev], runtime: false},
 
       # Benchmarking dependencies
-      {:benchee, "~> 1.0", optional: true, only: [:bench]},
-      {:benchee_html, "~> 1.0", optional: true, only: [:bench]},
+      {:benchee, "~> 1.0", optional: true, only: [:dev, :test]},
+      {:benchee_html, "~> 1.0", optional: true, only: [:dev]},
 
       # Linting dependencies
       {:credo, "~> 1.1", only: [:dev]},
