@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.0-rc.2"
+  @version "2.0.1-rc.2"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
@@ -113,8 +113,8 @@ defmodule BoltSips.Mixfile do
       {:uuid, "~> 1.1.8", only: [:test, :dev], runtime: false},
 
       # Benchmarking dependencies
-      {:benchee, "~> 1.0", optional: true, only: [:bench]},
-      {:benchee_html, "~> 1.0", optional: true, only: [:bench]},
+      {:benchee, "~> 1.0", optional: true, only: [:dev, :test]},
+      {:benchee_html, "~> 1.0", optional: true, only: [:dev]},
 
       # Linting dependencies
       {:credo, "~> 1.1", only: [:dev]},

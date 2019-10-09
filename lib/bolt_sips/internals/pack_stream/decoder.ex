@@ -60,9 +60,7 @@ defmodule Bolt.Sips.Internals.PackStream.Decoder do
   defp call_decode(data, original_version, used_version) do
     module = Module.concat(["Bolt.Sips.Internals.PackStream", "DecoderV#{used_version}"])
 
-    with true <- Code.ensure_loaded?(module),
-         true <- Kernel.function_exported?(module, :decode, 2),
-         result <- Kernel.apply(module, :decode, [data, original_version]),
+    with result <- Kernel.apply(module, :decode, [data, original_version]),
          true <- is_list(result) do
       result
     else
