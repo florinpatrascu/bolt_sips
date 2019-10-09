@@ -1,5 +1,10 @@
 # Changelog
 
+## === 2.0.2 ===
+
+- The 2.0, stable release. Thank you all for your feedback and for contributing to making this driver better. w⦿‿⦿t!
+- fix: Simple Query taking too much time to process #73
+
 ## 2.0.0-rc.2
 
 - swapping the assets around, for better organizing the docs

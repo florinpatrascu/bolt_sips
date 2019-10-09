@@ -54,7 +54,7 @@ Contributions and feedback, are very welcome. Thank you!
 
 ```elixir
 def deps do
-  [{:bolt_sips, "~> 2.0.1-rc"}]
+  [{:bolt_sips, "~> 2.0"}]
 end
 ```
 

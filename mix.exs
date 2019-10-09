@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.1-rc.2"
+  @version "2.0.2"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
