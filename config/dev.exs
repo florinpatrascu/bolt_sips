@@ -11,8 +11,8 @@ level =
   end
 
 config :bolt_sips,
-  log: true,
-  log_hex: true
+  log: false,
+  log_hex: false
 
 config :logger, :console,
   level: level,
