@@ -68,13 +68,13 @@ Start an iex session:
 Erlang/OTP 21 [erts-10.2.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threads:1] [hipe]
 Interactive Elixir (1.8.1) - press Ctrl+C to exit (type h() ENTER for help)
 
-iex» {:ok, _neo} = Sips.start_link(url: "bolt://neo4j:test@localhost")
+iex» {:ok, _neo} = Bolt.Sips.start_link(url: "bolt://neo4j:test@localhost")
 {:ok, #PID<0.237.0>}
 
-iex» conn = Sips.conn()
+iex» conn = Bolt.Sips.conn()
 #PID<0.242.0>
 
-iex» Sips.query!(conn, "return 1 as n") |>
+iex» Bolt.Sips.query!(conn, "return 1 as n") |>
 ...» Bolt.Sips.Response.first()
 %{"n" => 1}
 ```
