@@ -2,6 +2,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
   @moduledoc false
   use Bolt.Sips.Internals.PackStream.Markers
   alias Bolt.Sips.Internals.PackStream.Encoder
+  alias Bolt.Sips.Internals.PackStream.EncoderHelper
   alias Bolt.Sips.Types.{TimeWithTZOffset, DateTimeWithTZOffset, Duration, Point}
 
   @doc """
@@ -18,13 +19,11 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
 
   ## Example
 
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_local_time(~T[06:54:32.453], 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_local_time(~T[06:54:32.453], 2))
       <<0xB1, 0x74, 0xCB, 0x0, 0x0, 0x16, 0x9F, 0x11, 0xB9, 0xCB, 0x40>>
   """
   @spec encode_local_time(Time.t(), integer()) :: Bolt.Sips.Internals.PackStream.value()
-  def encode_local_time(local_time, bolt_version) do
-    Encoder.encode({@local_time_signature, [day_time(local_time)]}, bolt_version)
-  end
+  def encode_local_time(local_time, bolt_version), do: EncoderHelper.call_encode(:local_time, local_time, bolt_version)
 
   @doc """
   Encode a TIME WITH TIMEZONE OFFSET (represented by TimeWithTZOffset) into Bolt binary format.
@@ -41,17 +40,10 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
   ## Example
 
       iex> time_with_tz = Bolt.Sips.Types.TimeWithTZOffset.create(~T[06:54:32.453], 3600)
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_time_with_tz(time_with_tz, 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_time_with_tz(time_with_tz, 2))
       <<0xB2, 0x54, 0xCB, 0x0, 0x0, 0x16, 0x9F, 0x11, 0xB9, 0xCB, 0x40, 0xC9, 0xE, 0x10>>
   """
-  def encode_time_with_tz(%TimeWithTZOffset{time: time, timezone_offset: offset}, bolt_version) do
-    Encoder.encode({@time_with_tz_signature, [day_time(time), offset]}, bolt_version)
-  end
-
-  @spec day_time(Time.t()) :: integer()
-  defp day_time(time) do
-    Time.diff(time, ~T[00:00:00.000], :nanosecond)
-  end
+  def encode_time_with_tz(%TimeWithTZOffset{time: time, timezone_offset: offset}, bolt_version), do: EncoderHelper.call_encode(:time_with_tz, %TimeWithTZOffset{time: time, timezone_offset: offset}, bolt_version )
 
   @doc """
   Encode a DATE (represented by Date) into Bolt binary format.
@@ -67,16 +59,12 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
 
   ## Example
 
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_date(~D[2019-04-23], 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_date(~D[2019-04-23], 2))
       <<0xB1, 0x44, 0xC9, 0x46, 0x59>>
 
   """
   @spec encode_date(Date.t(), integer()) :: Bolt.Sips.Internals.PackStream.value()
-  def encode_date(date, bolt_version) do
-    epoch = Date.diff(date, ~D[1970-01-01])
-
-    Encoder.encode({@date_signature, [epoch]}, bolt_version)
-  end
+  def encode_date(date, bolt_version), do: EncoderHelper.call_encode(:date, date, bolt_version)
 
   @doc """
   Encode a LOCAL DATETIME (Represented by NaiveDateTime) into Bolt binary format.
@@ -95,15 +83,13 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
 
   ## Example
 
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_local_datetime(~N[2019-04-23 13:45:52.678], 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_local_datetime(~N[2019-04-23 13:45:52.678], 2))
       <<0xB2, 0x64, 0xCA, 0x5C, 0xBF, 0x17, 0x10, 0xCA, 0x28, 0x69, 0x75, 0x80>>
 
   """
   @spec encode_local_datetime(Calendar.naive_datetime(), integer()) ::
           Bolt.Sips.Internals.PackStream.value()
-  def encode_local_datetime(local_datetime, bolt_version) do
-    Encoder.encode({@local_datetime_signature, decompose_datetime(local_datetime)}, bolt_version)
-  end
+  def encode_local_datetime(local_datetime, bolt_version), do: EncoderHelper.call_encode(:local_datetime, local_datetime, bolt_version)
 
   @doc """
   Encode DATETIME WITH TIMEZONE ID (represented by Calendar.DateTime) into Bolt binary format.
@@ -125,18 +111,14 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
       iex> d = Bolt.Sips.TypesHelper.datetime_with_micro(~N[2013-11-12 07:32:02.003],
       ...> "Europe/Berlin")
       #DateTime<2013-11-12 07:32:02.003+01:00 CET Europe/Berlin>
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_datetime_with_tz_id(d, 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_datetime_with_tz_id(d, 2))
       <<0xB3, 0x66, 0xCA, 0x52, 0x81, 0xD9, 0x72, 0xCA, 0x0, 0x2D, 0xC6, 0xC0, 0x8D, 0x45, 0x75,
       0x72, 0x6F, 0x70, 0x65, 0x2F, 0x42, 0x65, 0x72, 0x6C, 0x69, 0x6E>>
 
   """
   @spec encode_datetime_with_tz_id(Calendar.datetime(), integer()) ::
           Bolt.Sips.Internals.PackStream.value()
-  def encode_datetime_with_tz_id(datetime, bolt_version) do
-    data = decompose_datetime(DateTime.to_naive(datetime)) ++ [datetime.time_zone]
-
-    Encoder.encode({@datetime_with_zone_id_signature, data}, bolt_version)
-  end
+  def encode_datetime_with_tz_id(datetime, bolt_version), do: EncoderHelper.call_encode(:datetime_with_tz_id, datetime, bolt_version)
 
   @doc """
   Encode DATETIME WITH TIMEZONE OFFSET (represented by DateTimeWithTZOffset) into Bolt binary format.
@@ -160,7 +142,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
               naive_datetime: ~N[2013-11-12 07:32:02.003],
               timezone_offset: 7200
             }
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_datetime_with_tz_offset(d, 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_datetime_with_tz_offset(d, 2))
       <<0xB3, 0x46, 0xCA, 0x52, 0x81, 0xD9, 0x72, 0xCA, 0x0, 0x2D, 0xC6, 0xC0, 0xC9, 0x1C, 0x20>>
 
   """
@@ -169,20 +151,12 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
   def encode_datetime_with_tz_offset(
         %DateTimeWithTZOffset{naive_datetime: ndt, timezone_offset: tz_offset},
         bolt_version
-      ) do
-    data = decompose_datetime(ndt) ++ [tz_offset]
-    Encoder.encode({@datetime_with_zone_offset_signature, data}, bolt_version)
-  end
+  ), do: EncoderHelper.call_encode(:datetime_with_tz_offset,
 
-  @spec decompose_datetime(Calendar.naive_datetime()) :: [integer()]
-  defp decompose_datetime(%NaiveDateTime{} = datetime) do
-    datetime_micros = NaiveDateTime.diff(datetime, ~N[1970-01-01 00:00:00.000], :microsecond)
+        %DateTimeWithTZOffset{naive_datetime: ndt, timezone_offset: tz_offset},
+        bolt_version
+  )
 
-    seconds = div(datetime_micros, 1_000_000)
-    nanoseconds = rem(datetime_micros, 1_000_000) * 1_000
-
-    [seconds, nanoseconds]
-  end
 
   @doc """
   Encode DURATION (represented by Duration) into Bolt binary format.
@@ -218,22 +192,12 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
         weeks: 7,
         years: 3
       }
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_duration(d, 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_duration(d, 2))
       <<0xB4, 0x45, 0x25, 0x35, 0xCA, 0x0, 0x0, 0xB7, 0x5D, 0xC9, 0x2, 0x2A>>
   """
   @spec encode_duration(Duration.t(), integer()) :: Bolt.Sips.Internals.PackStream.value()
-  def encode_duration(%Duration{} = duration, bolt_version) do
-    Encoder.encode({@duration_signature, compact_duration(duration)}, bolt_version)
-  end
+  def encode_duration(%Duration{} = duration, bolt_version), do: EncoderHelper.call_encode(:duration, duration, bolt_version)
 
-  @spec compact_duration(Duration.t()) :: [integer()]
-  defp compact_duration(%Duration{} = duration) do
-    months = 12 * duration.years + duration.months
-    days = 7 * duration.weeks + duration.days
-    seconds = 3600 * duration.hours + 60 * duration.minutes + duration.seconds
-
-    [months, days, seconds, duration.nanoseconds]
-  end
 
   @doc """
   Encode POINT 2D & 3D (represented by Point) into Bolt binary format.
@@ -262,7 +226,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
               y: 12.54,
               z: nil
             }
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_point(p, 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_point(p, 2))
       <<0xB3, 0x58, 0xC9, 0x10, 0xE6, 0xC1, 0x40, 0x50, 0x5B, 0x85, 0x1E, 0xB8, 0x51, 0xEC, 0xC1,
       0x40, 0x29, 0x14, 0x7A, 0xE1, 0x47, 0xAE, 0x14>>
 
@@ -288,18 +252,14 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
               y: 40.3245,
               z: 23.1
             }
-      iex> Bolt.Sips.Internals.PackStream.EncoderV2.encode_point(p, 2)
+      iex> :erlang.iolist_to_binary(Bolt.Sips.Internals.PackStream.EncoderV2.encode_point(p, 2))
       <<0xB4, 0x59, 0xC9, 0x13, 0x73, 0xC1, 0x40, 0x46, 0x80, 0x9, 0xD4, 0x95, 0x18, 0x2B, 0xC1,
       0x40, 0x44, 0x29, 0x89, 0x37, 0x4B, 0xC6, 0xA8, 0xC1, 0x40, 0x37, 0x19, 0x99, 0x99, 0x99,
       0x99, 0x9A>>
 
   """
   @spec encode_point(Point.t(), integer()) :: Bolt.Sips.Internals.PackStream.value()
-  def encode_point(%Point{z: nil} = point, bolt_version) do
-    Encoder.encode({@point2d_signature, [point.srid, point.x, point.y]}, bolt_version)
-  end
+  def encode_point(%Point{z: nil} = point, bolt_version), do: EncoderHelper.call_encode(:point, point, bolt_version) 
 
-  def encode_point(%Point{} = point, bolt_version) do
-    Encoder.encode({@point3d_signature, [point.srid, point.x, point.y, point.z]}, bolt_version)
-  end
+  def encode_point(%Point{} = point, bolt_version), do: EncoderHelper.call_encode(:point, point, bolt_version)
 end
