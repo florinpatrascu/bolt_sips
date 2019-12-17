@@ -9,26 +9,26 @@ defmodule Bolt.Sips.Internals.PackStream.MessageTest do
     Enum.each(BoltVersionHelper.available_versions(), fn bolt_version ->
       test "DISCARD_ALL (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x2F, _::binary>> =
-                 Message.encode({:discard_all, []}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:discard_all, []}, unquote(bolt_version)))
       end
 
       test "PULL_ALL (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x3F, _::binary>> =
-                 Message.encode({:pull_all, []}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:pull_all, []}, unquote(bolt_version)))
       end
 
       test "RESET (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x0F, _::binary>> = Message.encode({:reset, []}, unquote(bolt_version))
+        assert <<_, _, _, 0x0F, _::binary>> = :erlang.iolist_to_binary(Message.encode({:reset, []}, unquote(bolt_version)))
       end
 
       test "RUN without params (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x10, _::binary>> =
-                 Message.encode({:run, ["RETURN 1 AS num"]}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:run, ["RETURN 1 AS num"]}, unquote(bolt_version)))
       end
 
       test "RUN with params (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x10, _::binary>> =
-                 Message.encode({:run, ["RETURN {num} AS num", %{num: 5}]}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:run, ["RETURN {num} AS num", %{num: 5}]}, unquote(bolt_version)))
       end
     end)
   end
@@ -39,16 +39,16 @@ defmodule Bolt.Sips.Internals.PackStream.MessageTest do
     |> Enum.each(fn bolt_version ->
       test "ACK_FAILURE (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x0E, _::binary>> =
-                 Message.encode({:ack_failure, []}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:ack_failure, []}, unquote(bolt_version)))
       end
 
       test "INIT without auth (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x01, _::binary>> = Message.encode({:init, []}, unquote(bolt_version))
+        assert <<_, _, _, 0x01, _::binary>> = :erlang.iolist_to_binary(Message.encode({:init, []}, unquote(bolt_version)))
       end
 
       test "INIT with auth (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x01, _::binary>> =
-                 Message.encode({:init, [{"neo4j", "password"}]}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:init, [{"neo4j", "password"}]}, unquote(bolt_version)))
       end
     end)
   end
@@ -58,57 +58,57 @@ defmodule Bolt.Sips.Internals.PackStream.MessageTest do
     |> Enum.filter(&(&1 >= 3))
     |> Enum.each(fn bolt_version ->
       test "HELLO without auth (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x01, _::binary>> = Message.encode({:hello, []}, unquote(bolt_version))
+        assert <<_, _, _, 0x01, _::binary>> = :erlang.iolist_to_binary(Message.encode({:hello, []}, unquote(bolt_version)))
       end
 
       test "HELLO with auth (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x01, _::binary>> =
-                 Message.encode({:hello, [{"neo4j", "password"}]}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:hello, [{"neo4j", "password"}]}, unquote(bolt_version)))
       end
 
       test "GOODBYE (bolt_version: #{bolt_version})" do
         assert assert <<_, _, _, 0x02, _::binary>> =
-                        Message.encode({:goodbye, []}, unquote(bolt_version))
+                        :erlang.iolist_to_binary(Message.encode({:goodbye, []}, unquote(bolt_version)))
       end
 
       test "BEGIN without params (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x11, _::binary>> = Message.encode({:begin, []}, unquote(bolt_version))
+        assert <<_, _, _, 0x11, _::binary>> = :erlang.iolist_to_binary(Message.encode({:begin, []}, unquote(bolt_version)))
       end
 
       test "BEGIN with params (bolt_version: #{bolt_version})" do
         {:ok, metadata} = Metadata.new(%{tx_timeout: 15000})
 
         assert <<_, _, _, 0x11, _::binary>> =
-                 Message.encode({:begin, [metadata]}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:begin, [metadata]}, unquote(bolt_version)))
       end
 
       test "COMMIT (bolt_version: #{bolt_version})" do
-        assert <<_, _, _, 0x12, _::binary>> = Message.encode({:commit, []}, unquote(bolt_version))
+        assert <<_, _, _, 0x12, _::binary>> = :erlang.iolist_to_binary(Message.encode({:commit, []}, unquote(bolt_version)))
       end
 
       test "ROLLBACK (bolt_version: #{bolt_version})" do
         assert <<_, _, _, 0x13, _::binary>> =
-                 Message.encode({:rollback, []}, unquote(bolt_version))
+                 :erlang.iolist_to_binary(Message.encode({:rollback, []}, unquote(bolt_version)))
       end
 
       test "RUN without params but with metadata (bolt_version: #{bolt_version})" do
         {:ok, metadata} = Metadata.new(%{tx_timeout: 15000})
 
         assert <<_, _, _, 0x10, _::binary>> =
-                 Message.encode(
+                 :erlang.iolist_to_binary(Message.encode(
                    {:run, ["RETURN 16 AS num", %{}, metadata]},
                    unquote(bolt_version)
-                 )
+                 ))
       end
 
       test "RUN with params and  metadata (bolt_version: #{bolt_version})" do
         {:ok, metadata} = Metadata.new(%{tx_timeout: 15000})
 
         assert <<_, _, _, 0x10, _::binary>> =
-                 Message.encode(
+                 :erlang.iolist_to_binary(Message.encode(
                    {:run, ["RETURN {num} AS num", %{num: 16}, metadata]},
                    unquote(bolt_version)
-                 )
+                 ))
       end
     end)
   end
