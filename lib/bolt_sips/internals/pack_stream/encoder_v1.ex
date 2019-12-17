@@ -1,16 +1,8 @@
 defmodule Bolt.Sips.Internals.PackStream.EncoderV1 do
   @moduledoc false
-  alias Bolt.Sips.Internals.PackStream.Encoder
   alias Bolt.Sips.Internals.PackStream.EncoderHelper
   use Bolt.Sips.Internals.PackStream.Markers
 
-  @int8 -127..-17
-  @int16_low -32_768..-129
-  @int16_high 128..32_767
-  @int32_low -2_147_483_648..-32_769
-  @int32_high 32_768..2_147_483_647
-  @int64_low -9_223_372_036_854_775_808..-2_147_483_649
-  @int64_high 2_147_483_648..9_223_372_036_854_775_807
 
   @doc """
   Encode an atom into Bolt binary format.

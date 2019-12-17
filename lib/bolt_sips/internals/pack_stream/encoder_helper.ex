@@ -53,53 +53,33 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
   @struct8_marker 0xDC
   @struct16_marker 0xDD
 
-  # Node
-  @node_marker 0x4E
-
-  # Relationship
-  @relationship_marker 0x52
-
-  # Unbounded relationship
-  @unbounded_relationship_marker 0x72
-
-  # Path
-  @path_marker 0x50
 
   # Local Time
   @local_time_signature 0x74
-  @local_time_struct_size 1
 
   # Time With TZ Offset
   @time_with_tz_signature 0x54
-  @time_with_tz_struct_size 2
 
   # Date
   @date_signature 0x44
-  @date_struct_size 1
 
   # Local DateTime
   @local_datetime_signature 0x64
-  @local_datetime_struct_size 2
 
   # Datetime with TZ offset
   @datetime_with_zone_offset_signature 0x46
-  @datetime_with_zone_offset_struct_size 3
 
   # Datetime with TZ id
   @datetime_with_zone_id_signature 0x66
-  @datetime_with_zone_id_struct_size 3
 
   # Duration
   @duration_signature 0x45
-  @duration_struct_size 4
 
   # Point 2D
   @point2d_signature 0x58
-  @point2d_struct_size 3
 
   # Point 3D
   @point3d_signature 0x59
-  @point3d_struct_size 4
 
   @doc """
   For the given `data_type` and `bolt_version`, determine the right enconding function
@@ -325,7 +305,7 @@ defmodule Bolt.Sips.Internals.PackStream.EncoderHelper do
     end)
   end
 
-  @spec do_reduce_kv({atom(), any()}, integer()) :: binary()
+  @spec do_reduce_kv({atom(), any()}, integer()) :: [binary()]
   defp do_reduce_kv({key, value}, bolt_version) do
     [Encoder.encode(key, bolt_version) , Encoder.encode(value, bolt_version)]
   end

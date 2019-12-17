@@ -17,7 +17,6 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1 do
 
   use Bolt.Sips.Internals.PackStream.Markers
   alias Bolt.Sips.Internals.PackStream.Decoder
-  alias Bolt.Sips.Types
 
   @spec decode(binary() | {integer(), binary(), integer()}, integer()) ::
           list() | {:error, :not_implemented}

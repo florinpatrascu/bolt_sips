@@ -28,8 +28,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   [https://boltprotocol.org/v1/#messages](https://boltprotocol.org/v1/#messages)
   """
 
-  alias Bolt.Sips.Internals.BoltVersionHelper
-  alias Bolt.Sips.Internals.PackStreamError
   alias Bolt.Sips.Metadata
 
   @max_chunk_size 65_535
@@ -48,10 +46,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @run_signature 0x10
 
   #OUT Signature
-  @success_signature 0x70
-  @failure_signature 0x7F
-  @record_signature 0x71
-  @ignored_signature 0x7E
 
   #TODO improve using macros?
   @valid_signatures [
@@ -98,7 +92,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     :run
   ]
 
-  @available_bolt_versions [1, 2, 3] 
 
   @last_bolt_version 3
 
@@ -267,13 +260,13 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   Examples (excluded from doctest because client_name changes at each bolt_sips version)
 
       # without auth token
-      diex> :erlang.iolist_to_binary(MainEncoder.encode({:hello, []}, 3))
+      diex> :erlang.iolist_to_binary(Encoder.encode({:hello, []}, 3))
       <<0x0, 0x1D, 0xB1, 0x1, 0xA1, 0x8A, 0x75, 0x73, 0x65, 0x72, 0x5F, 0x61, 0x67, 0x65, 0x6E,
       0x74, 0x8E, 0x42, 0x6F, 0x6C, 0x74, 0x53, 0x69, 0x70, 0x73, 0x2F, 0x31, 0x2E, 0x34, 0x2E,
       0x30, 0x0, 0x0>>
 
       # with auth token
-      diex(20)> :erlang.iolist_to_binary(MainEncoder.encode({:hello, [{"neo4j", "test"}]}, 3))
+      diex(20)> :erlang.iolist_to_binary(Encoder.encode({:hello, [{"neo4j", "test"}]}, 3))
       <<0x0, 0x4B, 0xB1, 0x1, 0xA4, 0x8B, 0x63, 0x72, 0x65, 0x64, 0x65, 0x6E, 0x74, 0x69, 0x61,
       0x6C, 0x73, 0x84, 0x74, 0x65, 0x73, 0x74, 0x89, 0x70, 0x72, 0x69, 0x6E, 0x63, 0x69, 0x70,
       0x61, 0x6C, 0x85, 0x6E, 0x65, 0x6F, 0x34, 0x6A, 0x86, 0x73, 0x63, 0x68, 0x65, 0x6D, 0x65,
@@ -289,7 +282,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   Example
 
       iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
-      iex> :erlang.iolist_to_binary(MainEncoder.encode({:goodbye, []}, 3))
+      iex> :erlang.iolist_to_binary(Encoder.encode({:goodbye, []}, 3))
       <<0x0, 0x2, 0xB0, 0x2, 0x0, 0x0>>
 
   ## BEGIN
@@ -309,7 +302,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
 
       # without metadata
       # iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
-      # iex> :erlang.iolist_to_binary(MainEncoder.encode({:begin, []}, 3))
+      # iex> :erlang.iolist_to_binary(Encoder.encode({:begin, []}, 3))
       # <<0x0, 0x3, 0xB1, 0x11, 0xA0, 0x0, 0x0>>
 
       # # with metadata
@@ -336,7 +329,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   Example
 
       iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
-      iex> :erlang.iolist_to_binary(MainEncoder.encode({:commit, []}, 3))
+      iex> :erlang.iolist_to_binary(Encoder.encode({:commit, []}, 3))
       <<0x0, 0x2, 0xB0, 0x12, 0x0, 0x0>>
 
   ## ROLLBACK
@@ -348,8 +341,8 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
 
   Example
 
-      iex> alias Bolt.Sips.Internals.PackStream.Message.MainEncoder
-      iex> :erlang.iolist_to_binary(MainEncoder.encode({:rollback, []}, 3))
+      iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
+      iex> :erlang.iolist_to_binary(Encoder.encode({:rollback, []}, 3))
       <<0x0, 0x2, 0xB0, 0x13, 0x0, 0x0>>
 
   ## RUN
@@ -372,7 +365,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
 
       # without params nor metadata
       iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
-      iex> :erlang.iolist_to_binary(MainEncoder.encode({:run, ["RETURN 'hello' AS str"]}, 3))
+      iex> :erlang.iolist_to_binary(Encoder.encode({:run, ["RETURN 'hello' AS str"]}, 3))
       <<0x0, 0x1B, 0xB3, 0x10, 0xD0, 0x15, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20, 0x27, 0x68,
       0x65, 0x6C, 0x6C, 0x6F, 0x27, 0x20, 0x41, 0x53, 0x20, 0x73, 0x74, 0x72, 0xA0, 0xA0, 0x0,
       0x0>>
@@ -414,9 +407,8 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
       0x74, 0x72, 0x7D, 0x20, 0x41, 0x53, 0x20, 0x73, 0x74, 0x72, 0xA1, 0x83, 0x73, 0x74, 0x72,
       0x85, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0xA1, 0x8A, 0x74, 0x78, 0x5F, 0x74, 0x69, 0x6D, 0x65,
       0x6F, 0x75, 0x74, 0xC9, 0x11, 0x94, 0x0, 0x0>>
-  """
-  @doc """
-  Encode  messages
+      
+   #   Encode  messages v1
 
   # Supported messages
 
@@ -529,7 +521,19 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
       iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
       iex> :erlang.iolist_to_binary(Encoder.encode({:reset, []}, 1))
       <<0x0, 0x2, 0xB0, 0xF, 0x0, 0x0>>
+
+  
+  Check if the encoder for the given bolt version is capable of encoding the given message
+  If it is the case, the encoding function will be called
+  If not, fallback to previous bolt version
+
+  If encoding function is not present in any of the bolt  version, an error will be raised
   """
+
+  def encode(data, bolt_version) when is_integer(bolt_version) and bolt_version > @last_bolt_version do
+      encode(data, @last_bolt_version)
+  end
+
   def encode(_data, _bolt_version) do
     {:error, :not_implemented}
   end
@@ -568,15 +572,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     %{user_agent: client_name()}
   end
 
-  # Wrap result in a ok-tuple if valid
-  # This ease the error pattern matching with a `with| statement
-  defp ok_result(result) when is_binary(result) do
-    {:ok, result}
-  end
 
-  defp ok_result(result) do
-    result
-  end
 
   @doc """
   Perform the final message:
@@ -590,15 +586,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
           list(),
           integer()
         ) ::
-          Bolt.Sips.Internals.PackStream.Message.encoded()
-  def encode_message(message_type, @run_signature, [stmt, params, meta] = data, bolt_version) when is_list(stmt) do
-    #stmt has been pre_encoded at compile time and is an io_list
-    Bolt.Sips.Internals.Logger.log_message(:client, message_type, data)
-    encoded = {@run_signature, data}
-      |> Bolt.Sips.Internals.PackStream.pre_encoded(bolt_version)
-      |> generate_chunks([])
-
-  end
+          [[Bolt.Sips.Internals.PackStream.Message.encoded()]]
 
   def encode_message(message_type, signature, data, bolt_version) do
     Bolt.Sips.Internals.Logger.log_message(:client, message_type, data)
@@ -613,7 +601,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   end
 
   @spec generate_chunks(Bolt.Sips.Internals.PackStream.value() | <<>>, list()) ::
-          Bolt.Sips.Internals.PackStream.Message.encoded()
+          [[Bolt.Sips.Internals.PackStream.Message.encoded()]]
   defp generate_chunks(<<>>, chunks) do
     [ chunks , [@end_marker ] , []]
   end
@@ -635,36 +623,11 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   end
 
   @spec format_chunk(Bolt.Sips.Internals.PackStream.value()) ::
-          Bolt.Sips.Internals.PackStream.Message.encoded()
+          [Bolt.Sips.Internals.PackStream.Message.encoded()]
   defp format_chunk(chunk) do
     [<<:erlang.iolist_size(chunk)::16>> , chunk]
   end
 
-  @doc """
-  Check if the encoder for the given bolt version is capable of encoding the given message
-  If it is the case, the encoding function will be called
-  If not, fallback to previous bolt version
-
-  If encoding function is not present in any of the bolt  version, an error will be raised
-  """
-
-  def encode(data, bolt_version) when is_integer(bolt_version) do
-    if bolt_version > @last_bolt_version do
-      encode(data, @last_bolt_version)
-    else
-      raise PackStreamError,
-        data: data,
-        bolt_version: bolt_version,
-        message: "[Message] Unsupported encoder version"
-    end
-  end
-
-  def encode(data, bolt_version) do
-    raise PackStreamError,
-      data: data,
-      bolt_version: bolt_version,
-      message: "[Message] Unsupported encoder version"
-  end
 
 
 

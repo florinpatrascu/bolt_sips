@@ -19,7 +19,6 @@ defmodule Bolt.Sips.Internals.PackStream.Decoder do
   alias Bolt.Sips.Types
   alias Bolt.Sips.Types.{TimeWithTZOffset, DateTimeWithTZOffset, Duration, Point}
 
-  @available_bolt_versions BoltVersionHelper.available_versions()
   @last_version BoltVersionHelper.last()
 
   # Null

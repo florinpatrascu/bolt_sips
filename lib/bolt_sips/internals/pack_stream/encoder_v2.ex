@@ -1,7 +1,6 @@
 defmodule Bolt.Sips.Internals.PackStream.EncoderV2 do
   @moduledoc false
   use Bolt.Sips.Internals.PackStream.Markers
-  alias Bolt.Sips.Internals.PackStream.Encoder
   alias Bolt.Sips.Internals.PackStream.EncoderHelper
   alias Bolt.Sips.Types.{TimeWithTZOffset, DateTimeWithTZOffset, Duration, Point}
 

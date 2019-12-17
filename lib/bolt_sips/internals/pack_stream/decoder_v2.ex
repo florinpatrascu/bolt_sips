@@ -23,7 +23,6 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV2 do
 
   use Bolt.Sips.Internals.PackStream.Markers
   alias Bolt.Sips.Internals.PackStream.Decoder
-  alias Bolt.Sips.Types.{TimeWithTZOffset, DateTimeWithTZOffset, Duration, Point}
 
   # Local Date
   @spec decode({integer(), binary(), integer()}, integer()) :: list() | {:error, :not_implemented}
