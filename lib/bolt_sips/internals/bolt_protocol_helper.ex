@@ -82,14 +82,14 @@ defmodule Bolt.Sips.Internals.BoltProtocolHelper do
 
     case transport.recv(port, 2, recv_timeout) do
       {:ok, <<chunk_size::16>>} ->
-        do_receive_data_(transport, port, chunk_size, options, [<<>>])
+        do_receive_data_(transport, port, chunk_size, options, <<>>)
 
       other ->
         other
     end
   end
 
-  @spec do_receive_data_(atom(), port(), integer(), Keyword.t(), iolist()) :: {:ok, binary()}
+  @spec do_receive_data_(atom(), port(), integer(), Keyword.t(), binary()) :: {:ok, binary()}
   defp do_receive_data_(transport, port, chunk_size, options, old_data) do
     recv_timeout = get_recv_timeout(options)
 
@@ -97,10 +97,10 @@ defmodule Bolt.Sips.Internals.BoltProtocolHelper do
          {:ok, marker} <- transport.recv(port, 2, recv_timeout) do
       case marker do
         @zero_chunk ->
-          {:ok, :erlang.iolist_to_binary([old_data | data])}
+          {:ok, <<old_data::binary, data::binary>>}
 
         <<chunk_size::16>> ->
-          data = [old_data | data]
+          data = <<old_data::binary, data::binary>> 
           do_receive_data_(transport, port, chunk_size, options, data)
       end
     else
