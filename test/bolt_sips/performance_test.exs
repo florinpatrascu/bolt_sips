@@ -1,5 +1,5 @@
 defmodule Bolt.Sips.PerformanceTest do
-  use Bolt.Sips.ConnCase
+  use Bolt.Sips.ConnCase, async: false
 
   test "Querying 500 nodes should under 100ms", context do
     conn = context[:conn]
@@ -18,6 +18,7 @@ defmodule Bolt.Sips.PerformanceTest do
       MATCH (t:Test)
       RETURN t AS test
     """
+
 
     output =
       Benchee.run(
