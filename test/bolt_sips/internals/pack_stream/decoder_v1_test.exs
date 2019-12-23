@@ -63,7 +63,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1Test do
     map_8 =
       <<0xD8, 16::8>> <>
         (1..16
-         |> Enum.map(fn i -> PackStream.encode("#{i}", 1) <> <<1>> end)
+         |> Enum.map(fn i -> :erlang.iolist_to_binary(PackStream.encode("#{i}", 1)) <> <<1>> end)
          |> Enum.join())
 
     assert DecoderV1.decode(map_8, 1) |> List.first() |> map_size == 16
@@ -71,7 +71,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1Test do
     map_16 =
       <<0xD9, 256::16>> <>
         (1..256
-         |> Enum.map(fn i -> PackStream.encode("#{i}", 1) <> <<1>> end)
+         |> Enum.map(fn i -> :erlang.iolist_to_binary(PackStream.encode("#{i}", 1)) <> <<1>> end)
          |> Enum.join())
 
     assert DecoderV1.decode(map_16, 1) |> List.first() |> map_size == 256
@@ -79,7 +79,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV1Test do
     map_32 =
       <<0xDA, 66_000::32>> <>
         (1..66_000
-         |> Enum.map(fn i -> PackStream.encode("#{i}", 1) <> <<1>> end)
+         |> Enum.map(fn i -> :erlang.iolist_to_binary(PackStream.encode("#{i}", 1)) <> <<1>> end)
          |> Enum.join())
 
     assert DecoderV1.decode(map_32, 1) |> List.first() |> map_size == 66_000

@@ -97,10 +97,10 @@ defmodule Bolt.Sips.Internals.BoltProtocolHelper do
          {:ok, marker} <- transport.recv(port, 2, recv_timeout) do
       case marker do
         @zero_chunk ->
-          {:ok, old_data <> data}
+          {:ok, <<old_data::binary, data::binary>>}
 
         <<chunk_size::16>> ->
-          data = old_data <> data
+          data = <<old_data::binary, data::binary>> 
           do_receive_data_(transport, port, chunk_size, options, data)
       end
     else
