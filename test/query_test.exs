@@ -35,6 +35,29 @@ defmodule Query.Test do
            "missing 'The Name of the Wind' database, or data incomplete"
   end
 
+  test "A procedure call failure should send reset and not lock the db", context do
+    conn = context[:conn]
+    
+    cyp_fail = """
+      CALL db.index.fulltext.queryNodes(\"topic_label\", \"badparen)\") YIELD node RETURN node
+    """
+    {:error, %Bolt.Sips.Error{
+      code: "Neo.ClientError.Procedure.ProcedureCallFailed"}
+    } = Bolt.Sips.query(conn, cyp_fail)
+    
+
+    cyp = """
+      MATCH (n:Person {bolt_sips: true})
+      RETURN n.name AS Name
+      ORDER BY Name DESC
+      LIMIT 5
+    """
+
+    {:ok, %Response{} = row} = Bolt.Sips.query(conn, cyp)
+
+    assert Response.first(row)["Name"] == "Patrick Rothfuss",
+           "missing 'The Name of the Wind' database, or data incomplete"
+  end
   test "executing a Cypher query, with parameters", context do
     conn = context[:conn]
 
