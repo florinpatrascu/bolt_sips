@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.3
+
+- refactoring the internals for achieving a better performance, while improving the code readability and extensibility - many thanks to @kristofka and @dominique-vassard. You guys are awesome!
+- fix: Consistent bad connection state after malformed query [...] issue #78
+
 ## === 2.0.2 ===
 
 - The 2.0, stable release. Thank you all for your feedback and for contributing to making this driver better. w⦿‿⦿t!

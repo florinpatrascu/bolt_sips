@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.2"
+  @version "2.0.3"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
@@ -89,7 +89,7 @@ defmodule BoltSips.Mixfile do
         "LICENSE"
       ],
       licenses: ["Apache 2.0"],
-      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk", "Dominique VASSARD"],
+      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk", "kristofka", "Dominique VASSARD"],
       links: %{
         "Docs" => @url_docs,
         "Github" => @url_github
