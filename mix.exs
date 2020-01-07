@@ -89,7 +89,12 @@ defmodule BoltSips.Mixfile do
         "LICENSE"
       ],
       licenses: ["Apache 2.0"],
-      maintainers: ["Florin T.PATRASCU", "Dmitriy Nesteryuk", "kristofka", "Dominique VASSARD"],
+      maintainers: [
+        "Florin T.PATRASCU",
+        "Dmitriy Nesteryuk",
+        "Dominique VASSARD",
+        "Kristof Semjen"
+      ],
       links: %{
         "Docs" => @url_docs,
         "Github" => @url_github
