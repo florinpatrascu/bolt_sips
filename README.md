@@ -2,20 +2,6 @@
 
 # Neo4j driver for Elixir.
 
-## IMPORTANT
-
-> the `master` branch is observing the development of the 2.0 version! While the new driver architecture is considered stable, this branch should be considered as work in progress! For production, please use the `Bolt.Sips` driver `v1.5.x`, from hex.pm. This branch, while in development, will be available on hex.pm, but please use it with care!
-
-We moved the development in the public area, for offering our users an early preview of what is coming. The documentation for functions and modules, including the new `docs/` sections, is work in progress, pretty much. However, the code is stable and can be used for experimenting with the new features introduced in this version:
-
-- routing
-- role based connections
-- multi-tenancy
-- better support for errors
-- and so much more
-
-Contributions and feedback, are very welcome. Thank you!
-
 [![Build Status](https://travis-ci.org/florinpatrascu/bolt_sips.svg?branch=master)](https://travis-ci.org/florinpatrascu/bolt_sips)
 [![Hex.pm](https://img.shields.io/hexpm/dt/bolt_sips.svg?maxAge=2592000)](https://hex.pm/packages/bolt_sips)
 [![Hexdocs.pm](https://img.shields.io/badge/api-hexdocs-brightgreen.svg)](https://hexdocs.pm/bolt_sips)
