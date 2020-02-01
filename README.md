@@ -18,7 +18,7 @@
 ## Table of Contents
 
 - [Installation](#installation)
-  - [Getting Started](docs/getting-started.md#Starting-the-Driver)
+  - [Getting Started](docs/getting-started.md#starting-the-driver)
   - [Basic usage](docs/getting-started.md#usage)
   - [Configuration](docs/features/configuration.md)
     - [Direct mode](docs/features/configuration.md#direct-mode)
@@ -115,7 +115,7 @@ As reported by Github: [contributions to master, excluding merge commits](https:
 ### License
 
 ```txt
-Copyright 2016-2019 the original author or authors
+Copyright 2016-2020 the original author or authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

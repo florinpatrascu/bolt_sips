@@ -47,6 +47,8 @@ we added the [jason](https://hex.pm/packages/jason) library too, for converting 
 mix do deps.get, compile
 ```
 
+## Starting the driver
+
 And our simple project is ready for us to start experimenting with it.
 
 Let's first configure the connection to a running Neo4j server. We presume a standalone community edition server is started and available on the `localhost` interface, and having its Bolt port open at: `7687`. For simplicity edit the `config/config.exs`, and modify it to look like this:
@@ -90,6 +92,8 @@ The easiest way to start playing with the driver, in the current configuration, 
 cd neo4j_demo
 iex -S mix
 ```
+
+## Usage
 
 A few examples:
 
@@ -153,7 +157,7 @@ iex» Jason.encode!(results)
 
 # of course you can do more:
 
-iex» Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr") |>
+iex» Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr", %{}, timeout: 19_000) |>
 ...» Enum.reduce(0, &(Enum.sum(&1["arr"]) + &2))
 42
 
@@ -161,6 +165,5 @@ iex» Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr") |>
 
 # Enjoy!
 ```
-
 
 Follow this link: [Cypher Basics](https://neo4j.com/developer/cypher-query-language/), for a gentle introduction to Cypher; Neo4j's query language. Throughout the code snippets we are often using examples copied from the original documentation published by Neo4j, so that you can feel comfortable with them.

@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.4
+
+- feature: support connection options in queries PR #82. Many thanks @tcrossland, for this contribution!
+  This PR adds support for passing options through to DBConnection.execute/4
+- fix some broken links, in the docs; closes #76
+- update some dependencies, including the DBConnection package.
+- squashing some compile warnings; to be continued /attn: @team ;)
+- please use Elixir 1.9 or 1.10, for test and development - where possible.
+
 ## 2.0.3
 
 - refactoring the internals for achieving a better performance, while improving the code readability and extensibility - many thanks to @kristofka and @dominique-vassard. You guys are awesome!
@@ -19,8 +28,8 @@
 - more documentation
 - fix the TravisCi build
 - min versions
-    erlang 21.2
-    elixir 1.7
+  erlang 21.2
+  elixir 1.7
 
 ## === 2.0.0-rc ===
 
