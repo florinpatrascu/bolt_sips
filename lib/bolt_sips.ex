@@ -159,6 +159,20 @@ defmodule Bolt.Sips do
   @spec query!(conn, String.t(), map()) :: Response.t() | [Response.t()] | Exception.t()
   defdelegate query!(conn, statement, params), to: Query
 
+  @doc """
+  send a query and an associated map of parameters with options. Returns the server response or an error
+  """
+  @spec query(conn, String.t(), map(), Keyword.t()) ::
+          {:ok, Response.t() | [Response.t()]} | {:error, Error.t()}
+  defdelegate query(conn, statement, params, opts), to: Query
+
+  @doc """
+  The same as query/4 but raises a Exception if it fails.
+  """
+  @spec query!(conn, String.t(), map(), Keyword.t()) ::
+          Response.t() | [Response.t()] | Exception.t()
+  defdelegate query!(conn, statement, params, opts), to: Query
+
   ## Transaction
   ########################
 
