@@ -32,9 +32,12 @@ defmodule Bolt.Sips.Internals.Error do
     }
   end
 
-  def exception({:failure, %Bolt.Sips.Internals.Error{message: message, code:  code} = err}, pid, function) do
+  def exception({:failure, %Bolt.Sips.Internals.Error{message: _message, code:  _code} = err}, _pid, _function) do
     err
   end
+
+  def exception(%Bolt.Sips.Internals.Error{} = err, _pid, _function), do: err
+  
   def exception(message, pid, function) do
     %Bolt.Sips.Internals.Error{
       message: message_for(function, message),

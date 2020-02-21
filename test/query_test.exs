@@ -58,6 +58,38 @@ defmodule Query.Test do
     assert Response.first(row)["Name"] == "Patrick Rothfuss",
            "missing 'The Name of the Wind' database, or data incomplete"
   end
+
+  @tag :apoc
+  test "Passing a timeout option to the query should prevent a timeout", context do
+    conn = context[:conn]
+
+    cyp_wait = """
+      CALL apoc.util.sleep(20000) RETURN 1 as test
+    """
+    {:ok, %Response{} = _row} = Bolt.Sips.query(conn, cyp_wait, %{}, timeout: 21_000)
+  end
+
+  @tag :apoc
+  test "After a timeout, subsequent queries should work", context do
+    conn = context[:conn]
+
+    cyp_wait = """
+      CALL apoc.util.sleep(10000) RETURN 1 as test
+    """
+    {:error, _} = Bolt.Sips.query(conn, cyp_wait, %{}, timeout: 5_000)
+    cyp = """
+      MATCH (n:Person {bolt_sips: true})
+      RETURN n.name AS Name
+      ORDER BY Name DESC
+      LIMIT 5
+    """
+
+    {:ok, %Response{} = row} = Bolt.Sips.query(conn, cyp)
+
+    assert Response.first(row)["Name"] == "Patrick Rothfuss",
+           "missing 'The Name of the Wind' database, or data incomplete"
+  end
+
   test "executing a Cypher query, with parameters", context do
     conn = context[:conn]
 

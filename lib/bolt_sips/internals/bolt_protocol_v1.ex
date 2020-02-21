@@ -22,7 +22,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolV1 do
   """
   @spec handshake(atom(), port(), Keyword.t()) ::
           {:ok, integer()} | {:error, Bolt.Sips.Internals.Error.t()}
-  def handshake(transport, port, options) do
+  def handshake(transport, port, options \\ [recv_timeout: 15_000]) do
     recv_timeout = BoltProtocolHelper.get_recv_timeout(options)
     max_version = BoltVersionHelper.last()
 
@@ -78,7 +78,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolV1 do
   """
   @spec init(atom(), port(), integer(), tuple(), Keyword.t()) ::
           {:ok, any()} | {:error, Bolt.Sips.Internals.Error.t()}
-  def init(transport, port, bolt_version, auth, options) do
+  def init(transport, port, bolt_version, auth, options \\ [recv_timeout: 15_000]) do
     BoltProtocolHelper.send_message(transport, port, bolt_version, {:init, [auth]})
 
     case BoltProtocolHelper.receive_data(transport, port, bolt_version, options) do

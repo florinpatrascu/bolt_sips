@@ -24,7 +24,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3 do
   """
   @spec hello(atom(), port(), integer(), tuple(), Keyword.t()) ::
           {:ok, any()} | {:error, Bolt.Sips.Internals.Error.t()}
-  def hello(transport, port, bolt_version, auth, options) do
+  def hello(transport, port, bolt_version, auth, options \\ [recv_timeout: 15_000]) do
     BoltProtocolHelper.send_message(transport, port, bolt_version, {:hello, [auth]})
 
     case BoltProtocolHelper.receive_data(transport, port, bolt_version, options) do

@@ -43,9 +43,8 @@ defmodule Bolt.Sips do
 
   - `:url`- a full url to pointing to a running Neo4j server. Please remember you must specify the scheme used to connect to the server. Valid schemes:`bolt`,`bolt+routing`and`neo4j` - the last two being used for connecting to a Neo4j causal cluster.
   - `:pool_size` - the size of the connection pool. Default: 15
-  - `:timeout` - a timeout value defined in milliseconds. Default: 15_000
+  - `:timeout` - a connection timeout value defined in milliseconds. Default: 15_000
   - `:ssl`-`true`, if the connection must be encrypted. Default:`false`
-  - `:retry_linear_backoff`- the retry mechanism parameters. Also expected, the following parameters:`:delay`,`:factor`and`:tries`. Default value:`retry_linear_backoff: [delay: 150, factor: 2, tries: 3]`
   - `:prefix`- used for differentiating between multiple connections available in the same app. Default:`:default`
 
   ## Example of valid configurations (i.e. defined in config/dev.exs) and usage:
@@ -61,7 +60,6 @@ defmodule Bolt.Sips do
         url: "bolt://Bilbo:Baggins@hobby-hobbits.dbs.graphenedb.com:24786",
         ssl: true,
         timeout: 15_000,
-        retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
 
   Example with a configuration defined in the `config/dev.exs`:
 
@@ -113,7 +111,6 @@ defmodule Bolt.Sips do
   """
   @spec conn(atom, keyword) :: conn
   def conn(role \\ :direct, opts \\ [prefix: :default])
-  def conn(role, opts)
 
   def conn(role, opts) do
     prefix = Keyword.get(opts, :prefix, :default)
@@ -161,6 +158,9 @@ defmodule Bolt.Sips do
 
   @doc """
   send a query and an associated map of parameters with options. Returns the server response or an error
+  The `opts` keyword list will be passed to `DbConnection.execute/4`.
+  By default, the query will timeout after `15_000` milliseconds, this may be overriden by setting the `timeout`
+  option in `opts`.
   """
   @spec query(conn, String.t(), map(), Keyword.t()) ::
           {:ok, Response.t() | [Response.t()]} | {:error, Error.t()}
