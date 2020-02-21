@@ -36,7 +36,7 @@ defmodule Query.Test do
   end
 
   test "A procedure call failure should send reset and not lock the db", context do
-    expected_neo4j = System.get_env("NEO4J_VERSION", "3.0.0")
+    expected_neo4j = System.get_env("NEO4J_VERSION") || "3.0.0"
 
     if Version.match?(expected_neo4j, "~> 3.5.0") do
       conn = context[:conn]
