@@ -36,27 +36,30 @@ defmodule Query.Test do
   end
 
   test "A procedure call failure should send reset and not lock the db", context do
-    conn = context[:conn]
-    
-    cyp_fail = """
-      CALL db.index.fulltext.queryNodes(\"topic_label\", \"badparen)\") YIELD node RETURN node
-    """
-    {:error, %Bolt.Sips.Error{
-      code: "Neo.ClientError.Procedure.ProcedureCallFailed"}
-    } = Bolt.Sips.query(conn, cyp_fail)
-    
+    expected_neo4j = System.get_env("NEO4J_VERSION", "3.0.0")
 
-    cyp = """
-      MATCH (n:Person {bolt_sips: true})
-      RETURN n.name AS Name
-      ORDER BY Name DESC
-      LIMIT 5
-    """
+    if Version.match?(expected_neo4j, "~> 3.5.0") do
+      conn = context[:conn]
 
-    {:ok, %Response{} = row} = Bolt.Sips.query(conn, cyp)
+      cyp_fail = """
+        CALL db.index.fulltext.queryNodes(\"topic_label\", \"badparen)\") YIELD node RETURN node
+      """
 
-    assert Response.first(row)["Name"] == "Patrick Rothfuss",
-           "missing 'The Name of the Wind' database, or data incomplete"
+      {:error, %Bolt.Sips.Error{code: "Neo.ClientError.Procedure.ProcedureCallFailed"}} =
+        Bolt.Sips.query(conn, cyp_fail)
+
+      cyp = """
+        MATCH (n:Person {bolt_sips: true})
+        RETURN n.name AS Name
+        ORDER BY Name DESC
+        LIMIT 5
+      """
+
+      {:ok, %Response{} = row} = Bolt.Sips.query(conn, cyp)
+
+      assert Response.first(row)["Name"] == "Patrick Rothfuss",
+             "missing 'The Name of the Wind' database, or data incomplete"
+    end
   end
 
   @tag :apoc
@@ -66,6 +69,7 @@ defmodule Query.Test do
     cyp_wait = """
       CALL apoc.util.sleep(20000) RETURN 1 as test
     """
+
     {:ok, %Response{} = _row} = Bolt.Sips.query(conn, cyp_wait, %{}, timeout: 21_000)
   end
 
@@ -76,7 +80,9 @@ defmodule Query.Test do
     cyp_wait = """
       CALL apoc.util.sleep(10000) RETURN 1 as test
     """
+
     {:error, _} = Bolt.Sips.query(conn, cyp_wait, %{}, timeout: 5_000)
+
     cyp = """
       MATCH (n:Person {bolt_sips: true})
       RETURN n.name AS Name

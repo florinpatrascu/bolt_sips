@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5
+
+- fix #83. More details in commit: https://github.com/florinpatrascu/bolt_sips/commit/ebe17e62ab1d823e301b11d99d532663b0b25135 Thank you @kristofka!
+
 ## 2.0.4
 
 - feature: support connection options in queries PR #82. Many thanks @tcrossland, for this contribution!
