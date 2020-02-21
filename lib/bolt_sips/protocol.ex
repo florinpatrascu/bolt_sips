@@ -16,7 +16,6 @@ defmodule Bolt.Sips.Protocol do
   end
 
   use DBConnection
-  use Retry
 
   require Logger
 

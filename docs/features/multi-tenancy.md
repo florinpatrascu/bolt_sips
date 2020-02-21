@@ -8,14 +8,12 @@ For differentiating about Neo4j tenants, we introduced a new configurations para
 monster_cluster_conf = [
   url: "neo4j://localhost",
   basic_auth: [username: "neo4j", password: "password"],
-  retry_linear_backoff: [delay: 150, factor: 1, tries: 1],
   pool_size: 50,
   prefix: :monster_cluster
 
 baby_monster_cluster_conf = [
   url: "neo4j://raspberry_π",
   basic_auth: [username: "πs", password: "4VR"],
-  retry_linear_backoff: [delay: 150, factor: 1, tries: 1],
   pool_size: 50,
   prefix: :baby_monster_cluster
 ```

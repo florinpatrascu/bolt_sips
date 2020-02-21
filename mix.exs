@@ -63,8 +63,7 @@ defmodule BoltSips.Mixfile do
       applications: [
         :logger,
         :calendar,
-        :db_connection,
-        :retry
+        :db_connection
       ]
     ]
   end
@@ -106,7 +105,6 @@ defmodule BoltSips.Mixfile do
   defp deps do
     [
       {:db_connection, "~> 2.2"},
-      {:retry, "0.9.1"},
       {:calendar, "~> 0.17.2"},
       {:jason, "~> 1.1"},
       {:poison, "~> 3.1"},

@@ -8,11 +8,8 @@ config :bolt_sips, Bolt,
   max_overflow: 2,
   queue_interval: 500,
   queue_target: 1500,
-  retry_linear_backoff: [delay: 150, factor: 2, tries: 2],
   prefix: :default
 
-# the `retry_linear_backoff` values above are also the default driver values,
-# re-defined here mostly as a reminder
 
 level =
   if System.get_env("DEBUG") do

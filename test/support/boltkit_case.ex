@@ -20,7 +20,6 @@ defmodule Bolt.Sips.BoltKitCase do
   @moduletag :boltkit
 
   use ExUnit.CaseTemplate
-  use Retry
 
   alias Porcelain.Process, as: Proc
 
@@ -95,25 +94,16 @@ defmodule Bolt.Sips.BoltKitCase do
 
   @sock_opts [:binary, active: false]
   defp wait_for_socket(address, port) do
-    retry with: delay_stream() do
-      with {:ok, socket} <- :gen_tcp.connect(address, port, @sock_opts, 100) do
+      with {:ok, socket} <- :gen_tcp.connect(address, port, @sock_opts, 1000) do
         socket
       end
-    end
   end
 
-  defp delay_stream(delay \\ 150),
-    do:
-      delay
-      |> lin_backoff(2)
-      |> cap(1000)
-      |> Stream.take(3)
 
   defp connect(url, prefix) do
     conf = [
       url: url,
       basic_auth: [username: "neo4j", password: "password"],
-      retry_linear_backoff: [delay: 150, factor: 1, tries: 1],
       # pool: DBConnection.Ownership,
       pool_size: 1,
       prefix: prefix
