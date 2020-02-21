@@ -15,9 +15,8 @@ These are the values you can configure, and their default values:
 
 - `:url`- a full url to pointing to a running Neo4j server. Please remember you must specify the scheme used to connect to the server. Valid schemes:`bolt`,`bolt+routing`and`neo4j` - the last two being used for connecting to a Neo4j causal cluster.
 - `:pool_size` - the size of the connection pool. Default: 15
-- `:timeout` - a timeout value defined in milliseconds. Default: 15_000
+- `:timeout` - a connection timeout value defined in milliseconds. Default: 15_000
 - `:ssl`-`true`, if the connection must be encrypted. Default:`false`
-- `:retry_linear_backoff`- the retry mechanism parameters. Also expected, the following parameters:`:delay`,`:factor`and`:tries`. Default value:`retry_linear_backoff: [delay: 150, factor: 2, tries: 3]`
 - `:prefix`- used for differentiating between multiple connections available in the same app. Default:`:default`
 
 ## Examples of configurations
@@ -31,24 +30,12 @@ config :bolt_sips, Bolt,
   ssl: true
 ```
 
-We also support retrying sending the requests to the servers, using a linear backoff, and try them a couple of times before giving up - all these as part of the existing pool management, of course. Example:
-
-```elixir
-config :bolt_sips, Bolt,
-  url: "bolt://<ip_address>:<bolt_port>",
-  basic_auth: [username: "neo4j", password: "#######"]
-  ssl: true
-  timeout: 15_000,
-  retry_linear_backoff: [delay: 150, factor: 2, tries: 3]
-```
-
-In the configuration above, the retry will linearly increase the delay from `150ms` following a Fibonacci pattern, cap the delay at `15 seconds` (the value defined by the `:timeout` parameter) and giving up after `3` attempts.
 
 ## Direct mode
 
 Until this version, `Bolt.Sips` was used for connecting to a single Neo4j server from the moment the hosting app started, until the hosting app was terminated/restarted. This is known as the: `direct` mode. In `direct` mode, the `Bolt.Sips` driver has one configuration describing the connection to a single Neo4j server.
 
-Since this connection mode is well known to our users, we'll not spend time on talking about it. It is sufficient to say that in direct mode, you have one configurable pool of connections, and the settings governing them i.e. timeout, retry, size, etc., are all about this single connection.
+Since this connection mode is well known to our users, we'll not spend time on talking about it. It is sufficient to say that in direct mode, you have one configurable pool of connections, and the settings governing them i.e. timeout,  size, etc., are all about this single connection.
 
 Because starting with version 2.0 `Bolt.Sips` is supporting a new type of connectivity: `routing`, for connecting to multiple servers or to a Neo4j causal cluster, you must specify the `scheme` in the `url` parameter, of your configuration. Example, for configuring a connection in `direct` mode:
 
@@ -146,7 +133,6 @@ my_secret_cluster_config [
     max_overflow: 2,
     queue_interval: 500,
     queue_target: 1500,
-    retry_linear_backoff: [delay: 150, factor: 2, tries: 2],
     prefix: :secret_cluster
   ]
 

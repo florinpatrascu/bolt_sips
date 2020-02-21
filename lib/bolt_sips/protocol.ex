@@ -16,7 +16,6 @@ defmodule Bolt.Sips.Protocol do
   end
 
   use DBConnection
-  use Retry
 
   require Logger
 
@@ -136,28 +135,8 @@ defmodule Bolt.Sips.Protocol do
   end
 
   @doc "Callback for DBConnection.handle_execute/1"
-  def handle_execute(query, params, opts, %ConnData{configuration: conf} = conn_data) do
-    # only try to reconnect if the error is about the broken connection
-    with {:disconnect, _, _} <- execute(query, params, opts, conn_data) do
-      [
-        delay: delay,
-        factor: factor,
-        tries: tries
-      ] = conf[:retry_linear_backoff]
-
-      delay_stream =
-        delay
-        |> lin_backoff(factor)
-        |> cap(conf[:timeout])
-        |> Stream.take(tries)
-
-      retry with: delay_stream do
-        with {:ok, conn_data} <- connect([]),
-             {:ok, conn_data} <- checkout(conn_data) do
-          execute(query, params, opts, conn_data)
-        end
-      end
-    end
+  def handle_execute(query, params, opts, conn_data) do
+    execute(query, params, opts, conn_data)
   end
 
   def handle_info(msg, state) do

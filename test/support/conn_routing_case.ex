@@ -12,7 +12,6 @@ defmodule Bolt.Sips.RoutingConnCase do
     max_overflow: 2,
     queue_interval: 500,
     queue_target: 1500,
-    retry_linear_backoff: [delay: 150, factor: 2, tries: 2],
     tag: @moduletag
   ]
 

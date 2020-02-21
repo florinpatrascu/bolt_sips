@@ -14,7 +14,6 @@ defmodule Bolt.Sips.Utils do
     ssl: false,
     socket: Bolt.Sips.Socket,
     with_etls: false,
-    retry_linear_backoff: [delay: 150, factor: 2, tries: 3],
     schema: "bolt",
     prefix: :default
   ]
@@ -46,7 +45,6 @@ defmodule Bolt.Sips.Utils do
     |> Keyword.put_new(:ssl, false)
     |> Keyword.put_new(:socket, Bolt.Sips.Socket)
     |> Keyword.put_new(:with_etls, false)
-    |> Keyword.put_new(:retry_linear_backoff, delay: 150, factor: 2, tries: 3)
     |> Keyword.put_new(:schema, "bolt")
     |> Keyword.put_new(:path, "")
     |> Keyword.put_new(:prefix, :default)
