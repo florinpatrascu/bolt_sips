@@ -1,7 +1,6 @@
 defmodule Bolt.Sips.Internals.PackStream.V2 do
   alias Bolt.Sips.Types.{TimeWithTZOffset, DateTimeWithTZOffset, Duration, Point}
   alias Bolt.Sips.Internals.PackStream.Encoder
-  alias Bolt.Sips.Internals.PackStreamError
 
   defmacro __using__(_options) do
     quote do
