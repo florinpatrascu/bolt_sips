@@ -57,6 +57,12 @@ defmodule Bolt.Sips.Types do
     """
 
     use Entity, labels: nil
+
+    @type t :: %__MODULE__{
+            id: integer,
+            labels: [String.t()],
+            properties: map
+          }
   end
 
   defmodule Relationship do
@@ -71,6 +77,11 @@ defmodule Bolt.Sips.Types do
     """
 
     use Entity, start: nil, end: nil, type: nil
+
+    @type t :: %__MODULE__{
+            id: integer,
+            properties: map
+          }
   end
 
   defmodule UnboundRelationship do
@@ -83,6 +94,11 @@ defmodule Bolt.Sips.Types do
     """
 
     use Entity, start: nil, end: nil, type: nil
+
+    @type t :: %__MODULE__{
+            id: integer,
+            properties: map
+          }
   end
 
   defmodule Path do
