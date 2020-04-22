@@ -63,7 +63,7 @@ defmodule Bolt.Sips.Response do
           records: list,
           plan: map,
           notifications: list,
-          stats: list,
+          stats: list | map,
           profile: any,
           type: String.t(),
           bookmark: String.t()

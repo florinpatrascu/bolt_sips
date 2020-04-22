@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.6
+- Fix 'unused alias' compilation warnings  
+- Fix Bolt.Sips.Response type: `stats` was a `list` instead of `list|map`  
+- Add typespec for Bolt.Sips.Types: Node, Relationship and UnboundRelationship  
+
 ## 2.0.5
 
 - fix #83. More details in commit: https://github.com/florinpatrascu/bolt_sips/commit/ebe17e62ab1d823e301b11d99d532663b0b25135 Thank you @kristofka!
