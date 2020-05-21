@@ -329,10 +329,16 @@ defmodule Bolt.Sips.Router do
   end
 
   defp parse_server_version(%{"server" => server_version_string}) do
-    %{"M" => major, "m" => minor, "p" => patch} =
-      Regex.named_captures(~r/Neo4j\/(?<M>\d+)\.(?<m>\d+)\.(?<p>\d+)/, server_version_string)
+    ["Neo4j", version] = String.split(server_version_string, "/")
 
-    {server_version_string, "#{major}.#{minor}.#{patch}"}
+    {server_version_string,
+     case String.split(version, ".") do
+       [major, minor] ->
+         "#{major}.#{minor}.0"
+
+       [major, minor, patch] ->
+         "#{major}.#{minor}.#{patch}"
+     end}
   end
 
   defp parse_server_version(some_version),
