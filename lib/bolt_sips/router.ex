@@ -328,14 +328,36 @@ defmodule Bolt.Sips.Router do
     {:noreply, state}
   end
 
-  defp parse_server_version(%{"server" => server_version_string}) do
+  @sever_version_stringex ~r/Neo4j\/(?<M>\d+)\.(?<m>\d+)\.(?<p>\d+)/
+  @spec parse_server_version(map) :: {binary, <<_::16, _::_*8>>}
+  @doc """
+  parse the version string received from the server, while considering the lack of the
+  patch number in some situations
+
+  ## Examples
+
+  iex> Bolt.Sips.Router.parse_server_version(%{"server" => "Neo4j/3.5.0"})
+  {"Neo4j/3.5.0", "3.5.0"}
+
+  iex> Bolt.Sips.Router.parse_server_version(%{"server" => "Neo4j/3.5"})
+  {"Neo4j/3.5", "3.5.0"}
+
+  iex> Bolt.Sips.Router.parse_server_version(%{"server" => "Neo4j/3.5.10"})
+  {"Neo4j/3.5.10", "3.5.10"}
+
+  iex> Bolt.Sips.Router.parse_server_version(%{"server" => "Neo4j/3.5.11.1"})
+  {"Neo4j/3.5.11.1", "3.5.11"}
+
+  """
+  def parse_server_version(%{"server" => server_version_string}) do
     %{"M" => major, "m" => minor, "p" => patch} =
-      Regex.named_captures(~r/Neo4j\/(?<M>\d+)\.(?<m>\d+)\.(?<p>\d+)/, server_version_string)
+      @sever_version_stringex
+      |> Regex.named_captures(server_version_string <> ".0")
 
     {server_version_string, "#{major}.#{minor}.#{patch}"}
   end
 
-  defp parse_server_version(some_version),
+  def parse_server_version(some_version),
     do: raise(ArgumentError, "not a Neo4J version info: " <> inspect(some_version))
 
   defp error_no_connection_available_for_role(role, _e, prefix \\ :default)

@@ -229,11 +229,16 @@ defmodule Bolt.Sips do
   @doc """
   peek into the main Router state, and return the internal state controlling the connections
   to the server/server. Mostly for internal use or for helping driver developers.
+
+  The authentication credentials will be sanitized, if any
+
+  ### Examples:
+
+  iex> Bolt.Sips.info()
+  %{default: %{connections: %{direct: %{"localhost:7687" => 0}, routing_query: nil, zorba: %{"localhost:7687" => 0}}, user_options: [basic_auth: [username: "******", password: "******"], socket: Bolt.Sips.Socket, port: 7687, routing_context: %{}, schema: "bolt", hostname: "localhost", timeout: 15000, ssl: false, with_etls: false, prefix: :default, url: "bolt://localhost", pool_size: 10, max_overflow: 2, role: :zorba]}}
   """
   @spec info() :: map
-  def info() do
-    Bolt.Sips.Router.info()
-  end
+  def info(), do: sanitized_info(Bolt.Sips.Router.info())
 
   @doc """
   extract the routing table from the router
@@ -250,4 +255,13 @@ defmodule Bolt.Sips do
   """
   @spec registry_name() :: :bolt_sips_registry
   def registry_name(), do: @registry_name
+
+  @hide_auth [username: "******", password: "******"]
+  defp sanitized_info(info) when is_map(info) do
+    for {k, v} <- info, into: %{} do
+      {k, Map.update(v, :user_options, @hide_auth, &Keyword.put(&1, :basic_auth, @hide_auth))}
+    end
+  end
+
+  defp sanitized_info(info), do: info
 end

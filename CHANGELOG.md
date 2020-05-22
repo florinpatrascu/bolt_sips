@@ -1,9 +1,15 @@
 # Changelog
 
+## 2.0.7
+
+- sometimes the server version is missing the patch number, and the router couldn't return the proper version. Thank you @barry-w-hill, for finding this bug and reporting it!
+- remove the `basic_auth` when using the `&Bolt.Sips.info/0` function. Thanks @dominique-vassard, for suggestion. Closes: #89
+
 ## 2.0.6
-- Fix 'unused alias' compilation warnings  
-- Fix Bolt.Sips.Response type: `stats` was a `list` instead of `list|map`  
-- Add typespec for Bolt.Sips.Types: Node, Relationship and UnboundRelationship  
+
+- Fix 'unused alias' compilation warnings
+- Fix Bolt.Sips.Response type: `stats` was a `list` instead of `list|map`
+- Add typespec for Bolt.Sips.Types: Node, Relationship and UnboundRelationship
 
 ## 2.0.5
 

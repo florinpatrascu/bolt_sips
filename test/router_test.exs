@@ -1,5 +1,6 @@
 defmodule Bolt.Sips.Routing.RouterTest do
   use ExUnit.Case
+  doctest Bolt.Sips.Router
 
   alias Bolt.Sips.Response
 
