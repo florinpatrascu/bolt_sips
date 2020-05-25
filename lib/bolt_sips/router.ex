@@ -328,7 +328,7 @@ defmodule Bolt.Sips.Router do
     {:noreply, state}
   end
 
-  @sever_version_stringex ~r/Neo4j\/(?<M>\d+)\.(?<m>\d+)\.(?<p>\d+)/
+  @server_version_stringex ~r/Neo4j\/(?<M>\d+)\.(?<m>\d+)\.(?<p>\d+)/
   @spec parse_server_version(map) :: {binary, <<_::16, _::_*8>>}
   @doc """
   parse the version string received from the server, while considering the lack of the
@@ -351,7 +351,7 @@ defmodule Bolt.Sips.Router do
   """
   def parse_server_version(%{"server" => server_version_string}) do
     %{"M" => major, "m" => minor, "p" => patch} =
-      @sever_version_stringex
+      @server_version_stringex
       |> Regex.named_captures(server_version_string <> ".0")
 
     {server_version_string, "#{major}.#{minor}.#{patch}"}
