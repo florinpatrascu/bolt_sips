@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.8
+
+- Fix Response.profile not being properly filled. Closes #91 
+
 ## 2.0.7
 
 - sometimes the server version is missing the patch number, and the router couldn't return the proper version. Thank you @barry-w-hill, for finding this bug and reporting it!

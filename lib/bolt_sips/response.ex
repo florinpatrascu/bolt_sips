@@ -159,8 +159,8 @@ defmodule Bolt.Sips.Response do
     %{response | fields: fields}
   end
 
-  defp parse_record(:success, %{"profile" => profile, "stats" => stats, "type" => type}, response) do
-    %{response | profile: profile, stats: stats, type: type}
+  defp parse_record(:success, %{"profile" => profile, "type" => type} = record, response) do
+    %{response | profile: profile, stats: Map.get(record, "stats", []), type: type}
   end
 
   defp parse_record(:success, %{"notifications" => n, "plan" => plan, "type" => type}, response) do
