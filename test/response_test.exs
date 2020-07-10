@@ -88,34 +88,137 @@ defmodule ResponseTest do
     }
   ]
 
-  @profile [
-    success: %{"fields" => ["n"], "t_first" => 1},
+  @profile_no_results [
+    success: %{"fields" => [], "t_first" => 20},
     success: %{
-      "bookmark" => "neo4j:bookmark:v1:tx13440",
-      "plan" => %{
+      "bookmark" => "neo4j:bookmark:v1:tx48642",
+      "profile" => %{
         "args" => %{
+          "DbHits" => 0,
           "EstimatedRows" => 1.0,
+          "PageCacheHitRatio" => 0.0,
+          "PageCacheHits" => 0,
+          "PageCacheMisses" => 0,
+          "Rows" => 0,
           "planner" => "COST",
           "planner-impl" => "IDP",
           "planner-version" => "3.5",
-          "runtime" => "INTERPRETED",
-          "runtime-impl" => "INTERPRETED",
+          "runtime" => "SLOTTED",
+          "runtime-impl" => "SLOTTED",
           "runtime-version" => "3.5",
           "version" => "CYPHER 3.5"
         },
         "children" => [
           %{
-            "args" => %{"EstimatedRows" => 1.0},
-            "children" => [],
+            "args" => %{
+              "DbHits" => 0,
+              "EstimatedRows" => 1.0,
+              "PageCacheHitRatio" => 0.0,
+              "PageCacheHits" => 0,
+              "PageCacheMisses" => 0,
+              "Rows" => 0
+            },
+            "children" => [
+              %{
+                "args" => %{
+                  "DbHits" => 3,
+                  "EstimatedRows" => 1.0,
+                  "PageCacheHitRatio" => 0.0,
+                  "PageCacheHits" => 0,
+                  "PageCacheMisses" => 0,
+                  "Rows" => 1
+                },
+                "children" => [],
+                "dbHits" => 3,
+                "identifiers" => ["n"],
+                "operatorType" => "Create",
+                "pageCacheHitRatio" => 0.0,
+                "pageCacheHits" => 0,
+                "pageCacheMisses" => 0,
+                "rows" => 1
+              }
+            ],
+            "dbHits" => 0,
             "identifiers" => ["n"],
-            "operatorType" => "Create"
+            "operatorType" => "EmptyResult",
+            "pageCacheHitRatio" => 0.0,
+            "pageCacheHits" => 0,
+            "pageCacheMisses" => 0,
+            "rows" => 0
           }
         ],
+        "dbHits" => 0,
         "identifiers" => ["n"],
-        "operatorType" => "ProduceResults"
+        "operatorType" => "ProduceResults",
+        "pageCacheHitRatio" => 0.0,
+        "pageCacheHits" => 0,
+        "pageCacheMisses" => 0,
+        "rows" => 0
+      },
+      "stats" => %{
+        "labels-added" => 1,
+        "nodes-created" => 1,
+        "properties-set" => 1
       },
       "t_last" => 0,
-      "type" => "rw"
+      "type" => "w"
+    }
+  ]
+
+  @profile_results [
+    success: %{"fields" => ["num"], "t_first" => 1},
+    record: [1],
+    success: %{
+      "bookmark" => "neo4j:bookmark:v1:tx48642",
+      "profile" => %{
+        "args" => %{
+          "DbHits" => 0,
+          "EstimatedRows" => 1.0,
+          "PageCacheHitRatio" => 0.0,
+          "PageCacheHits" => 0,
+          "PageCacheMisses" => 0,
+          "Rows" => 1,
+          "Time" => 25980,
+          "planner" => "COST",
+          "planner-impl" => "IDP",
+          "planner-version" => "3.5",
+          "runtime" => "COMPILED",
+          "runtime-impl" => "COMPILED",
+          "runtime-version" => "3.5",
+          "version" => "CYPHER 3.5"
+        },
+        "children" => [
+          %{
+            "args" => %{
+              "DbHits" => 0,
+              "EstimatedRows" => 1.0,
+              "Expressions" => "{num : $`  AUTOINT0`}",
+              "PageCacheHitRatio" => 0.0,
+              "PageCacheHits" => 0,
+              "PageCacheMisses" => 0,
+              "Rows" => 1,
+              "Time" => 42285
+            },
+            "children" => [],
+            "dbHits" => 0,
+            "identifiers" => ["num"],
+            "operatorType" => "Projection",
+            "pageCacheHitRatio" => 0.0,
+            "pageCacheHits" => 0,
+            "pageCacheMisses" => 0,
+            "rows" => 1
+          }
+        ],
+        "dbHits" => 0,
+        "identifiers" => ["num"],
+        "operatorType" => "ProduceResults",
+        "pageCacheHitRatio" => 0.0,
+        "pageCacheHits" => 0,
+        "pageCacheMisses" => 0,
+        "rows" => 1
+      },
+      "t_last" => 0,
+      "type" => "r"
     }
   ]
 
@@ -206,31 +309,134 @@ defmodule ResponseTest do
              } = notifications
     end
 
-    test "with Profile" do
-      %Response{plan: plan} = Response.transform!(@profile)
+    test "with Profile (without results)" do
+      %Response{plan: nil, profile: profile, stats: stats} =
+        Response.transform!(@profile_no_results)
 
       assert %{
                "args" => %{
+                 "DbHits" => 0,
                  "EstimatedRows" => 1.0,
+                 "PageCacheHitRatio" => 0.0,
+                 "PageCacheHits" => 0,
+                 "PageCacheMisses" => 0,
+                 "Rows" => 0,
                  "planner" => "COST",
                  "planner-impl" => "IDP",
                  "planner-version" => "3.5",
-                 "runtime" => "INTERPRETED",
-                 "runtime-impl" => "INTERPRETED",
+                 "runtime" => "SLOTTED",
+                 "runtime-impl" => "SLOTTED",
                  "runtime-version" => "3.5",
                  "version" => "CYPHER 3.5"
                },
                "children" => [
                  %{
-                   "args" => %{"EstimatedRows" => 1.0},
-                   "children" => [],
+                   "args" => %{
+                     "DbHits" => 0,
+                     "EstimatedRows" => 1.0,
+                     "PageCacheHitRatio" => 0.0,
+                     "PageCacheHits" => 0,
+                     "PageCacheMisses" => 0,
+                     "Rows" => 0
+                   },
+                   "children" => [
+                     %{
+                       "args" => %{
+                         "DbHits" => 3,
+                         "EstimatedRows" => 1.0,
+                         "PageCacheHitRatio" => 0.0,
+                         "PageCacheHits" => 0,
+                         "PageCacheMisses" => 0,
+                         "Rows" => 1
+                       },
+                       "children" => [],
+                       "dbHits" => 3,
+                       "identifiers" => ["n"],
+                       "operatorType" => "Create",
+                       "pageCacheHitRatio" => 0.0,
+                       "pageCacheHits" => 0,
+                       "pageCacheMisses" => 0,
+                       "rows" => 1
+                     }
+                   ],
+                   "dbHits" => 0,
                    "identifiers" => ["n"],
-                   "operatorType" => "Create"
+                   "operatorType" => "EmptyResult",
+                   "pageCacheHitRatio" => 0.0,
+                   "pageCacheHits" => 0,
+                   "pageCacheMisses" => 0,
+                   "rows" => 0
                  }
                ],
+               "dbHits" => 0,
                "identifiers" => ["n"],
-               "operatorType" => "ProduceResults"
-             } = plan
+               "operatorType" => "ProduceResults",
+               "pageCacheHitRatio" => 0.0,
+               "pageCacheHits" => 0,
+               "pageCacheMisses" => 0,
+               "rows" => 0
+             } = profile
+
+      assert %{
+               "labels-added" => 1,
+               "nodes-created" => 1,
+               "properties-set" => 1
+             } = stats
+    end
+
+    test "with Profile (with results)" do
+      %Response{plan: nil, profile: profile, stats: [], records: records, results: results} =
+        Response.transform!(@profile_results)
+
+      assert %{
+               "args" => %{
+                 "DbHits" => 0,
+                 "EstimatedRows" => 1.0,
+                 "PageCacheHitRatio" => 0.0,
+                 "PageCacheHits" => 0,
+                 "PageCacheMisses" => 0,
+                 "Rows" => 1,
+                 "Time" => 25980,
+                 "planner" => "COST",
+                 "planner-impl" => "IDP",
+                 "planner-version" => "3.5",
+                 "runtime" => "COMPILED",
+                 "runtime-impl" => "COMPILED",
+                 "runtime-version" => "3.5",
+                 "version" => "CYPHER 3.5"
+               },
+               "children" => [
+                 %{
+                   "args" => %{
+                     "DbHits" => 0,
+                     "EstimatedRows" => 1.0,
+                     "Expressions" => "{num : $`  AUTOINT0`}",
+                     "PageCacheHitRatio" => 0.0,
+                     "PageCacheHits" => 0,
+                     "PageCacheMisses" => 0,
+                     "Rows" => 1,
+                     "Time" => 42285
+                   },
+                   "children" => [],
+                   "dbHits" => 0,
+                   "identifiers" => ["num"],
+                   "operatorType" => "Projection",
+                   "pageCacheHitRatio" => 0.0,
+                   "pageCacheHits" => 0,
+                   "pageCacheMisses" => 0,
+                   "rows" => 1
+                 }
+               ],
+               "dbHits" => 0,
+               "identifiers" => ["num"],
+               "operatorType" => "ProduceResults",
+               "pageCacheHitRatio" => 0.0,
+               "pageCacheHits" => 0,
+               "pageCacheMisses" => 0,
+               "rows" => 1
+             } = profile
+
+      assert [%{"num" => 1}] = results
     end
   end
 end
