@@ -2,10 +2,10 @@ defmodule Bolt.Sips.Internals.PackStream.V1 do
   defmacro __using__(_options) do
     quote do
       import unquote(__MODULE__)
-      
+
       @last_version Bolt.Sips.Internals.BoltVersionHelper.last()
 
-      @int8 -127..-17
+      @int8 -128..-17
       @int16_low -32_768..-129
       @int16_high 128..32_767
       @int32_low -2_147_483_648..-32_769
@@ -71,7 +71,7 @@ defmodule Bolt.Sips.Internals.PackStream.V1 do
         call_encode(:string, other |> Atom.to_string(), bolt_version)
       end
 
-      # Strings 
+      # Strings
       defp do_call_encode(:string, string, bolt_version)
            when bolt_version <= @last_version and byte_size(string) <= 15 do
         [<<@tiny_bitstring_marker::4, byte_size(string)::4>>, string]
