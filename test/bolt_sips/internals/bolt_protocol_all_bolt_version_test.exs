@@ -81,4 +81,21 @@ defmodule Bolt.Sips.Internals.BoltProtocolAllBoltVersionTest do
       })
     end
   end
+
+  test "encode value -128", %{port: port, bolt_version: bolt_version} do
+    query = "CREATE (t:Test) SET t.value = {value} RETURN t"
+
+    [{:success, _} | records] =
+      BoltProtocol.run_statement(:gen_tcp, port, bolt_version, query, %{value: -128})
+
+    assert [
+             record: [
+               %Bolt.Sips.Types.Node{
+                 labels: ["Test"],
+                 properties: %{"value" => -128}
+               }
+             ],
+             success: _
+           ] = records
+  end
 end

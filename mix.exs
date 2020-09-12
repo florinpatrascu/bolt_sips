@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.8"
+  @version "2.0.9"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
@@ -106,12 +106,12 @@ defmodule BoltSips.Mixfile do
     [
       {:db_connection, "~> 2.2"},
       {:calendar, "~> 0.17.2"},
-      {:jason, "~> 1.1"},
+      {:jason, "~> 1.2"},
       {:poison, "~> 3.1"},
 
       # Testing dependencies
       {:excoveralls, "~> 0.12", optional: true, only: [:test, :dev]},
-      {:mix_test_watch, "~> 0.9", only: [:dev, :test]},
+      {:mix_test_watch, "~> 1.0", only: [:dev, :test]},
       {:porcelain, "~> 2.0", only: [:test, :dev], runtime: false},
       {:uuid, "~> 1.1.8", only: [:test, :dev], runtime: false},
 
@@ -120,8 +120,8 @@ defmodule BoltSips.Mixfile do
       {:benchee_html, "~> 1.0", optional: true, only: [:dev]},
 
       # Linting dependencies
-      {:credo, "~> 1.2.1", only: [:dev]},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false},
+      {:credo, "~> 1.4", only: [:dev]},
+      {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
       # mix eye_drops
       {:eye_drops, github: "florinpatrascu/eye_drops", only: [:dev, :test], runtime: false},
 

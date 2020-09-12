@@ -385,7 +385,7 @@ defmodule ResponseTest do
     end
 
     test "with Profile (with results)" do
-      %Response{plan: nil, profile: profile, stats: [], records: records, results: results} =
+      %Response{plan: nil, profile: profile, stats: [], records: _records, results: results} =
         Response.transform!(@profile_results)
 
       assert %{

@@ -1,8 +1,12 @@
 # Changelog
 
+## 2.0.9
+
+- fix: (Bolt.Sips.Exception) unable to encode value: -128, see: https://boltprotocol.org/v1/#ints, for details. Closes #93 Thank you, @kalamarski-marcin
+
 ## 2.0.8
 
-- Fix Response.profile not being properly filled. Closes #91 
+- Fix Response.profile not being properly filled. Closes #91
 
 ## 2.0.7
 
