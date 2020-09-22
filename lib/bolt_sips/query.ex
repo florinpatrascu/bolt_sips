@@ -110,12 +110,14 @@ defmodule Bolt.Sips.Query do
       end)
       |> Enum.map(fn {k, {:error, error}} -> {k, error} end)
 
-    Logger.debug("""
-    Query:
-    #{statements}
-    Params:
-    #{inspect(formated_params)}
-    """)
+    Logger.debug(fn ->
+      """
+      Query:
+      #{statements}
+      Params:
+      #{inspect(formated_params)}
+      """
+    end)
 
     {:ok, commit!(errors, conn, statements, formated_params, opts)}
   rescue
