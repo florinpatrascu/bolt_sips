@@ -48,6 +48,8 @@ defmodule Bolt.Sips.Query do
   """
   alias Bolt.Sips.{QueryStatement, Response, Types, Error, Exception}
 
+  require Logger
+
   @cypher_seps ~r/;(.){0,1}\n/
 
   @spec query!(Bolt.Sips.conn(), String.t()) :: Response.t() | Exception.t()
@@ -107,6 +109,13 @@ defmodule Bolt.Sips.Query do
         end
       end)
       |> Enum.map(fn {k, {:error, error}} -> {k, error} end)
+
+    Logger.debug("""
+    Query:
+    #{statements}
+    Params:
+    #{inspect(formated_params)}
+    """)
 
     {:ok, commit!(errors, conn, statements, formated_params, opts)}
   rescue
