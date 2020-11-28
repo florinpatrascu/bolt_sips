@@ -104,13 +104,13 @@ defmodule BoltSips.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:db_connection, "~> 2.2"},
-      {:calendar, "~> 0.17.2"},
+      {:db_connection, "~> 2.3"},
+      {:calendar, "~> 1.0"},
       {:jason, "~> 1.2"},
-      {:poison, "~> 3.1"},
+      {:poison, "~> 4.0"},
 
       # Testing dependencies
-      {:excoveralls, "~> 0.12", optional: true, only: [:test, :dev]},
+      {:excoveralls, "~> 0.13", optional: true, only: [:test, :dev]},
       {:mix_test_watch, "~> 1.0", only: [:dev, :test]},
       {:porcelain, "~> 2.0", only: [:test, :dev], runtime: false},
       {:uuid, "~> 1.1.8", only: [:test, :dev], runtime: false},
@@ -120,14 +120,14 @@ defmodule BoltSips.Mixfile do
       {:benchee_html, "~> 1.0", optional: true, only: [:dev]},
 
       # Linting dependencies
-      {:credo, "~> 1.4", only: [:dev]},
+      {:credo, "~> 1.5", only: [:dev]},
       {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
       # mix eye_drops
       {:eye_drops, github: "florinpatrascu/eye_drops", only: [:dev, :test], runtime: false},
 
       # Documentation dependencies
       # Run me like this: `mix docs`
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.23", only: :dev, runtime: false}
     ]
   end
 end
