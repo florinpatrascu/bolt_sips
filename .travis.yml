@@ -59,6 +59,13 @@ matrix:
         - BOLT_V1_EXCLUDED=true
         - BOLT_V2_EXCLUDED=false
         - BOLT_V3_EXCLUDED=false
+    - elixir: 1.8.2
+      otp_release: 21.2
+      env:
+        - NEO4J_VERSION=4.2.1
+        - BOLT_V1_EXCLUDED=true
+        - BOLT_V2_EXCLUDED=false
+        - BOLT_V3_EXCLUDED=false
   exclude:
     - elixir: 1.8
       otp_release: 19.3
