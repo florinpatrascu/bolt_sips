@@ -25,7 +25,6 @@ defmodule Bolt.Sips.PerformanceTest do
       RETURN t AS test
     """
 
-
     output =
       Benchee.run(
         %{
@@ -44,9 +43,10 @@ defmodule Bolt.Sips.PerformanceTest do
   test "Creating nodes with properties and a long list should take less than 100ms", context do
     conn = context[:conn]
 
-    long_list = Enum.to_list 1..10_000
+    long_list = Enum.to_list(1..10_000)
+
     simple_cypher = """
-      CREATE (t:Test {props})
+      CREATE (t:Test $props)
       RETURN t AS test
     """
 
@@ -54,7 +54,11 @@ defmodule Bolt.Sips.PerformanceTest do
       Benchee.run(
         %{
           # "run" => fn -> query.(conn, simple_cypher) end
-          "run with properties" => fn -> Bolt.Sips.Query.query(conn, simple_cypher, %{props: %{test_int: 124, test_float: 12.5, list: long_list}}) end
+          "run with properties" => fn ->
+            Bolt.Sips.Query.query(conn, simple_cypher, %{
+              props: %{test_int: 124, test_float: 12.5, list: long_list}
+            })
+          end
           # " new conn" => fn -> query.(Bolt.Sips.conn(), simple_cypher) end
         },
         time: 5
@@ -63,5 +67,4 @@ defmodule Bolt.Sips.PerformanceTest do
     # Query should take less than 50ms in average
     assert Enum.at(output.scenarios, 0).run_time_data.statistics.average < 125_000_000
   end
-
 end

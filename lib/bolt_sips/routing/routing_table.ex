@@ -5,7 +5,7 @@ defmodule Bolt.Sips.Routing.RoutingTable do
   There are a couple of ways to get the routing table from the server, for recent Neo4j servers, and with the
   latest version of Bolt.Sips, you could use this query:
 
-      Bolt.Sips.query!(Bolt.Sips.conn, "call dbms.cluster.routing.getRoutingTable({props})", %{props: %{}})
+      Bolt.Sips.query!(Bolt.Sips.conn, "call dbms.cluster.routing.getRoutingTable($props)", %{props: %{}})
 
       [
         %{

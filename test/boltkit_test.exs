@@ -18,7 +18,7 @@ defmodule Bolt.Sips.BoltStubTest do
   test "test/scripts/return_x.bolt", %{prefix: prefix} do
     assert %Bolt.Sips.Response{results: [%{"x" => 1}]} =
              Bolt.Sips.conn(:direct, prefix: prefix)
-             |> Bolt.Sips.query!("RETURN {x}", %{x: 1})
+             |> Bolt.Sips.query!("RETURN $x", %{x: 1})
   end
 
   @tag boltkit: %{

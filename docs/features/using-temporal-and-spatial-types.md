@@ -23,21 +23,21 @@ iex> conn = Bolt.Sips.conn
 :bolt_sips_pool
 
 # Date without timezone with Date
-iex(8)> Bolt.Sips.query!(conn, "RETURN date({d}) AS d", %{d: ~D[2019-02-04]})
+iex(8)> Bolt.Sips.query!(conn, "RETURN date($d) AS d", %{d: ~D[2019-02-04]})
 [%{"d" => ~D[2019-02-04]}]
 
 # Time without timezone with Time
-iex> Bolt.Sips.query!(conn, "RETURN localtime({t}) AS t", %{t: ~T[13:26:08.543440]})
+iex> Bolt.Sips.query!(conn, "RETURN localtime($t) AS t", %{t: ~T[13:26:08.543440]})
 [%{"t" => ~T[13:26:08.543440]}]
 
 # Datetime without timezone with Naive DateTime
-iex> Bolt.Sips.query!(conn, "RETURN localdatetime({ldt}) AS ldt", %{ldt: ~N[2016-05-24 13:26:08.543]})
+iex> Bolt.Sips.query!(conn, "RETURN localdatetime($ldt) AS ldt", %{ldt: ~N[2016-05-24 13:26:08.543]})
 [%{"ldt" => ~N[2016-05-24 13:26:08.543]}]
 
 # Datetime with timezone ID with DateTime (through Calendar)
 iex> date_time_with_tz_id = TypesHelper.datetime_with_micro(~N[2016-05-24 13:26:08.543], "Europe/Paris")
 #DateTime<2016-05-24 13:26:08.543+02:00 CEST Europe/Paris>
-iex> Bolt.Sips.query!(conn, "RETURN datetime({dt}) AS dt", %{dt: date_time_with_tz_id})
+iex> Bolt.Sips.query!(conn, "RETURN datetime($dt) AS dt", %{dt: date_time_with_tz_id})
 [%{"dt" => #DateTime<2016-05-24 13:26:08.543+02:00 CEST Europe/Paris>}]
 
 # Datetime with timezone offset (seconds) with DateTimeWithTZOffset
@@ -46,7 +46,7 @@ iex(17)> date_time_with_tz = DateTimeWithTZOffset.create(~N[2016-05-24 13:26:08.
   naive_datetime: ~N[2016-05-24 13:26:08.543],
   timezone_offset: 7200
 }
-iex(18)> Bolt.Sips.query!(conn, "RETURN datetime({dt}) AS dt", %{dt: date_time_with_tz})
+iex(18)> Bolt.Sips.query!(conn, "RETURN datetime($dt) AS dt", %{dt: date_time_with_tz})
 [
   %{
     "dt" => %Bolt.Sips.Types.DateTimeWithTZOffset{
@@ -63,7 +63,7 @@ iex> time_with_tz = TimeWithTZOffset.create(~T[12:45:30.250000], 3600)
   time: ~T[12:45:30.250000],
   timezone_offset: 3600
 }
-iex> Bolt.Sips.query!(conn, "RETURN time({t}) AS t", %{t: time_with_tz})
+iex> Bolt.Sips.query!(conn, "RETURN time($t) AS t", %{t: time_with_tz})
 [
   %{
     "t" => %Bolt.Sips.Types.TimeWithTZOffset{
@@ -85,7 +85,7 @@ iex> point_cartesian_2D = Point.create(:cartesian, 50, 60.5)
   y: 60.5,
   z: nil
 }
-iex> Bolt.Sips.query!(conn, "RETURN point({pt}) AS pt", %{pt: point_cartesian_2D})
+iex> Bolt.Sips.query!(conn, "RETURN point($pt) AS pt", %{pt: point_cartesian_2D})
 [
   %{
     "pt" => %Bolt.Sips.Types.Point{
@@ -113,7 +113,7 @@ iex> point_geo_2D = Point.create(:wgs_84, 50, 60.5)
   y: 60.5,
   z: nil
 }
-iex> Bolt.Sips.query!(conn, "RETURN point({pt}) AS pt", %{pt: point_geo_2D})
+iex> Bolt.Sips.query!(conn, "RETURN point($pt) AS pt", %{pt: point_geo_2D})
 [
   %{
     "pt" => %Bolt.Sips.Types.Point{
@@ -141,7 +141,7 @@ iex> point_cartesian_3D = Point.create(:cartesian, 50, 60.5, 12.34)
   y: 60.5,
   z: 12.34
 }
-iex> Bolt.Sips.query!(conn, "RETURN point({pt}) AS pt", %{pt: point_cartesian_3D})
+iex> Bolt.Sips.query!(conn, "RETURN point($pt) AS pt", %{pt: point_cartesian_3D})
 [
   %{
     "pt" => %Bolt.Sips.Types.Point{
@@ -169,7 +169,7 @@ iex> point_geo_3D = Point.create(:wgs_84, 50, 60.5, 12.34)
   y: 60.5,
   z: 12.34
 }
-iex> Bolt.Sips.query!(conn, "RETURN point({pt}) AS pt", %{pt: point_geo_2D})
+iex> Bolt.Sips.query!(conn, "RETURN point($pt) AS pt", %{pt: point_geo_2D})
 [
   %{
     "pt" => %Bolt.Sips.Types.Point{

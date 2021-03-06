@@ -86,7 +86,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3Test do
       assert {:ok, _} = BoltProtocolV3.hello(:gen_tcp, port, 3, config[:auth], [])
 
       assert {:ok, {:success, %{"fields" => ["num"]}}} =
-               BoltProtocolV3.run(:gen_tcp, port, 3, "RETURN {num} AS num", %{num: 5}, %{}, [])
+               BoltProtocolV3.run(:gen_tcp, port, 3, "RETURN $num AS num", %{num: 5}, %{}, [])
     end
 
     test "ok with parameters with metadata", %{config: config, port: port} do
@@ -98,7 +98,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3Test do
                  :gen_tcp,
                  port,
                  3,
-                 "RETURN {num} AS num",
+                 "RETURN $num AS num",
                  %{num: 5},
                  metadata,
                  []

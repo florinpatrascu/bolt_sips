@@ -45,9 +45,9 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @rollback_signature 0x13
   @run_signature 0x10
 
-  #OUT Signature
+  # OUT Signature
 
-  #TODO improve using macros?
+  # TODO improve using macros?
   @valid_signatures [
     @ack_failure_signature,
     @begin_signature,
@@ -91,7 +91,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     :reset,
     :run
   ]
-
 
   @last_bolt_version 3
 
@@ -176,7 +175,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @doc """
   Encode RUN without params nor metadata
   """
-  def encode({:run, [statement]}, 3)  do
+  def encode({:run, [statement]}, 3) do
     do_encode(:run, [statement, %{}, %{}], 3)
   end
 
@@ -233,7 +232,8 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @doc """
   Encode messages that don't need any data formating
   """
-  def encode({message_type, data}, bolt_version) when bolt_version <= 2 and message_type in @valid_v1_message_types do
+  def encode({message_type, data}, bolt_version)
+      when bolt_version <= 2 and message_type in @valid_v1_message_types do
     do_encode(message_type, data, bolt_version)
   end
 
@@ -387,10 +387,10 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
 
       # with params but without metadata
       iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
-      iex> :erlang.iolist_to_binary(Encoder.encode({:run, ["RETURN {str} AS str", %{str: "hello"}]}, 3))
-      <<0x0, 0x23, 0xB3, 0x10, 0xD0, 0x13, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20, 0x7B, 0x73,
-      0x74, 0x72, 0x7D, 0x20, 0x41, 0x53, 0x20, 0x73, 0x74, 0x72, 0xA1, 0x83, 0x73, 0x74, 0x72,
-      0x85, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0xA0, 0x0, 0x0>>
+      iex> :erlang.iolist_to_binary(Encoder.encode({:run, ["RETURN $str AS str", %{str: "hello"}]}, 3))
+      <<0x0, 0x22, 0xB3, 0x10, 0xD0, 0x12, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20,
+      0x24, 0x73, 0x74, 0x72, 0x20, 0x41, 0x53, 0x20, 0x73, 0x74, 0x72, 0xA1, 0x83,
+      0x73, 0x74, 0x72, 0x85, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0xA0, 0x0, 0x0>>
 
       # with params and metadata
       iex> alias Bolt.Sips.Internals.PackStream.Message.Encoder
@@ -402,12 +402,12 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
         metadata: nil,
         tx_timeout: 4500
       }}
-      iex> :erlang.iolist_to_binary(Encoder.encode({:run, ["RETURN {str} AS str", %{str: "hello"}, metadata]}, 3))
-      <<0x0, 0x31, 0xB3, 0x10, 0xD0, 0x13, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20, 0x7B, 0x73,
-      0x74, 0x72, 0x7D, 0x20, 0x41, 0x53, 0x20, 0x73, 0x74, 0x72, 0xA1, 0x83, 0x73, 0x74, 0x72,
-      0x85, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0xA1, 0x8A, 0x74, 0x78, 0x5F, 0x74, 0x69, 0x6D, 0x65,
-      0x6F, 0x75, 0x74, 0xC9, 0x11, 0x94, 0x0, 0x0>>
-      
+      iex> :erlang.iolist_to_binary(Encoder.encode({:run, ["RETURN $str AS str", %{str: "hello"}, metadata]}, 3))
+      <<0x0, 0x30, 0xB3, 0x10, 0xD0, 0x12, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20,
+      0x24, 0x73, 0x74, 0x72, 0x20, 0x41, 0x53, 0x20, 0x73, 0x74, 0x72, 0xA1, 0x83,
+      0x73, 0x74, 0x72, 0x85, 0x68, 0x65, 0x6C, 0x6C, 0x6F, 0xA1, 0x8A, 0x74, 0x78,
+      0x5F, 0x74, 0x69, 0x6D, 0x65, 0x6F, 0x75, 0x74, 0xC9, 0x11, 0x94, 0x0, 0x0>>
+
    #   Encode  messages v1
 
   # Supported messages
@@ -465,10 +465,10 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
       <<0x0, 0x13, 0xB2, 0x10, 0x8F, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20, 0x31, 0x20, 0x41,
       0x53, 0x20, 0x6E, 0x75, 0x6D, 0xA0, 0x0, 0x0>>
       # with parameters
-      iex> :erlang.iolist_to_binary(Encoder.encode({:run, ["RETURN {num} AS num", %{num: 1}]}, 1))
-      <<0x0, 0x1D, 0xB2, 0x10, 0xD0, 0x13, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20, 0x7B, 0x6E,
-      0x75, 0x6D, 0x7D, 0x20, 0x41, 0x53, 0x20, 0x6E, 0x75, 0x6D, 0xA1, 0x83, 0x6E, 0x75, 0x6D,
-      0x1, 0x0, 0x0>>
+      iex> :erlang.iolist_to_binary(Encoder.encode({:run, ["RETURN $num AS num", %{num: 1}]}, 1))
+      <<0x0, 0x1C, 0xB2, 0x10, 0xD0, 0x12, 0x52, 0x45, 0x54, 0x55, 0x52, 0x4E, 0x20,
+      0x24, 0x6E, 0x75, 0x6D, 0x20, 0x41, 0x53, 0x20, 0x6E, 0x75, 0x6D, 0xA1, 0x83,
+      0x6E, 0x75, 0x6D, 0x1, 0x0, 0x0>>
 
   ## ACK_FAILURE
   Usage: Acknowledge a failure the server has sent.
@@ -522,7 +522,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
       iex> :erlang.iolist_to_binary(Encoder.encode({:reset, []}, 1))
       <<0x0, 0x2, 0xB0, 0xF, 0x0, 0x0>>
 
-  
+
   Check if the encoder for the given bolt version is capable of encoding the given message
   If it is the case, the encoding function will be called
   If not, fallback to previous bolt version
@@ -530,8 +530,9 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   If encoding function is not present in any of the bolt  version, an error will be raised
   """
 
-  def encode(data, bolt_version) when is_integer(bolt_version) and bolt_version > @last_bolt_version do
-      encode(data, @last_bolt_version)
+  def encode(data, bolt_version)
+      when is_integer(bolt_version) and bolt_version > @last_bolt_version do
+    encode(data, @last_bolt_version)
   end
 
   def encode(_data, _bolt_version) do
@@ -572,8 +573,6 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     %{user_agent: client_name()}
   end
 
-
-
   @doc """
   Perform the final message:
   - add header
@@ -603,32 +602,30 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @spec generate_chunks(Bolt.Sips.Internals.PackStream.value() | <<>>, list()) ::
           [[Bolt.Sips.Internals.PackStream.Message.encoded()]]
   defp generate_chunks(<<>>, chunks) do
-    [ chunks , [@end_marker ] , []]
+    [chunks, [@end_marker], []]
   end
 
   defp generate_chunks(data, chunks) do
     data_size = :erlang.iolist_size(data)
+
     case data_size > @max_chunk_size do
-      true ->  bindata = :erlang.iolist_to_binary(data)
-               <<chunk::binary-@max_chunk_size, rest::binary>> = bindata
-               new_chunk = format_chunk(chunk)
-               #[new_chunk, generate_chunks(rest,[])]
-               generate_chunks(rest, [chunks, new_chunk])
-      #generate_chunks(<<rest>>, [new_chunk, chunks])
+      true ->
+        bindata = :erlang.iolist_to_binary(data)
+        <<chunk::binary-@max_chunk_size, rest::binary>> = bindata
+        new_chunk = format_chunk(chunk)
+        # [new_chunk, generate_chunks(rest,[])]
+        generate_chunks(rest, [chunks, new_chunk])
+
+      # generate_chunks(<<rest>>, [new_chunk, chunks])
 
       _ ->
-        generate_chunks(<<>>, [ chunks,format_chunk(data)])
+        generate_chunks(<<>>, [chunks, format_chunk(data)])
     end
-
   end
 
   @spec format_chunk(Bolt.Sips.Internals.PackStream.value()) ::
           [Bolt.Sips.Internals.PackStream.Message.encoded()]
   defp format_chunk(chunk) do
-    [<<:erlang.iolist_size(chunk)::16>> , chunk]
+    [<<:erlang.iolist_size(chunk)::16>>, chunk]
   end
-
-
-
-
 end

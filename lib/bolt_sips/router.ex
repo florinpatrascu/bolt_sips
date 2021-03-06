@@ -200,7 +200,7 @@ defmodule Bolt.Sips.Router do
       {query, params} =
         if Version.match?(short, ">= 3.2.3") do
           props = Keyword.get(opts, :routing_context, %{})
-          {"CALL dbms.cluster.routing.getRoutingTable({context})", %{context: props}}
+          {"CALL dbms.cluster.routing.getRoutingTable($context)", %{context: props}}
         else
           {"CALL dbms.cluster.routing.getServers()", %{}}
         end

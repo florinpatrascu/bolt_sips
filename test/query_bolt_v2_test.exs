@@ -13,7 +13,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform Point in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN point({point_data}) AS pt"
+    query = "RETURN point($point_data) AS pt"
     params = %{point_data: Point.create(:cartesian, 50, 60.5)}
 
     assert {:ok, %Response{results: res}} = Bolt.Sips.query(conn, query, params)
@@ -36,7 +36,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform Duration in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN duration({d}) AS d"
+    query = "RETURN duration($d) AS d"
 
     params = %{
       d: %Duration{
@@ -67,7 +67,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform Date in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN date({d}) AS d"
+    query = "RETURN date($d) AS d"
     params = %{d: ~D[2019-02-04]}
 
     assert {:ok, %Response{results: res}} = Bolt.Sips.query(conn, query, params)
@@ -76,7 +76,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform TimeWithTZOffset in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN time({t}) AS t"
+    query = "RETURN time($t) AS t"
     time_with_tz = %TimeWithTZOffset{time: ~T[12:45:30.250876], timezone_offset: 3600}
     params = %{t: time_with_tz}
 
@@ -86,7 +86,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform DateTimeWithTZOffset in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN datetime({t}) AS t"
+    query = "RETURN datetime($t) AS t"
 
     date_time_with_tz = %DateTimeWithTZOffset{
       naive_datetime: ~N[2016-05-24 13:26:08.543267],
@@ -101,7 +101,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform DateTime With TimeZone id (UTC) in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN datetime({t}) AS t"
+    query = "RETURN datetime($t) AS t"
 
     date_time_with_tz_id =
       TypesHelper.datetime_with_micro(~N[2016-05-24 13:26:08.543218], "Etc/UTC")
@@ -114,7 +114,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform DateTime With TimeZone id (Non-UTC) in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN datetime({t}) AS t"
+    query = "RETURN datetime($t) AS t"
 
     date_time_with_tz_id =
       TypesHelper.datetime_with_micro(~N[2016-05-24 13:26:08.543789], "Europe/Paris")
@@ -127,7 +127,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform NaiveDateTime in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN localdatetime({t}) AS t"
+    query = "RETURN localdatetime($t) AS t"
 
     ndt = ~N[2016-05-24 13:26:08.543156]
     params = %{t: ndt}
@@ -137,7 +137,7 @@ defmodule Bolt.Sips.QueryBoltV2Test do
 
   test "transform Time in cypher-compliant data", context do
     conn = context[:conn]
-    query = "RETURN localtime({t}) AS t"
+    query = "RETURN localtime($t) AS t"
 
     t = ~T[13:26:08.543440]
     params = %{t: t}

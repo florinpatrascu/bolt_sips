@@ -78,7 +78,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolV3 do
 
   ## Example
 
-      iex> BoltProtocolV1.run(:gen_tcp, port, 1, "RETURN {num} AS num", %{num: 5}, %{}, [])
+      iex> BoltProtocolV1.run(:gen_tcp, port, 1, "RETURN $num AS num", %{num: 5}, %{}, [])
       {:ok, {:success, %{"fields" => ["num"]}}}
   """
   @spec run(atom(), port(), integer(), String.t(), map(), Bolt.Sips.Metadata.t(), Keyword.t()) ::

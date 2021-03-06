@@ -13,7 +13,7 @@ defmodule Bolt.Sips.Routing.ConnectionsTest do
     },
     routing_query: %{
       params: %{props: %{}},
-      query: "call dbms.cluster.routing.getRoutingTable({props})"
+      query: "call dbms.cluster.routing.getRoutingTable($props)"
     },
     ttl: 300,
     updated_at: 1_555_705_797,
@@ -34,7 +34,7 @@ defmodule Bolt.Sips.Routing.ConnectionsTest do
                write: %{"localhost:7689" => 0},
                routing_query: %{
                  params: %{props: %{}},
-                 query: "call dbms.cluster.routing.getRoutingTable({props})"
+                 query: "call dbms.cluster.routing.getRoutingTable($props)"
                },
                ttl: 300
              } = Router.merge_connections_maps(@current_connections, @new_connections)

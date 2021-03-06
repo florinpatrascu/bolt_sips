@@ -14,7 +14,7 @@ defmodule ErrorsTest do
 
   test "create a node using SET properties and a simple map" do
     %Bolt.Sips.Response{stats: stats, type: type} =
-      Bolt.Sips.query!(Bolt.Sips.conn(), "CREATE (report:Report) SET report = {props}", %{
+      Bolt.Sips.query!(Bolt.Sips.conn(), "CREATE (report:Report) SET report = $props", %{
         props: @simple_map
       })
 
@@ -28,7 +28,7 @@ defmodule ErrorsTest do
     assert_raise Bolt.Sips.Exception, err, fn ->
       Bolt.Sips.query!(
         Bolt.Sips.conn(),
-        "CREATE (report:Report) SET report = {props}",
+        "CREATE (report:Report) SET report = $props",
         %{props: @nested_map}
       )
     end
@@ -36,7 +36,7 @@ defmodule ErrorsTest do
 
   test "exception when creating a node using SET properties with a list" do
     assert_raise Bolt.Sips.Exception, fn ->
-      Bolt.Sips.query!(Bolt.Sips.conn(), "CREATE (report:Report) SET report = {props}", %{
+      Bolt.Sips.query!(Bolt.Sips.conn(), "CREATE (report:Report) SET report = $props", %{
         props: ["foo", "bar"]
       })
     end

@@ -6,7 +6,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolAllBoltVersionTest do
     string = Enum.to_list(0..100) |> Enum.join()
 
     query = """
-      RETURN {string} as string
+      RETURN $string as string
     """
 
     params = %{string: string}
@@ -21,7 +21,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolAllBoltVersionTest do
     string = Enum.to_list(0..25_000) |> Enum.join()
 
     query = """
-      RETURN {string} as string
+      RETURN $string as string
     """
 
     params = %{string: string}
@@ -83,7 +83,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolAllBoltVersionTest do
   end
 
   test "encode value -128", %{port: port, bolt_version: bolt_version} do
-    query = "CREATE (t:Test) SET t.value = {value} RETURN t"
+    query = "CREATE (t:Test) SET t.value = $value RETURN t"
 
     [{:success, _} | records] =
       BoltProtocol.run_statement(:gen_tcp, port, bolt_version, query, %{value: -128})

@@ -74,7 +74,7 @@ defmodule BoltProtocolV1.Sips.Internals.BoltProtocolV1Test do
       assert {:ok, _} = BoltProtocolV1.init(:gen_tcp, port, 1, config[:auth], [])
 
       assert {:ok, {:success, %{"fields" => ["num"]}}} =
-               BoltProtocolV1.run(:gen_tcp, port, 1, "RETURN {num} AS num", %{num: 5}, [])
+               BoltProtocolV1.run(:gen_tcp, port, 1, "RETURN $num AS num", %{num: 5}, [])
     end
 
     test "returns IGNORED when sending RUN on a FAILURE state", %{config: config, port: port} do

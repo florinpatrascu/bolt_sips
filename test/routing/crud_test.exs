@@ -14,7 +14,7 @@ defmodule Bolt.Sips.Routing.CrudTest do
 
     test "write" do
       conn = Sips.conn(:write)
-      cypher = "CREATE (elf:Elf { name: {name}, from: {from}, klout: 99 })"
+      cypher = "CREATE (elf:Elf { name: $name, from: $from, klout: 99 })"
 
       assert %{
                stats: %{
@@ -28,11 +28,11 @@ defmodule Bolt.Sips.Routing.CrudTest do
 
     # https://neo4j.com/docs/cypher-manual/current/clauses/set/#set-adding-properties-from-maps
     test "update" do
-      create_cypher = "CREATE (p:Person { first: { person }.first, last: { person }.last })"
+      create_cypher = "CREATE (p:Person { first: $person.first, last: $person.last })"
 
       update_cypher = """
       MATCH (p:Person{ first: 'Green', last: 'Alien' })
-        SET p.first = { person }.first, p.last = { person }.last
+        SET p.first = { person }.first, p.last = $person.last
         RETURN p.first as first_name, p.last as last_name
       """
 

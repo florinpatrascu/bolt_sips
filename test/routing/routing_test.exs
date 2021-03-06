@@ -58,7 +58,7 @@ defmodule Bolt.Sips.RoutingTest do
            } = Bolt.Sips.routing_table(prefix)
 
     Bolt.Sips.conn(:read, prefix: prefix)
-    |> Bolt.Sips.query!("RETURN {x}", %{x: 1})
+    |> Bolt.Sips.query!("RETURN $x", %{x: 1})
   end
 
   @tag boltkit: %{
