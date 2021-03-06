@@ -106,7 +106,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderImplV2 do
           when bolt_version >= 2 and bolt_version <= @last_version do
         {[time], rest} = decode_struct(struct, @local_time_struct_size, bolt_version)
 
-        [Time.add(~T[00:00:00.000], time, :nanosecond) | rest]
+        [Time.add(~T[00:00:00.000000], time, :nanosecond) | rest]
       end
 
       # Local DateTime
@@ -117,7 +117,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderImplV2 do
 
         ndt =
           NaiveDateTime.add(
-            ~N[1970-01-01 00:00:00.000],
+            ~N[1970-01-01 00:00:00.000000000],
             seconds * 1_000_000_000 + nanoseconds,
             :nanosecond
           )
@@ -130,7 +130,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderImplV2 do
           when bolt_version >= 2 and bolt_version <= @last_version do
         {[time, offset], rest} = decode_struct(struct, @time_with_tz_struct_size, bolt_version)
 
-        t = TimeWithTZOffset.create(Time.add(~T[00:00:00.000], time, :nanosecond), offset)
+        t = TimeWithTZOffset.create(Time.add(~T[00:00:00.000000], time, :nanosecond), offset)
         [t | rest]
       end
 
@@ -145,7 +145,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderImplV2 do
 
         naive_dt =
           NaiveDateTime.add(
-            ~N[1970-01-01 00:00:00.000],
+            ~N[1970-01-01 00:00:00.000000],
             seconds * 1_000_000_000 + nanoseconds,
             :nanosecond
           )
@@ -166,7 +166,7 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderImplV2 do
 
         naive_dt =
           NaiveDateTime.add(
-            ~N[1970-01-01 00:00:00.000],
+            ~N[1970-01-01 00:00:00.000000],
             seconds * 1_000_000_000 + nanoseconds,
             :nanosecond
           )

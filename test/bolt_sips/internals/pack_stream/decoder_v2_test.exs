@@ -21,44 +21,44 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderV2Test do
     end
 
     test "local datetime" do
-      assert [~N[2014-11-30 16:15:01.435]] ==
+      assert [~N[2014-11-30 16:15:01.435432]] ==
                DecoderV2.decode(
-                 {0x64, <<0xCA, 0x54, 0x7B, 0x42, 0x85, 0xCA, 0x19, 0xED, 0x92, 0xC0>>, 2},
+                 {0x64, <<0xCA, 0x54, 0x7B, 0x42, 0x85, 0xCA, 0x19, 0xF4, 0x2A, 0x40>>, 2},
                  2
                )
     end
 
     test "Time with timezone offzet" do
-      assert [%TimeWithTZOffset{time: ~T[04:45:32.123000], timezone_offset: 7200}] ==
+      assert [%TimeWithTZOffset{time: ~T[04:45:32.123456], timezone_offset: 7200}] ==
                DecoderV2.decode(
-                 {0x54, <<0xCB, 0x0, 0x0, 0xF, 0x94, 0xE2, 0x1B, 0xC, 0xC0, 0xC9, 0x1C, 0x20>>,
-                  2},
-                 2
-               )
-    end
-
-    test "Datetime ith zone id" do
-      dt = Bolt.Sips.TypesHelper.datetime_with_micro(~N[1998-03-18 06:25:12.123], "Europe/Paris")
-
-      assert [dt] ==
-               DecoderV2.decode(
-                 {0x66,
-                  <<0xCA, 0x35, 0xF, 0x68, 0xC8, 0xCA, 0x7, 0x54, 0xD4, 0xC0, 0x8C, 0x45, 0x75,
-                    0x72, 0x6F, 0x70, 0x65, 0x2F, 0x50, 0x61, 0x72, 0x69, 0x73>>, 3},
+                 {0x54, <<0xCB, 0x0, 0x0, 0xF, 0x94, 0xE2, 0x22, 0x2, 0x0, 0xC9, 0x1C, 0x20>>, 2},
                  2
                )
     end
 
     test "Datetime with zone id" do
+      dt =
+        Bolt.Sips.TypesHelper.datetime_with_micro(~N[1998-03-18 06:25:12.123456], "Europe/Paris")
+
+      assert [dt] ==
+               DecoderV2.decode(
+                 {0x66,
+                  <<0xCA, 0x35, 0xF, 0x68, 0xC8, 0xCA, 0x7, 0x5B, 0xCA, 0x0, 0x8C, 0x45, 0x75,
+                    0x72, 0x6F, 0x70, 0x65, 0x2F, 0x50, 0x61, 0x72, 0x69, 0x73>>, 3},
+                 2
+               )
+    end
+
+    test "Datetime with zone offset" do
       assert [
                %DateTimeWithTZOffset{
-                 naive_datetime: ~N[1998-03-18 06:25:12.123],
+                 naive_datetime: ~N[1998-03-18 06:25:12.123456],
                  timezone_offset: 7200
                }
              ] ==
                DecoderV2.decode(
                  {0x46,
-                  <<0xCA, 0x35, 0xF, 0x68, 0xC8, 0xCA, 0x7, 0x54, 0xD4, 0xC0, 0xC9, 0x1C, 0x20>>,
+                  <<0xCA, 0x35, 0xF, 0x68, 0xC8, 0xCA, 0x7, 0x5B, 0xCA, 0x0, 0xC9, 0x1C, 0x20>>,
                   3},
                  2
                )
