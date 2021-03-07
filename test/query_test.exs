@@ -19,27 +19,6 @@ defmodule Query.Test do
     {:ok, context}
   end
 
-  test "CALL with bolt v3", context do
-    conn = context[:conn]
-
-    cypher = """
-    MATCH (m:Movie)
-    CALL {
-      WITH m
-      // conditional execution
-      WITH m WHERE exists(m.genres)
-      UNWIND m.genres AS genre
-      MERGE (g:Genre {name: genre})
-      MERGE (m)-[:IN_GENRE]->(g)
-      RETURN count(*) AS c
-    }
-    RETURN m, c
-    """
-
-    Bolt.Sips.query!(conn, cypher)
-    |> IO.inspect()
-  end
-
   test "a simple query that should work", context do
     conn = context[:conn]
 
