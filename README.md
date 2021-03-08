@@ -13,7 +13,10 @@
 - Provides the user with the ability to create and manage distinct ad-hoc `role-based` connections to one or more Neo4j servers/databases
 - Supports transactions, simple and complex Cypher queries with or w/o parameters
 - Multi-tenancy
-- Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x
+- Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x/4.0.x/4.1.x/4.2.x
+
+Note:
+Regarding Neo4j 4, stream capabilities are not yet supported.
 
 ## Table of Contents
 
