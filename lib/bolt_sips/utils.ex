@@ -27,7 +27,7 @@ defmodule Bolt.Sips.Utils do
   Fills in the given `opts` with default options.
   """
   @spec default_config(Keyword.t()) :: Keyword.t()
-  def default_config(), do: Application.get_env(:bolt_sips, Bolt) |> default_config
+  def default_config(), do: Application.get_env(:bolt_sips, Bolt, []) |> default_config
 
   def default_config(opts) do
     config =

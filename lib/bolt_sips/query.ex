@@ -143,8 +143,12 @@ defmodule Bolt.Sips.Query do
   @spec send!(Bolt.Sips.conn(), String.t(), Keyword.t(), map, list) ::
           {:error, Exception.t()} | [Response.t()] | RuntimeError
   defp send!(conn, statement, params, opts, acc) do
-    conf = Bolt.Sips.Utils.default_config()
+    conf = case Enum.at(Bolt.Sips.info(), 0) do
+      nil -> []
+      {_, info} -> info.user_options
+    end
     opts = Keyword.merge([timeout: conf[:timeout]], opts)
+
 
     case DBConnection.execute(conn, %QueryStatement{statement: statement}, params, opts) do
       {:ok, _query, resp} ->
