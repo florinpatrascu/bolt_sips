@@ -132,27 +132,27 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderTest do
       end
 
       test "Local Time (bolt_version: #{bolt_version})" do
-        assert [~T[09:34:23.724000]] ==
+        assert [~T[09:34:23.654321]] ==
                  Decoder.decode(
-                   <<0xB1, 0x74, 0xCB, 0x0, 0x0, 0x1F, 0x58, 0x36, 0x6, 0xD3, 0x0>>,
+                   <<0xB1, 0x74, 0xCB, 0x0, 0x0, 0x1F, 0x58, 0x31, 0xDF, 0x9B, 0x68>>,
                    unquote(bolt_version)
                  )
       end
 
       test "Local DateTime (bolt_version: #{bolt_version})" do
-        assert [~N[2018-04-05 12:34:00.543]] ==
+        assert [~N[2018-04-05 12:34:00.654321]] ==
                  Decoder.decode(
-                   <<0xB2, 0x64, 0xCA, 0x5A, 0xC6, 0x17, 0xB8, 0xCA, 0x20, 0x5D, 0x85, 0xC0>>,
+                   <<0xB2, 0x64, 0xCA, 0x5A, 0xC6, 0x17, 0xB8, 0xCA, 0x27, 0x0, 0x25, 0x68>>,
                    unquote(bolt_version)
                  )
       end
 
       test "Time with timezone offset (bolt_version: #{bolt_version})" do
-        ttz = Types.TimeWithTZOffset.create(~T[12:45:30.250000], 3600)
+        ttz = Types.TimeWithTZOffset.create(~T[12:45:30.654321], 3600)
 
         assert [ttz] ==
                  Decoder.decode(
-                   <<0xB2, 0x54, 0xCB, 0x0, 0x0, 0x29, 0xC5, 0xF8, 0x3C, 0x56, 0x80, 0xC9, 0xE,
+                   <<0xB2, 0x54, 0xCB, 0x0, 0x0, 0x29, 0xC6, 0x10, 0x55, 0xC9, 0x68, 0xC9, 0xE,
                      0x10>>,
                    unquote(bolt_version)
                  )
@@ -160,11 +160,14 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderTest do
 
       test "Datetime with timezone id (bolt_version: #{bolt_version})" do
         dt =
-          Bolt.Sips.TypesHelper.datetime_with_micro(~N[2016-05-24 13:26:08.543], "Europe/Berlin")
+          Bolt.Sips.TypesHelper.datetime_with_micro(
+            ~N[2016-05-24 13:26:08.654321],
+            "Europe/Berlin"
+          )
 
         assert [dt] ==
                  Decoder.decode(
-                   <<0xB3, 0x66, 0xCA, 0x57, 0x44, 0x56, 0x70, 0xCA, 0x20, 0x5D, 0x85, 0xC0, 0x8D,
+                   <<0xB3, 0x66, 0xCA, 0x57, 0x44, 0x56, 0x70, 0xCA, 0x27, 0x0, 0x25, 0x68, 0x8D,
                      0x45, 0x75, 0x72, 0x6F, 0x70, 0x65, 0x2F, 0x42, 0x65, 0x72, 0x6C, 0x69,
                      0x6E>>,
                    unquote(bolt_version)
@@ -174,12 +177,12 @@ defmodule Bolt.Sips.Internals.PackStream.DecoderTest do
       test "Datetime with timezone offset (bolt_version: #{bolt_version})" do
         assert [
                  %Types.DateTimeWithTZOffset{
-                   naive_datetime: ~N[2016-05-24 13:26:08.543],
+                   naive_datetime: ~N[2016-05-24 13:26:08.654321],
                    timezone_offset: 7200
                  }
                ] =
                  Decoder.decode(
-                   <<0xB3, 0x46, 0xCA, 0x57, 0x44, 0x56, 0x70, 0xCA, 0x20, 0x5D, 0x85, 0xC0, 0xC9,
+                   <<0xB3, 0x46, 0xCA, 0x57, 0x44, 0x56, 0x70, 0xCA, 0x27, 0x0, 0x25, 0x68, 0xC9,
                      0x1C, 0x20>>,
                    unquote(bolt_version)
                  )

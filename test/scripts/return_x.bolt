@@ -2,7 +2,7 @@
 !: AUTO RESET
 !: AUTO PULL_ALL
 
-C: RUN "RETURN {x}" {"x": 1}
+C: RUN "RETURN $x" {"x": 1}
 S: SUCCESS {"fields": ["x"]}
    RECORD [1]
    SUCCESS {}

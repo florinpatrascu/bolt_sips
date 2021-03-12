@@ -45,7 +45,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
 
     test "(params, no metadata, no options)", %{port: port, bolt_version: bolt_version} do
       assert {:ok, {:success, _}} =
-               BoltProtocol.run(:gen_tcp, port, bolt_version, "RETURN {num} AS num", %{num: 14})
+               BoltProtocol.run(:gen_tcp, port, bolt_version, "RETURN $num AS num", %{num: 14})
     end
 
     test "(no params, metadata, no options)", %{port: port, bolt_version: bolt_version} do
@@ -63,7 +63,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN {num} AS num",
+                 "RETURN $num AS num",
                  %{num: 14},
                  metadata
                )
@@ -82,7 +82,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN {num} AS num",
+                 "RETURN $num AS num",
                  %{num: 14},
                  %{},
                  recv_timeout: 5000
@@ -106,7 +106,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN {num} AS num",
+                 "RETURN $num AS num",
                  %{num: 14},
                  metadata,
                  recv_timeout: 5000
@@ -129,7 +129,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
 
     test "(params, no metadata, no options)", %{port: port, bolt_version: bolt_version} do
       assert [success: _, record: _, success: _] =
-               BoltProtocol.run_statement(:gen_tcp, port, bolt_version, "RETURN {num} AS num", %{
+               BoltProtocol.run_statement(:gen_tcp, port, bolt_version, "RETURN $num AS num", %{
                  num: 14
                })
     end
@@ -156,7 +156,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN {num} AS num",
+                 "RETURN $num AS num",
                  %{num: 14},
                  metadata
                )
@@ -181,7 +181,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN {num} AS num",
+                 "RETURN $num AS num",
                  %{num: 14},
                  %{},
                  recv_timeout: 5000
@@ -211,7 +211,7 @@ defmodule Bolt.Sips.Internals.BoltProtocolBoltV3Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN {num} AS num",
+                 "RETURN $num AS num",
                  %{num: 14},
                  metadata,
                  recv_timeout: 5000

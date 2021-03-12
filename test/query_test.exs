@@ -101,7 +101,7 @@ defmodule Query.Test do
 
     cypher = """
       MATCH (n:Person {bolt_sips: true})
-      WHERE n.name = {name}
+      WHERE n.name = $name
       RETURN n.name AS name
     """
 
@@ -122,7 +122,7 @@ defmodule Query.Test do
     conn = context[:conn]
 
     cypher = """
-      CREATE(n:User {props})
+      CREATE(n:User $props)
     """
 
     assert {:ok,
@@ -143,7 +143,7 @@ defmodule Query.Test do
     conn = context[:conn]
 
     cypher = """
-      CREATE(n:User {props})
+      CREATE(n:User $props)
     """
 
     assert {:ok, %Response{}} =
@@ -155,7 +155,7 @@ defmodule Query.Test do
 
     cypher = """
       MATCH (p:Person {bolt_sips: true})
-      RETURN p, p.name AS name, upper(p.name) as NAME,
+      RETURN p, p.name AS name, toUpper(p.name) as NAME,
              coalesce(p.nickname,"n/a") AS nickname,
              { name: p.name, label:head(labels(p))} AS person
       ORDER BY name DESC
@@ -222,7 +222,7 @@ defmodule Query.Test do
 
   test "return a single number from a statement with params", context do
     conn = context[:conn]
-    row = Bolt.Sips.query!(conn, "RETURN {n} AS num", %{n: 10}) |> Response.first()
+    row = Bolt.Sips.query!(conn, "RETURN $n AS num", %{n: 10}) |> Response.first()
     assert row["num"] == 10
   end
 
@@ -230,7 +230,7 @@ defmodule Query.Test do
     conn = context[:conn]
 
     row =
-      Bolt.Sips.query!(conn, "RETURN {x} AS n", %{x: %{abc: ["d", "e", "f"]}})
+      Bolt.Sips.query!(conn, "RETURN $x AS n", %{x: %{abc: ["d", "e", "f"]}})
       |> Response.first()
 
     assert row["n"]["abc"] == ["d", "e", "f"]
@@ -299,7 +299,7 @@ defmodule Query.Test do
 
     assert %Response{plan: plan} = Bolt.Sips.query!(conn, "EXPLAIN RETURN 1")
     refute plan == nil
-    assert Regex.match?(~r/CYPHER 3/iu, plan["args"]["version"])
+    assert Regex.match?(~r/CYPHER [3|4]/iu, plan["args"]["version"])
   end
 
   test "EXPLAIN MATCH (n), (m) RETURN n, m", context do
@@ -311,10 +311,19 @@ defmodule Query.Test do
     refute notifications == nil
     refute plan == nil
 
-    assert "CartesianProduct" ==
-             plan["children"]
-             |> List.first()
-             |> Map.get("operatorType")
+    if Regex.match?(~r/CYPHER 3/iu, plan["args"]["version"]) do
+      assert "CartesianProduct" ==
+               plan["children"]
+               |> List.first()
+               |> Map.get("operatorType")
+    else
+      assert(
+        "CartesianProduct@neo4j" ==
+          plan["children"]
+          |> List.first()
+          |> Map.get("operatorType")
+      )
+    end
   end
 
   test "can execute a query after a failure", context do

@@ -80,14 +80,14 @@ defmodule Bolt.Sips.Internals.BoltProtoolBoltV2Test do
     test "Local datetime", %{port: port, bolt_version: bolt_version} do
       assert [
                success: %{"fields" => ["d"]},
-               record: [~N[2018-04-05 12:34:00.543]],
+               record: [~N[2018-04-05 12:34:00.654321]],
                success: %{"type" => "r"}
              ] =
                BoltProtocol.run_statement(
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN localdatetime('2018-04-05T12:34:00.543') AS d"
+                 "RETURN localdatetime('2018-04-05T12:34:00.654321') AS d"
                )
     end
 
@@ -96,7 +96,7 @@ defmodule Bolt.Sips.Internals.BoltProtoolBoltV2Test do
                success: %{"fields" => ["d"]},
                record: [
                  %Bolt.Sips.Types.DateTimeWithTZOffset{
-                   naive_datetime: ~N[2018-04-05 12:34:23.543],
+                   naive_datetime: ~N[2018-04-05 12:34:23.654321],
                    timezone_offset: 3600
                  }
                ],
@@ -106,12 +106,13 @@ defmodule Bolt.Sips.Internals.BoltProtoolBoltV2Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN datetime('2018-04-05T12:34:23.543+01:00') AS d"
+                 "RETURN datetime('2018-04-05T12:34:23.654321+01:00') AS d"
                )
     end
 
     test "datetime with timezone id", %{port: port, bolt_version: bolt_version} do
-      dt = Bolt.Sips.TypesHelper.datetime_with_micro(~N[2018-04-05T12:34:23.543], "Europe/Berlin")
+      dt =
+        Bolt.Sips.TypesHelper.datetime_with_micro(~N[2018-04-05T12:34:23.654321], "Europe/Berlin")
 
       assert [
                success: %{"fields" => ["d"]},
@@ -122,7 +123,7 @@ defmodule Bolt.Sips.Internals.BoltProtoolBoltV2Test do
                  :gen_tcp,
                  port,
                  bolt_version,
-                 "RETURN datetime('2018-04-05T12:34:23.543[Europe/Berlin]') AS d"
+                 "RETURN datetime('2018-04-05T12:34:23.654321[Europe/Berlin]') AS d"
                )
     end
   end
