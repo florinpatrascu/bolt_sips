@@ -1,11 +1,16 @@
 # Changelog
 
+## 2.0.11
+
+- Issue #100: Timeout set in config in now used by queries
+- DBConnection, bump dependencies
+
 ## 2.0.10
+
 - Fix temporal types usage: microseconds are not fully available
 - Review to pass test on Neo4j 4 :
   - test and doctests to use new parameter syntax (using {} is deprecated in Neo4j 4)
   - `toUpper` instead of `upper`
-- Issue #100: Timeout set in config in now used by queries
 
 ## 2.0.9
 

@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.10"
+  @version "2.0.11"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
@@ -104,7 +104,7 @@ defmodule BoltSips.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:db_connection, "~> 2.2"},
+      {:db_connection, "~> 2.4"},
       {:calendar, "~> 0.17.2"},
       {:jason, "~> 1.2"},
       {:poison, "~> 3.1"},

@@ -92,14 +92,14 @@ defmodule Bolt.Sips.Query do
       |> Enum.map(&String.trim(&1))
       |> Enum.filter(&(String.length(&1) > 0))
 
-    formated_params =
+    formatted_params =
       params
       |> Enum.map(&format_param/1)
       |> Enum.map(fn {k, {:ok, value}} -> {k, value} end)
       |> Map.new()
 
     errors =
-      formated_params
+      formatted_params
       |> Enum.filter(fn {_, formated} ->
         case formated do
           {:error, _} -> true
@@ -108,7 +108,7 @@ defmodule Bolt.Sips.Query do
       end)
       |> Enum.map(fn {k, {:error, error}} -> {k, error} end)
 
-    {:ok, commit!(errors, conn, statements, formated_params, opts)}
+    {:ok, commit!(errors, conn, statements, formatted_params, opts)}
   rescue
     e in [RuntimeError, DBConnection.ConnectionError] ->
       {:error, Bolt.Sips.Error.new(e.message)}
@@ -126,10 +126,10 @@ defmodule Bolt.Sips.Query do
       {:error, e}
   end
 
-  defp commit!([], conn, statements, formated_params, opts),
-    do: tx!(conn, statements, formated_params, opts)
+  defp commit!([], conn, statements, formatted_params, opts),
+    do: tx!(conn, statements, formatted_params, opts)
 
-  defp commit!(errors, _conn, _statements, _formated_params, _opts),
+  defp commit!(errors, _conn, _statements, _formatted_params, _opts),
     do: raise(Exception, message: "Unable to format params: #{inspect(errors)}")
 
   defp tx!(conn, [statement], params, opts), do: hd(send!(conn, statement, params, opts))
@@ -140,17 +140,17 @@ defmodule Bolt.Sips.Query do
 
   defp send!(conn, statement, params, opts, acc \\ [])
 
-  @spec send!(Bolt.Sips.conn(), String.t(), Keyword.t(), map, list) ::
-          {:error, Exception.t()} | [Response.t()] | RuntimeError
   defp send!(conn, statement, params, opts, acc) do
     # Retrieve timeout defined in config
     prefix = Keyword.get(opts, :prefix, :default)
-    conf_timeout = Bolt.Sips.info()
-    |> Map.get(prefix)
-    |> Map.get(:user_options)
-    |> Keyword.get(:timeout)
 
-    opts = Keyword.put_new(opts, :timeout, conf_timeout)
+    conf_timeout =
+      Bolt.Sips.info()
+      |> Map.get(prefix)
+      |> Map.get(:user_options)
+      |> Keyword.get(:timeout)
+
+    opts = Keyword.put_new(opts, :timeout, Keyword.get(opts, :timeout, conf_timeout))
 
     case DBConnection.execute(conn, %QueryStatement{statement: statement}, params, opts) do
       {:ok, _query, resp} ->
