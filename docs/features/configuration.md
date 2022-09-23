@@ -17,6 +17,7 @@ These are the values you can configure, and their default values:
 - `:pool_size` - the size of the connection pool. Default: 15
 - `:timeout` - a connection timeout value defined in milliseconds. Default: 15_000
 - `:ssl`-`true`, if the connection must be encrypted. Default:`false`
+- `:ssl_options` - if the user wants to specify custom ssl options. More info [here](https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/ssl). Default: `[]` 
 - `:prefix`- used for differentiating between multiple connections available in the same app. Default:`:default`
 
 ## Examples of configurations
