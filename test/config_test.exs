@@ -9,8 +9,7 @@ defmodule Config.Test do
   @basic_tls_config [
     url: @graphenedb_like_url,
     basic_auth: [username: "xmas", password: "Kr1ngl3"],
-    ssl: true,
-    ssl_options: [verify: :verify_none]
+    ssl: [verify: :verify_none]
   ]
 
   @light_tls_config [
@@ -40,8 +39,7 @@ defmodule Config.Test do
     assert config[:hostname] == "hobby-happyHoHoHo.dbs.graphenedb.com"
     assert config[:basic_auth] == [username: "xmas", password: "Kr1ngl3"]
     assert config[:port] == 24786
-    assert config[:ssl] == true
-    assert config[:ssl_options] == [verify: :verify_none]
+    assert config[:ssl] == [verify: :verify_none]
     assert config[:prefix] == :default
   end
 

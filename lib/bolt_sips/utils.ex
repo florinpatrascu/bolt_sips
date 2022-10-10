@@ -12,7 +12,6 @@ defmodule Bolt.Sips.Utils do
     max_overflow: 0,
     timeout: 15_000,
     ssl: false,
-    ssl_options: [],
     socket: Bolt.Sips.Socket,
     with_etls: false,
     schema: "bolt",
@@ -44,7 +43,6 @@ defmodule Bolt.Sips.Utils do
     |> Keyword.put_new(:max_overflow, 2)
     |> Keyword.put_new(:timeout, 15_000)
     |> Keyword.put_new(:ssl, false)
-    |> Keyword.put_new(:ssl_options, [])
     |> Keyword.put_new(:socket, Bolt.Sips.Socket)
     |> Keyword.put_new(:with_etls, false)
     |> Keyword.put_new(:schema, "bolt")

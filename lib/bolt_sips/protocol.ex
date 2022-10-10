@@ -39,7 +39,7 @@ defmodule Bolt.Sips.Protocol do
 
     socket_opts =
       case conf[:ssl] do
-        true -> Keyword.merge(default_socket_options, conf[:ssl_options])
+        list when is_list(list) -> Keyword.merge(default_socket_options, conf[:ssl])
         _ -> default_socket_options
       end
 
