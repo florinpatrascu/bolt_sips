@@ -88,8 +88,9 @@ defmodule Bolt.Sips.Query do
           {:error, Error.t()} | {:ok, Response.t()}
   defp query_commit(conn, statement, params, opts) do
     statements =
-      String.split(statement, @cypher_seps, trim: true)
-      |> Enum.map(&String.trim(&1))
+      statement
+      |> String.split(@cypher_seps, trim: true)
+      |> Enum.map(&String.trim/1)
       |> Enum.filter(&(String.length(&1) > 0))
 
     formatted_params =
@@ -154,9 +155,8 @@ defmodule Bolt.Sips.Query do
 
     case DBConnection.execute(conn, %QueryStatement{statement: statement}, params, opts) do
       {:ok, _query, resp} ->
-        with {:ok, %Response{} = r} <- Response.transform(resp) do
-          acc ++ [r]
-        else
+        case Response.transform(resp) do
+          {:ok, %Response{} = r} -> acc ++ [r]
           {:error, e} -> raise DBConnection.ConnectionError, message: e
         end
 

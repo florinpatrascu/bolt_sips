@@ -130,7 +130,7 @@ defmodule Bolt.Sips.Response do
   end
 
   def fetch!(%Bolt.Sips.Response{} = r, key) do
-    with {:ok, findings} = fetch(r, key) do
+    with {:ok, findings} <- fetch(r, key) do
       findings
     end
   end
@@ -189,9 +189,7 @@ defmodule Bolt.Sips.Response do
 
   defp parse_record(:success, record, _response) do
     line =
-      "; around: #{
-        String.replace_leading("#{__ENV__.file}", "#{File.cwd!()}", "") |> Path.relative()
-      }:#{__ENV__.line()}"
+      "; around: #{String.replace_leading("#{__ENV__.file}", "#{File.cwd!()}", "") |> Path.relative()}:#{__ENV__.line()}"
 
     err_msg = "UNKNOWN success type: " <> inspect(record) <> line
     Logger.error(err_msg)
@@ -206,9 +204,7 @@ defmodule Bolt.Sips.Response do
 
   defp parse_record(_type, record, _response) do
     line =
-      "; around: #{
-        String.replace_leading("#{__ENV__.file}", "#{File.cwd!()}", "") |> Path.relative()
-      }:#{__ENV__.line()}"
+      "; around: #{String.replace_leading("#{__ENV__.file}", "#{File.cwd!()}", "") |> Path.relative()}:#{__ENV__.line()}"
 
     err_msg = "UNKNOWN `:record`: " <> inspect(record) <> line
     Logger.error(err_msg)

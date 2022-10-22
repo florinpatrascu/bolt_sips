@@ -1,7 +1,7 @@
 defmodule BoltSips.Mixfile do
   use Mix.Project
 
-  @version "2.0.11"
+  @version "2.1.0"
   @url_docs "https://hexdocs.pm/bolt_sips"
   @url_github "https://github.com/florinpatrascu/bolt_sips"
 
@@ -60,10 +60,11 @@ defmodule BoltSips.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [
-      applications: [
+      extra_applications: [
         :logger,
         :calendar,
-        :db_connection
+        :db_connection,
+        :jason
       ]
     ]
   end
@@ -104,30 +105,30 @@ defmodule BoltSips.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:db_connection, "~> 2.4"},
-      {:calendar, "~> 0.17.2"},
-      {:jason, "~> 1.2"},
-      {:poison, "~> 3.1"},
+      {:db_connection, "~> 2.4.2"},
+      {:calendar, "~> 1.0.0"},
+      {:jason, "~> 1.4.0"},
+      {:poison, "~> 5.0.0"},
 
       # Testing dependencies
-      {:excoveralls, "~> 0.12", optional: true, only: [:test, :dev]},
-      {:mix_test_watch, "~> 1.0", only: [:dev, :test]},
-      {:porcelain, "~> 2.0", only: [:test, :dev], runtime: false},
+      {:excoveralls, "~> 0.15.0", optional: true, only: [:test, :dev]},
+      {:mix_test_watch, "~> 1.1.0", only: [:dev, :test]},
+      {:porcelain, "~> 2.0.3", only: [:test, :dev], runtime: false},
       {:uuid, "~> 1.1.8", only: [:test, :dev], runtime: false},
 
       # Benchmarking dependencies
-      {:benchee, "~> 1.0", optional: true, only: [:dev, :test]},
-      {:benchee_html, "~> 1.0", optional: true, only: [:dev]},
+      {:benchee, "~> 1.1.0", optional: true, only: [:dev, :test]},
+      {:benchee_html, "~> 1.0.0", optional: true, only: [:dev]},
 
       # Linting dependencies
-      {:credo, "~> 1.4", only: [:dev]},
-      {:dialyxir, "~> 1.0.0", only: [:dev], runtime: false},
+      {:credo, "~> 1.6.7", only: [:dev]},
+      {:dialyxir, "~> 1.2.0", only: [:dev], runtime: false},
       # mix eye_drops
       {:eye_drops, github: "florinpatrascu/eye_drops", only: [:dev, :test], runtime: false},
 
       # Documentation dependencies
       # Run me like this: `mix docs`
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false}
+      {:ex_doc, "~> 0.29.0", only: :dev, runtime: false}
     ]
   end
 end

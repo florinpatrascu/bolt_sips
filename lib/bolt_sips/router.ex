@@ -63,8 +63,8 @@ defmodule Bolt.Sips.Router do
 
     %{user_options: user_options, connections: connections} =
       try do
-        _configure(opts)
-        # %{prefix => %{user_options: user_options, connections: connections}}
+        opts
+        |> _configure()
         |> Map.get(prefix)
       rescue
         e in Bolt.Sips.Exception ->
@@ -375,7 +375,8 @@ defmodule Bolt.Sips.Router do
     |> Enum.flat_map(fn role ->
       new_urls = Map.keys(new_connections[role])
 
-      Map.keys(current_connections[role])
+      current_connections[role]
+      |> Map.keys()
       |> Enum.flat_map(fn url -> remove_old_urls(role, url, new_urls) end)
     end)
     |> close_connections(prefix)

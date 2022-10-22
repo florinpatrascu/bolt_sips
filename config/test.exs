@@ -1,4 +1,4 @@
-use Mix.Config
+import Config
 
 config :bolt_sips, Bolt,
   # default port considered to be: 7687

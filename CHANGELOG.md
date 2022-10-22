@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.1.0
+
+Thank you https://github.com/zediogoviana, for the following improvements:
+
+- Add configurable SSL options
+- Fix local connection
+- Keep the :ssl keyword to manage the options also
+
+Dependencies updated, paving the road to switching to latest Elixir/Erlang combo.
+
 ## 2.0.11
 
 - Issue #100: Timeout set in config in now used by queries

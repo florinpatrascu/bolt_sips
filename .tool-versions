@@ -1,5 +1,10 @@
-erlang 22.0
-elixir 1.9.4-otp-22
-nodejs 10.3.0
-# python 2.7.16
-python 3.7.3
+erlang 24.1.7
+elixir 1.13.0-otp-24
+nodejs 12.6.0
+#python 3.7.3
+python 3.7.3 2.7.16
+
+ruby 2.7.5
+lua 5.3.5
+terraform 0.15.4
+direnv 2.20.0

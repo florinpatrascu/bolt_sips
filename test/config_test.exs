@@ -69,7 +69,6 @@ defmodule Config.Test do
     assert config[:basic_auth] == [username: "xmas", password: "Kr1ngl3"]
     assert config[:port] == 24786
     assert config[:ssl] == true
-    assert config[:ssl_options] == []
   end
 
   test "standard Bolt.Sips default configuration" do
