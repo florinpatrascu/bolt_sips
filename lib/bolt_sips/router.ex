@@ -151,7 +151,7 @@ defmodule Bolt.Sips.Router do
     ssl_or_sock = if(Keyword.get(options, :ssl), do: :ssl, else: Keyword.get(options, :socket))
 
     user_options = Keyword.put(options, :socket, ssl_or_sock)
-    with_routing? = Keyword.get(user_options, :schema, "bolt") =~ ~r/(^neo4j$)|(^bolt\+routing$)/i
+    with_routing? = Keyword.get(user_options, :schema, "bolt") =~ ~r/(^bolt\+routing$)/i
 
     with {:ok, routing_table} <- get_routing_table(user_options, with_routing?),
          {:ok, connections} <- start_connections(user_options, routing_table) do

@@ -16,7 +16,7 @@ These are the values you can configure, and their default values:
 - `:url`- a full url to pointing to a running Neo4j server. Please remember you must specify the scheme used to connect to the server. Valid schemes:`bolt`,`bolt+routing`and`neo4j` - the last two being used for connecting to a Neo4j causal cluster.
 - `:pool_size` - the size of the connection pool. Default: 15
 - `:timeout` - a connection timeout value defined in milliseconds. Default: 15_000
-- `:ssl`-`true`, if the connection must be encrypted. Default:`false`
+- `:ssl`-`true`, if the connection must be encrypted. If the user wants to specify custom ssl options, just pass a keyword list with the options. More info [here](https://erlef.github.io/security-wg/secure_coding_and_deployment_hardening/ssl) Default:`false`
 - `:prefix`- used for differentiating between multiple connections available in the same app. Default:`:default`
 
 ## Examples of configurations
@@ -27,9 +27,8 @@ Connecting to remote (hosted) Neo4j servers, such as the ones available (also fo
 config :bolt_sips, Bolt,
   url: "bolt://<ip_address>:<bolt_port>",
   basic_auth: [username: "neo4j", password: "#######"]
-  ssl: true
+  ssl: true # or for example `[verify: :verify_none]` if custom ssl options
 ```
-
 
 ## Direct mode
 

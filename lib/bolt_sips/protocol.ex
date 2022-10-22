@@ -35,7 +35,13 @@ defmodule Bolt.Sips.Protocol do
     auth = extract_auth(conf[:basic_auth])
     timeout = conf[:timeout]
     socket = conf[:socket]
-    socket_opts = [packet: :raw, mode: :binary, active: false]
+    default_socket_options = [packet: :raw, mode: :binary, active: false]
+
+    socket_opts =
+      case conf[:ssl] do
+        list when is_list(list) -> Keyword.merge(default_socket_options, conf[:ssl])
+        _ -> default_socket_options
+      end
 
     with {:ok, sock} <- socket.connect(host, port, socket_opts, timeout),
          {:ok, bolt_version} <- BoltProtocol.handshake(socket, sock),
