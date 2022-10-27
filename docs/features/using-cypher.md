@@ -129,3 +129,22 @@ iex» response |>
 ```
 
 and much more. Check the `Bolt.Sips.Response`'s own docs, for more.
+
+## Protection against Cypher Injection
+
+If you want to secure your queries against Cypher Injection where Neo4j parameters don't work
+you can use `Bolt.Sips.Query.Utils.prepared_statement/2` to escape the variables you want to use
+in as Label or Relationship names. Check [more information here](https://neo4j.com/developer/kb/protecting-against-cypher-injection/)
+
+Example:
+
+```elixir
+label = "Robby' WITH DISTINCT true as haxxored MATCH (s:Student) DETACH DELETE s //"
+query = 
+  "CREATE (s:{{label}}) SET s.name = 'student name'"
+  |> Bolt.Sips.Query.prepared_statement([label: label])
+
+Bolt.Sips.query!(conn, query)
+```
+
+
