@@ -89,7 +89,7 @@ config :bolt_sips, Bolt,
 then start a IEx shell session, from the projects'r main folder: `iex -S mix`. While inside the IEx session, let's see if our configuration is sound?
 
 ```elixir
-iex» Bolt.Sips.info()
+iex> Bolt.Sips.info()
 %{
   default: %{
     connections: %{
@@ -137,15 +137,15 @@ But don't worry about the gory details, we got you covered :)
 Let's run some Cypher queries.
 
 ```elixir
-iex» alias Bolt.Sips.Response
-iex» alias Bolt.Sips, as: Neo
+iex> alias Bolt.Sips.Response
+iex> alias Bolt.Sips, as: Neo
 
 # obtaining a read(only) connection:
-iex» rconn = Neo.conn(:read)
+iex> rconn = Neo.conn(:read)
 #PID<0.324.0>
 
 # checking if there are any Person nodes "named": Bob?
-iex» %Response{results: r} = Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p")
+iex> %Response{results: r} = Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p")
 %Bolt.Sips.Response{
   bookmark: "neo4j:bookmark:v1:tx2",
   fields: ["p"],
@@ -160,12 +160,12 @@ iex» %Response{results: r} = Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) R
 
 # r is [], meaning: our query found none. So let's create one.
 # First we obtain a connection suitable for `write` operations:
-iex» wconn = Neo.conn(:write)
+iex> wconn = Neo.conn(:write)
 #PID<0.384.0>
 
 # and now we can use it for creating a new node:
 
-iex» %Response{results: r} = Neo.query!(wconn, "CREATE (p:Person{name:'Bob'})")
+iex> %Response{results: r} = Neo.query!(wconn, "CREATE (p:Person{name:'Bob'})")
 %Bolt.Sips.Response{
   ...
   stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1},
@@ -175,7 +175,7 @@ iex» %Response{results: r} = Neo.query!(wconn, "CREATE (p:Person{name:'Bob'})")
 # our node was created and has one property set,  w⦿‿⦿t!
 # but can we find it? Rerun the previous query using the `read` connection:
 
-iex» Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p") |> Response.first()
+iex> Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p") |> Response.first()
 %{
   "p" => %Bolt.Sips.Types.Node{
     id: 20,
@@ -186,9 +186,9 @@ iex» Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p") |> Response.fi
 
 # and yessss, our new Person node is in the cluster!
 # Do you need its json form, instead? Easy:
-iex» Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p") |>
-...» Response.first() |>
-...» Bolt.Sips.ResponseEncoder.encode!(:json)
+iex> Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p") |>
+...> Response.first() |>
+...> Bolt.Sips.ResponseEncoder.encode!(:json)
 "{\"p\":{\"id\":20,\"labels\":[\"Person\"],\"properties\":{\"name\":\"Bob\"}}}"
 
 ```
@@ -196,7 +196,7 @@ iex» Neo.query!(rconn, "MATCH (p:Person{name: 'Bob'}) RETURN p") |>
 But what happens if we try to create a new Person, using our `read` connection?
 
 ```elixir
-iex» Neo.query!(rconn, "CREATE (p:Person{name:'Alice'})")
+iex> Neo.query!(rconn, "CREATE (p:Person{name:'Alice'})")
 ** (Bolt.Sips.Exception) ... No write operations are allowed directly on this database. Writes must pass through the leader. The role of this server is: FOLLOWER
 ```
 
@@ -205,7 +205,7 @@ Neo4j will promptly let us know we can't use that connection for write operation
 Same command executed on the proper (write) connection, will be successful:
 
 ```elixir
-iex» Neo.query!(wconn, "CREATE (p:Person{name:'Alice'})")
+iex> Neo.query!(wconn, "CREATE (p:Person{name:'Alice'})")
 %Bolt.Sips.Response{
   ...
   stats: %{"labels-added" => 1, "nodes-created" => 1, "properties-set" => 1},

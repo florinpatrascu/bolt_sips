@@ -21,13 +21,7 @@ defmodule Bolt.Sips.TypesHelper do
   """
   @spec datetime_with_micro(Calendar.naive_datetime(), String.t()) :: Calendar.datetime()
   def datetime_with_micro(%NaiveDateTime{} = naive_dt, timezone) do
-    erl_date =
-      {{naive_dt.year, naive_dt.month, naive_dt.day},
-       {naive_dt.hour, naive_dt.minute, naive_dt.second}}
-
-    micros = naive_dt.microsecond
-
-    Calendar.DateTime.from_erl!(erl_date, timezone, micros)
+    DateTime.from_naive!(naive_dt, timezone)
   end
 
   @doc """

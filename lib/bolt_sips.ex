@@ -11,11 +11,11 @@ defmodule Bolt.Sips do
 
   To start, add the `:bolt_sips` dependency to you project, run `mix do deps.get, compile` on it and then you can quickly start experimenting with Neo4j from the convenience of your IEx shell. Example:
 
-      iex» {:ok, _neo} = Bolt.Sips.start_link(url: "bolt://neo4j:test@localhost")
+      iex> {:ok, _neo} = Bolt.Sips.start_link(url: "bolt://neo4j:test@localhost")
       {:ok, #PID<0.250.0>}
-      iex»   conn = Bolt.Sips.conn()
+      iex>   conn = Bolt.Sips.conn()
       #PID<0.256.0>
-      iex» Bolt.Sips.query!(conn, "RETURN 1 as n")
+      iex> Bolt.Sips.query!(conn, "RETURN 1 as n")
       %Bolt.Sips.Response{
         records: [[1]],
         results: [%{"n" => 1}]

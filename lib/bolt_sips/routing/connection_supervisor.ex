@@ -1,7 +1,5 @@
 defmodule Bolt.Sips.ConnectionSupervisor do
-  @moduledoc """
-
-  """
+  @moduledoc false
 
   use DynamicSupervisor
 
@@ -9,7 +7,6 @@ defmodule Bolt.Sips.ConnectionSupervisor do
   alias Bolt.Sips
 
   require Logger
-  # @type via :: {:via, Registry, any}
   @name __MODULE__
 
   def start_link(init_args) do

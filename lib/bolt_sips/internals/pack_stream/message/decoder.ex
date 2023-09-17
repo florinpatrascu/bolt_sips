@@ -8,9 +8,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Decoder do
   @record_signature 0x71
   @ignored_signature 0x7E
 
-  @doc """
-  Decode SUCCESS message
-  """
+  # Decode SUCCESS message
   @spec decode(Bolt.Sips.Internals.PackStream.Message.encoded(), integer()) ::
           Bolt.Sips.Internals.PackStream.Message.decoded()
   def decode(
@@ -20,9 +18,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Decoder do
     build_response(:success, data, nb_entries, bolt_version)
   end
 
-  @doc """
-  Decode FAILURE message
-  """
+  # Decode FAILURE message
   def decode(
         <<@tiny_struct_marker::4, nb_entries::4, @failure_signature, data::binary>>,
         bolt_version
@@ -30,9 +26,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Decoder do
     build_response(:failure, data, nb_entries, bolt_version)
   end
 
-  @doc """
-  Decode RECORD message
-  """
+  # Decode RECORD message
   def decode(
         <<@tiny_struct_marker::4, nb_entries::4, @record_signature, data::binary>>,
         bolt_version
@@ -40,9 +34,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Decoder do
     build_response(:record, data, nb_entries, bolt_version)
   end
 
-  @doc """
-  Decode IGNORED message
-  """
+  # Decode IGNORED message
   def decode(
         <<@tiny_struct_marker::4, nb_entries::4, @ignored_signature, data::binary>>,
         bolt_version

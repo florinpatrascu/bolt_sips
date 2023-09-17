@@ -27,8 +27,8 @@ defmodule Bolt.Sips.Response do
 
   and while you have now access to the full data returned by Neo4j, most of the times you'll just want the results:
 
-      iex» %Bolt.Sips.Response{results: results} = Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr")
-      iex» results
+      iex> %Bolt.Sips.Response{results: results} = Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr")
+      iex> results
       [%{"arr" => [10, 11, 21]}]
 
   More complex queries, i.e.:
@@ -44,16 +44,16 @@ defmodule Bolt.Sips.Response do
 
   Our Bolt.Sips.Response is implementing Elixir's [Enumerable Protocol](https://hexdocs.pm/elixir/Enumerable.html), to help you accessing the results. Hence something like this, is possible:
 
-      iex» Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr") |>
-      ...» Enum.reduce(0, &(Enum.sum(&1["arr"]) + &2))
+      iex> Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr") |>
+      ...> Enum.reduce(0, &(Enum.sum(&1["arr"]) + &2))
       42
 
   an overly complicated example, but you get the point?! :)
 
   You can also quickly get the `first` of the results, returned by Neo4j. Example:
 
-      iex» Bolt.Sips.query!(Bolt.Sips.conn(), "UNWIND range(1, 10) AS n RETURN n") |>
-      ...» Bolt.Sips.Response.first()
+      iex> Bolt.Sips.query!(Bolt.Sips.conn(), "UNWIND range(1, 10) AS n RETURN n") |>
+      ...> Bolt.Sips.Response.first()
       %{"n" => 1}
   """
 

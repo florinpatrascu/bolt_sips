@@ -19,6 +19,7 @@ config :logger, :console,
   format: "$date $time [$level] $metadata$message\n"
 
 config :tzdata, :autoupdate, :disabled
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :eye_drops,
   tasks: [
