@@ -1,5 +1,5 @@
 defmodule Bolt.Sips.BoltKitCase do
-  @moduledoc """
+  _doc = """
   tag your tests with `boltkit`, like this:
 
       @tag boltkit: %{
@@ -17,7 +17,6 @@ defmodule Bolt.Sips.BoltKitCase do
       end
 
   """
-  @moduletag :boltkit
 
   use ExUnit.CaseTemplate
 

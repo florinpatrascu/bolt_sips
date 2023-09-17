@@ -19,25 +19,25 @@ Erlang/OTP 21 [erts-10.2.3] [source] [64-bit] [smp:8:8] [ds:8:8:10] [async-threa
 
 Interactive Elixir (1.8.1) - press Ctrl+C to exit (type h() ENTER for help)
 
-iex»
+iex>
 ```
 
 First we need to start the driver with a minimalist configuration (unless it is already started by your project?):
 
 ```elixir
-iex» {:ok, _neo} = Bolt.Sips.start_link(url: "bolt://neo4j:test@localhost")
+iex> {:ok, _neo} = Bolt.Sips.start_link(url: "bolt://neo4j:test@localhost")
 {:ok, #PID<0.243.0>}
-iex»
+iex>
 
 ```
 
 Presuming your database is empty, you can still test your setup by running a simple Cypher query:
 
 ```elixir
-iex» conn = Bolt.Sips.conn()
+iex> conn = Bolt.Sips.conn()
 #PID<0.248.0>
-iex» Bolt.Sips.query!(conn, "RETURN 1 as n") |>
-...» Bolt.Sips.Response.first()
+iex> Bolt.Sips.query!(conn, "RETURN 1 as n") |>
+...> Bolt.Sips.Response.first()
 %{"n" => 1}
 ```
 
@@ -71,7 +71,7 @@ cypher = """
 According to the response from the server, this is what we did:
 
 ```elixir
-iex» response
+iex> response
 %Bolt.Sips.Response{
   results: [],
   stats: %{
@@ -95,14 +95,14 @@ Observe we're adding a `bolt_sips` property to the Nodes we're adding, so that i
 Let's see how many nodes of "type" (`label`, according to Cypher's official terminology) `Person` having the property `bolt_sips` true, we have in our database:
 
 ```elixir
-iex» query = """
-...»   MATCH (n:Person {bolt_sips: true})
-...»   RETURN n.name AS Name
-...»   ORDER BY Name DESC
-...»   LIMIT 5
-...»  """
+iex> query = """
+...>   MATCH (n:Person {bolt_sips: true})
+...>   RETURN n.name AS Name
+...>   ORDER BY Name DESC
+...>   LIMIT 5
+...>  """
 
-iex» %Bolt.Sips.Response{} = response = Bolt.Sips.query!(conn, query)
+iex> %Bolt.Sips.Response{} = response = Bolt.Sips.query!(conn, query)
 %Bolt.Sips.Response{
   bookmark: "neo4j:bookmark:v1:tx21613",
   fields: ["Name"],
@@ -123,8 +123,8 @@ iex» %Bolt.Sips.Response{} = response = Bolt.Sips.query!(conn, query)
 We have 3 of them, and we're only showing the `name` property! Above you see the full `Bolt.Sips.Response` returned by our driver based on the raw data returned by the Neo4j server. The `:results` key, contains the aggregated response you will use most of the time, and for that the `Bolt.Sips.Response` module has some useful helpers, for example:
 
 ```elixir
-iex» response |>
-...» Bolt.Sips.Response.first()
+iex> response |>
+...> Bolt.Sips.Response.first()
 %{"Name" => "Patrick Rothfuss"}
 ```
 

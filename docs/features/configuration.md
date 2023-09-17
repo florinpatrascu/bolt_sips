@@ -90,21 +90,21 @@ config :bolt_sips, :hidden_gems,
 You'd have to load this config separately, after the starting the `Bolt.Sips`driver. Like this:
 
 ```elixir
-iex» Bolt.Sips.start_link(Application.get_env(:bolt_sips, :hidden_gems))
+iex> Bolt.Sips.start_link(Application.get_env(:bolt_sips, :hidden_gems))
 {:ok, #PID<0.266.0>}
 ```
 
 and the you can use connections from this new configuration, as easy as this:
 
 ```elixir
-iex» conn = Bolt.Sips.conn(:hidden_gems)
+iex> conn = Bolt.Sips.conn(:hidden_gems)
 #PID<0.324.0>
 ```
 
 while for obtaing the connections from your default configuration, is business as usual:
 
 ```elixir
-iex» conn = Bolt.Sips.conn()
+iex> conn = Bolt.Sips.conn()
 #PID<0.309.0>
 ```
 

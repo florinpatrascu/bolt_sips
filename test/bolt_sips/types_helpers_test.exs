@@ -46,7 +46,7 @@ defmodule Bolt.Sips.TypesHelperTest do
     end
 
     test "Fails with invalid timezone" do
-      assert_raise MatchError, fn ->
+      assert_raise ArgumentError, fn ->
         TypesHelper.datetime_with_micro(~N[2000-01-01 23:00:07], "Invalid")
       end
     end

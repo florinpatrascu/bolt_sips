@@ -324,7 +324,7 @@ defmodule Bolt.Sips.Router do
   end
 
   def handle_info(req, state) do
-    Logger.warn("An unusual request: #{inspect(req)}")
+    Logger.warning("An unusual request: #{inspect(req)}")
     {:noreply, state}
   end
 

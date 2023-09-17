@@ -128,9 +128,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
 
   # Encode messages for bolt version 3
 
-  @doc """
-  Encode HELLO message without auth token
-  """
+  # Encode HELLO message without auth token
   @spec encode({Bolt.Sips.Internals.PackStream.Message.out_signature(), list()}, integer()) ::
           Bolt.Sips.Internals.PackStream.Message.encoded()
           | {:error, :not_implemented}
@@ -139,26 +137,20 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     encode({:hello, [{}]}, 3)
   end
 
-  @doc """
-  Encode INIT message with a valid auth token.
-  The auth token is tuple formated as: {user, password}
-  """
+  # Encode INIT message with a valid auth token.
+  # The auth token is tuple formated as: {user, password}
   def encode({:hello, [auth]}, 3) do
     do_encode(:hello, [auth_params(auth)], 3)
   end
 
-  @doc """
-  Encode BEGIN message without metadata.
+  # Encode BEGIN message without metadata.
 
-  BEGIN is used to open a transaction.
-  """
+  # BEGIN is used to open a transaction.
   def encode({:begin, []}, 3) do
     encode({:begin, [%{}]}, 3)
   end
 
-  @doc """
-  Encode BEGIN message with metadata
-  """
+  # Encode BEGIN message with metadata
   def encode({:begin, [%Metadata{} = metadata]}, 3) do
     do_encode(:begin, [Metadata.to_map(metadata)], 3)
   end
@@ -172,66 +164,48 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     {:error, :invalid_data}
   end
 
-  @doc """
-  Encode RUN without params nor metadata
-  """
+  # Encode RUN without params nor metadata
   def encode({:run, [statement]}, 3) do
     do_encode(:run, [statement, %{}, %{}], 3)
   end
 
-  @doc """
-  Encode RUN message with its data: statement and parameters
-  """
+  # Encode RUN message with its data: statement and parameters
   def encode({:run, [statement]}, bolt_version) when bolt_version <= 2 do
     do_encode(:run, [statement, %{}], bolt_version)
   end
 
-  @doc """
-  Encode RUN with params but without metadata
-  """
+  # Encode RUN with params but without metadata
   def encode({:run, [statement, params]}, 3) do
     do_encode(:run, [statement, params, %{}], 3)
   end
 
-  @doc """
-  Encode RUN with params and metadata
-  """
+  # Encode RUN with params and metadata
   def encode({:run, [statement, params, %Metadata{} = metadata]}, 3) do
     do_encode(:run, [statement, params, Metadata.to_map(metadata)], 3)
   end
 
-  @doc """
-  INIT is no more a valid message in Bolt V3
-  """
+  # INIT is no more a valid message in Bolt V3
   def encode({:init, _}, 3) do
     {:error, :invalid_message}
   end
 
-  @doc """
-  Encode INIT message without auth token
-  """
+  # Encode INIT message without auth token
   def encode({:init, []}, bolt_version) when bolt_version <= 2 do
     encode({:init, [{}]}, bolt_version)
   end
 
-  @doc """
-  Encode INIT message with a valid auth token.
-  The auth token is tuple formated as: {user, password}
-  """
+  # Encode INIT message with a valid auth token.
+  # The auth token is tuple formated as: {user, password}
   def encode({:init, [auth]}, bolt_version) when bolt_version <= 2 do
     do_encode(:init, [client_name(), auth_params_v1(auth)], bolt_version)
   end
 
-  @doc """
-  Encode messages that don't need any data formating
-  """
+  # Encode messages that don't need any data formating
   def encode({message_type, data}, 3) when message_type in @valid_message_types do
     do_encode(message_type, data, 3)
   end
 
-  @doc """
-  Encode messages that don't need any data formating
-  """
+  # Encode messages that don't need any data formating
   def encode({message_type, data}, bolt_version)
       when bolt_version <= 2 and message_type in @valid_v1_message_types do
     do_encode(message_type, data, bolt_version)

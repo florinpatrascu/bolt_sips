@@ -98,12 +98,12 @@ iex -S mix
 A few examples:
 
 ```elixir
-iex» alias Bolt.Sips, as: Neo
-iex» alias Bolt.Sips.Response
+iex> alias Bolt.Sips, as: Neo
+iex> alias Bolt.Sips.Response
 
 # check the driver is up and running:
 
-iex» Neo.info()
+iex> Neo.info()
 %{
   default: %{
     connections: %{direct: %{"localhost:7687" => 0}, routing_query: nil},
@@ -122,12 +122,12 @@ iex» Neo.info()
 # delete, are sent to the Neo4j server using a common connection (pool).
 # Let's obtain a connection:
 
-iex» conn = Neo.conn()
+iex> conn = Neo.conn()
 #PID<0.308.0>
 
 # a few examples:
 
-iex» response = Neo.query!(conn, "CREATE (p:Person)-[:LIKES]->(t:Technology)")
+iex> response = Neo.query!(conn, "CREATE (p:Person)-[:LIKES]->(t:Technology)")
 %Response{
   bookmark: nil,
   fields: [],
@@ -152,13 +152,13 @@ iex» response = Neo.query!(conn, "CREATE (p:Person)-[:LIKES]->(t:Technology)")
 
 # and we can also encode them to json, as simple as this:
 
-iex» Jason.encode!(results)
+iex> Jason.encode!(results)
 "[{\"p\":{\"id\":355,\"labels\":[\"Person\"],\"properties\":{}}}]"
 
 # of course you can do more:
 
-iex» Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr", %{}, timeout: 19_000) |>
-...» Enum.reduce(0, &(Enum.sum(&1["arr"]) + &2))
+iex> Bolt.Sips.query!(Bolt.Sips.conn(), "RETURN [10,11,21] AS arr", %{}, timeout: 19_000) |>
+...> Enum.reduce(0, &(Enum.sum(&1["arr"]) + &2))
 42
 
 # see more examples and the tests, for getting familiar with what is possible.

@@ -30,4 +30,5 @@ config :mix_test_watch,
   clear: true
 
 config :tzdata, :autoupdate, :disabled
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :porcelain, driver: Porcelain.Driver.Basic
