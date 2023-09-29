@@ -76,10 +76,6 @@ You'll need a running Neo4j server, for running the tests. Please verify that yo
 
 If you have docker available on your system, you can start an instance before running the test suite:
 
-```shell
-docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=neo4j/test' neo4j:3.0.6
-```
-
 Neo4j versions used for test: 3.0, 3.1, 3.4, 3.5
 
 ```shell
@@ -96,6 +92,18 @@ or:
 
 ```shell
 mix test --only boltkit
+```
+
+#### Help script
+##### Dependencias
+```shell
+sudo apt-get install jq
+sudo apt-get docker-compose
+```
+
+```shell
+docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=neo4j/BoltSipsPassword' neo4j:3.0.6
+docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=neo4j/BoltSipsPassword' neo4j:5.12.0-community
 ```
 
 ### Special thanks
