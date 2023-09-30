@@ -97,7 +97,10 @@ defmodule Bolt.Sips.Client do
     with :ok <- send_packet(client, data),
     encode_version <- recv_packets(client, config.connect_timeout),
     version <- decode_version(encode_version) do
-      {:ok, %{client | version: version}}
+      case version do
+        0.0 -> {:error, %Bolt.Sips.Error{code: :version_negotiation_error}}
+        _ -> {:ok, %{client | version: version}}
+      end
     else
       _ ->
         {:error, "Could not negotiate the version"}
