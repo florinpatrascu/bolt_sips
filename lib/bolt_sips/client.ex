@@ -25,9 +25,12 @@ defmodule Bolt.Sips.Client do
       address = String.to_charlist(address || "localhost")
       versions = latest_versions(opts)
 
+      default_port = String.to_integer(System.get_env("BOLT_TCP_PORT") || "7687")
+      port = Keyword.get(opts, :port, default_port)
+
       %__MODULE__{
         address: address,
-        port: Keyword.get(opts, :port),
+        port: port,
         username: Keyword.get(opts, :username, System.get_env("USER")) || raise(":username is missing"),
         password: Keyword.get(opts, :password),
         connect_timeout: Keyword.get(opts, :connect_timeout, @default_timeout),

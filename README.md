@@ -79,33 +79,23 @@ If you have docker available on your system, you can start an instance before ru
 Neo4j versions used for test: 3.0, 3.1, 3.4, 3.5
 
 ```shell
-mix test
+docker-compose up -d
+docker-compose up neo4j-3.4.0 -d
 ```
-
-For the stubs using [boltkit](https://github.com/neo4j-drivers/boltkit/), you will have to install Python 3.7 and run: `pip install boltkit`. After this you can run any tests tagged with `:boltkit`. Example:
 
 ```shell
-mix test test/boltkit_test.exs --include boltkit
+mix test
 ```
-
 or:
 
 ```shell
-mix test --only boltkit
+mix test --only last_version
 ```
-
-#### Help script
-##### Dependencias
-```shell
-sudo apt-get install jq
-sudo apt-get docker-compose
-```
+or:
 
 ```shell
-docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=neo4j/BoltSipsPassword' neo4j:3.0.6
-docker run --rm -p 7687:7687 -e 'NEO4J_AUTH=neo4j/BoltSipsPassword' neo4j:5.12.0-community
+mix test --only bolt_version:1.0
 ```
-
 ### Special thanks
 
 - Michael Schaefermeyer (@mschae), for the initial version of the Bolt protocol in Elixir: [mschae/boltex](https://github.com/mschae/boltex)
