@@ -1,7 +1,13 @@
 #!/bin/bash
 set -euo pipefail
 
-#./scripts/test --c mix test --boltVersion [1.0, 5.2] --database [neo4j, memgraph]
+# This script is used to run tests on different database versions
+# using different versions of Bolt. You can customize the execution
+# specifying the test command, Bolt versions and databases to use.
+
+# Example of use:
+# ./scripts/test-runner.sh -c "mix test" -b "1.0,5.2" -d "neo4j,memgraph"
+
 
 if ! docker --version &> /dev/null
 then
@@ -123,7 +129,6 @@ function is_service_running?() {
     if [ "$elapsed_time" -ge "$timeout" ]; then
       break
     fi
-    #service=$(docker-compose ps --status running --format json | jq --arg service "neo4j-4.4" -r 'select(.Service == $service and .State == "running")')
     json_output=$(docker-compose ps --status running --format json | jq -s .)    
     service=$(echo "$json_output" | jq --arg service_name "$service_name" -r '
       .[]
@@ -159,6 +164,20 @@ get_published_port() {
   echo $published_port
 }
 
+function parse_array() {
+  local input="$1"
+  local delimiter=","
+  local cleaned_input=$(echo "$input" | tr -d ' ' | tr "$delimiter" "\n")
+  array=($cleaned_input)
+  echo "${array[@]}"
+}
+
+function parse_param() {
+  local bolt_versions_argument="$1"
+  local bolt_versions_array=($(parse_array "$bolt_versions_argument"))
+  echo "${bolt_versions_array[@]}"
+}
+
 function main() {
   local command="mix test"
   local boltVersions=($(getAllBoltVersions))
@@ -172,11 +191,11 @@ function main() {
         ;;
       -b|--boltVersion)
         shift
-        boltVersions=($1)
+        boltVersions=($(parse_param "$1"))
         ;;
       -d|--databases)
         shift
-        databases=($1)
+        databases=($(parse_param "$1"))
         ;;
       *)
         error_message "Error: Parámetro desconocido: $1"
@@ -187,8 +206,8 @@ function main() {
   done
 
   info_message "Running command: $command"
-  info_message "Bolt Versions: ${boltVersions[@]}"
-  info_message "Databases: ${databases[@]}"
+  info_message "Bolt Versions: ${boltVersions[*]}"
+  info_message "Databases: ${databases[*]}"
 
   for db in "${databases[@]}"; do
     for version in "${boltVersions[@]}"; do

@@ -4,8 +4,8 @@
 
 # Load Bats
 bats_helpers_root="${HOME_BATS}"
-load "/home/luis/bats-core/bats-support/load.bash"
-load "/home/luis/bats-core/bats-assert/load.bash"
+load "${bats_helpers_root}/bats-support/load.bash"
+load "${bats_helpers_root}/bats-assert/load.bash"
 
 # Load functions
 load './test-runner.sh'
@@ -29,7 +29,7 @@ load './test-runner.sh'
 }
 
 @test "find_services Devuelve error si falta database" {
-   run find_services "5.1"
+  run find_services "5.1"
   assert_failure
   assert_output --partial "Usage: find_services <boltVersion> <database>"
 }
@@ -68,4 +68,45 @@ load './test-runner.sh'
   run get_published_port "servicio_inexistente"
   assert_success
   assert_output ""
+}
+
+@test "parse_array with comma-separated values" {
+  run parse_array "1, 2, 3, 4"
+  assert_success
+  assert_output --partial "1 2 3 4"
+}
+
+@test "parse_array with comma-separated values (no spaces)" {
+  run parse_array "1,2,3,4"
+  assert_success
+  assert_output --partial "1 2 3 4"
+}
+
+@test "parse_array with empty input" {
+  run parse_array ""
+  assert_output --partial ""
+}
+
+@test "parse_array with comma and space-separated values with special characters" {
+  run parse_array "a, b c, d@e"
+  assert_success
+  assert_output --partial "a bc d@e"
+}
+
+@test "parse_param with comma and space-separated values" {
+  run parse_param "1, 2, 3, 4"
+  assert_success
+  assert_output --partial "1 2 3 4"
+}
+
+@test "parse_param with comma-separated values (no spaces)" {
+  run parse_param "1,2,3,4"
+  assert_success
+  assert_output --partial "1 2 3 4"
+}
+
+@test "parse_param with comma and space-separated values with databases" {
+  run parse_param "neo4j, memgraph"
+  assert_success
+  assert_output --partial "neo4j memgraph"
 }
