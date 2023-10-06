@@ -22,7 +22,7 @@ To run the script, you can use the following format:
 or
 
 ```shell
-./scripts/test-runner.sh -c "mix test --only last_version" -b "5.0, 5,2, 5.3" -d "neo4j"
+./scripts/test-runner.sh -c "mix test --only last_version" -b "5.0, 5.2, 5.3" -d "neo4j"
 ```
 
 This will execute tests with the specified command in different Bolt versions and databases according to the configuration in the docker-compose.yml file.
