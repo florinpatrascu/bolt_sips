@@ -2,8 +2,9 @@ defmodule Bolt.Sips.Client do
   @hs_magic <<0x60, 0x60, 0xB0, 0x17>>
 
   alias Bolt.Sips.BoltProtocol.Versions
+  alias Bolt.Sips.Utils.Converters
 
-  defstruct [:sock, :connection_id, :version]
+  defstruct [:sock, :connection_id, :bolt_version]
 
   defmodule Config do
     @moduledoc false
@@ -21,9 +22,9 @@ defmodule Bolt.Sips.Client do
     ]
 
     def new(opts) do
-      address = Keyword.get(opts, :address, System.get_env("MYSQL_HOST"))
+      address = Keyword.get(opts, :address, System.get_env("BOLT_HOST"))
       address = String.to_charlist(address || "localhost")
-      versions = latest_versions(opts)
+      versions = get_versions(opts)
 
       default_port = String.to_integer(System.get_env("BOLT_TCP_PORT") || "7687")
       port = Keyword.get(opts, :port, default_port)
@@ -40,12 +41,24 @@ defmodule Bolt.Sips.Client do
       }
     end
 
-    def latest_versions(opts) do
-      latest_versions = Versions.latest_versions()
-      versions = Keyword.get(opts, :versions, latest_versions)
+    def get_versions(opts) do
+      versions =
+        case Keyword.get(opts, :versions) do
+          nil ->
+            case System.get_env("BOLT_VERSIONS") do
+              nil ->
+                Versions.latest_versions()
+              env_versions ->
+                  env_versions
+                  |> String.split(",")
+                  |> Enum.map(&Converters.to_float/1)
+            end
+          ops_versions ->
+            ops_versions
+        end
+
       ((versions |> Enum.into([])) ++ [0, 0, 0]) |> Enum.take(4) |> Enum.sort(&>=/2)
     end
-
   end
 
   def connect(%Config{} = config) do
@@ -67,7 +80,7 @@ defmodule Bolt.Sips.Client do
     } = config
 
     buffer? = Keyword.has_key?(socket_options, :buffer)
-    client = %__MODULE__{connection_id: nil, sock: nil, version: nil}
+    client = %__MODULE__{connection_id: nil, sock: nil, bolt_version: nil}
     case :gen_tcp.connect(address, port, socket_options, connect_timeout) do
       {:ok, sock} when buffer? ->
         {:ok, %{client | sock: {:gen_tcp, sock}}}
@@ -102,7 +115,7 @@ defmodule Bolt.Sips.Client do
     version <- decode_version(encode_version) do
       case version do
         0.0 -> {:error, %Bolt.Sips.Error{code: :version_negotiation_error}}
-        _ -> {:ok, %{client | version: version}}
+        _ -> {:ok, %{client | bolt_version: version}}
       end
     else
       _ ->
@@ -134,4 +147,5 @@ defmodule Bolt.Sips.Client do
   def recv_data(%{sock: {sock_mod, sock}}, timeout) do
     sock_mod.recv(sock, 0, timeout)
   end
+
 end
