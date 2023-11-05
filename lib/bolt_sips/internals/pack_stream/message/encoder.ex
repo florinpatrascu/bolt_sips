@@ -513,7 +513,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     {:error, :not_implemented}
   end
 
-  defp do_encode(message_type, data, bolt_version) do
+  def do_encode(message_type, data, bolt_version) do
     signature = signature(message_type)
     encode_message(message_type, signature, data, bolt_version)
   end

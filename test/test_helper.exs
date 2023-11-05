@@ -8,7 +8,7 @@ defmodule Bolt.Sips.TestHelper do
   def opts() do
     [
       address: "127.0.0.1",
-      basic_auth: [username: "neo4j", password: "BoltSipsPassword"],
+      auth: [username: "neo4j", password: "BoltSipsPassword"],
       pool_size: 15,
       max_overflow: 3,
       prefix: :default

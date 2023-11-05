@@ -5,7 +5,7 @@ services:
   neo4j-3.4.0:
     image: neo4j:3.4.0
     labels:
-        - "boltVersions=1.0"
+        - "boltVersions=1.0,2.0"
         - "database=neo4j"
     ports:
       - 7688:7687
@@ -17,7 +17,7 @@ services:
   neo4j-4.4:
     image: neo4j:4.4-community
     labels:
-        - "boltVersions=4.0"
+        - "boltVersions=3.0,4.0,4.1,4.2,4.3,4.4"
         - "database=neo4j"
     ports:
       - 7689:7687

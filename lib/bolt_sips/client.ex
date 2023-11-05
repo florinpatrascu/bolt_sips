@@ -1,8 +1,10 @@
 defmodule Bolt.Sips.Client do
   @hs_magic <<0x60, 0x60, 0xB0, 0x17>>
+  @noop_chunk <<0x00, 0x00>>
 
   alias Bolt.Sips.BoltProtocol.Versions
   alias Bolt.Sips.Utils.Converters
+  alias Bolt.Sips.BoltProtocol.Message.{HelloMessage, InitMessage}
 
   defstruct [:sock, :connection_id, :bolt_version]
 
@@ -123,6 +125,20 @@ defmodule Bolt.Sips.Client do
     end
   end
 
+  def message_hello(client, fields) do
+    payload = HelloMessage.encode(client.bolt_version, fields)
+    with :ok <- send_packet(client, payload) do
+      recv_packets(client, &HelloMessage.decode/1, :infinity)
+    end
+  end
+
+  def message_init(client, fields) do
+    payload = InitMessage.encode(client.bolt_version, fields)
+    with :ok <- send_packet(client, payload) do
+      recv_packets(client, &InitMessage.decode/1, :infinity)
+    end
+  end
+
   defp decode_version(<<0, 0, minor::unsigned-integer, major::unsigned-integer>>) when is_integer(major) and is_integer(minor) do
     Float.round(major + minor / 10.0, 1)
   end
@@ -144,8 +160,52 @@ defmodule Bolt.Sips.Client do
     end
   end
 
+  def recv_packets(client, decoder, timeout) do
+    recv_packets(client, decoder, timeout, <<>>)
+  end
+
+  defp decode_messages(response, chunks) do
+    case response do
+      @noop_chunk ->
+        {:remaining_chunks, chunks}
+      <<_::binary-size(byte_size(response)-2), 0,0>> ->
+        <<_::16, message::binary>> = response
+        {:complete_chunks, chunks <> message}
+      << _::binary>> ->
+        <<_::16, message::binary>> = response
+        {:remaining_chunks, chunks <> message}
+    end
+  end
+
+  defp recv_packets(client, decoder, timeout, chunks) do
+    case recv_data(client, timeout) do
+      {:ok, response} ->
+        case decode_messages(response, chunks) do
+          {:complete_chunks, binary_message} ->
+            message = binary_message |> decoder.()
+            {:ok, message}
+          {:remaining_chunks, binary_message} -> recv_packets(client, decoder, timeout, binary_message)
+        end
+      {:error, _} = error ->
+        error
+    end
+  end
+
   def recv_data(%{sock: {sock_mod, sock}}, timeout) do
     sock_mod.recv(sock, 0, timeout)
   end
 
+  def disconnect(client) do
+    {sock_mod, sock} = client.sock
+    sock_mod.close(sock)
+    :ok
+  end
+
+  def checkin(client) do
+    {sock_mod, sock} = client.sock
+    case sock_mod.setopts(sock, active: :once) do
+      :ok -> :ok
+      other -> other
+    end
+  end
 end
