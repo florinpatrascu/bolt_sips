@@ -10,6 +10,7 @@ on:
 
 jobs:
   test:
+    name: BoltVersion ${{ matrix.boltVersion }}, DB ${{matrix.db}}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
