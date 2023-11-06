@@ -15,9 +15,9 @@ jobs:
       fail-fast: false
       matrix:
         boltVersion:
-          - 1.0
+          - '1.0'
         include:
-          - boltVersion: 1.0
+          - boltVersion: '1.0'
             db: neo4j:3.4.0
     env:
       MIX_ENV: test
