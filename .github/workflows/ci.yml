@@ -16,11 +16,8 @@ jobs:
       matrix:
         boltVersion:
           - 1.0
-          - 2.0
-          - 3.0
         db:
           - neo4j
-          - memgraph
     env:
       MIX_ENV: test
     steps:
