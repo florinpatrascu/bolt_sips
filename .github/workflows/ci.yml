@@ -16,24 +16,18 @@ jobs:
       matrix:
         boltVersion:
           - 1.0
-        db:
-          - neo4j
+        include:
+          - boltVersion: 1.0
+            db: neo4j:3.4.0
     env:
       MIX_ENV: test
+      BOLT_VERSIONS: ${{matrix.boltVersion}}
+      BOLT_TCP_PORT: 7687
     steps:
+      - run: docker run -p 7687:7687 -e NEO4J_AUTH=neo4j/BoltSipsPassword -e NEO4J_dbms_connector_bolt_listen__address=:7687
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get install -y docker-compose
-        shell: bash
-
-      - name: Install jq
-        run: |
-          sudo apt-get install -y jq
-        shell: bash
-      
       - uses: erlef/setup-beam@v1
         with:
           otp-version: '25.1.2'
@@ -50,5 +44,5 @@ jobs:
       - run: mix deps.compile
       - name: Run Test Script
         run: |
-          ./scripts/test-runner.sh -c "mix test" -b ${{matrix.boltVersion}} -d ${{matrix.db}}
+          mix test --only bolt_version:${{matrix.boltVersion}}
         working-directory: .
