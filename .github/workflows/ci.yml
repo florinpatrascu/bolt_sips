@@ -25,7 +25,7 @@ jobs:
           - boltVersion: '2.0'
             db: neo4j:3.4.0
           - boltVersion: '3.0'
-            db: neo4j:4.4-community
+            db: 4.4.27-community
     env:
       MIX_ENV: test
       BOLT_VERSIONS: ${{matrix.boltVersion}}
