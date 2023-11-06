@@ -51,3 +51,4 @@ jobs:
       - name: Run Test Script
         run: |
           ./scripts/test-runner.sh -c "mix test" -b ${{matrix.boltVersion}} -d ${{matrix.db}}
+        working-directory: .
