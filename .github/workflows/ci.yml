@@ -1,9 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - workflows
   pull_request:
     branches:
       - v3
