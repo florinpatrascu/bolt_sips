@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - workflows
+  pull_request:
+    branches:
+      - v3
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        boltVersion:
+          - 1.0
+          - 2.0
+          - 3.0
+        db:
+          - neo4j
+          - memgraph
+    env:
+      MIX_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get install -y docker-compose
+        shell: bash
+
+      - name: Install jq
+        run: |
+          sudo apt-get install -y jq
+        shell: bash
+      
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25.1.2'
+          elixir-version: '1.14.0'
+      
+      - uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-'1.14.0'-'25.1.2'-${{ hashFiles('**/mix.lock') }}
+      
+      - run: mix deps.get
+      - run: mix deps.compile
+      - name: Run Test Script
+        run: |
+          ./scripts/test-runner.sh -c "mix test" -b ${{matrix.boltVersion}} -d ${{matrix.db}}
