@@ -24,7 +24,7 @@ jobs:
       BOLT_VERSIONS: ${{matrix.boltVersion}}
       BOLT_TCP_PORT: 7687
     steps:
-      - run: docker run -p 7687:7687 -e NEO4J_AUTH=neo4j/BoltSipsPassword -e NEO4J_dbms_connector_bolt_listen__address=:7687 ${{matrix.db}}
+      - run: docker run -p 7687:7687 -e NEO4J_AUTH=neo4j/BoltSipsPassword -e NEO4J_dbms_connector_bolt_listen__address=:7687 --detach ${{matrix.db}}
       - name: Checkout code
         uses: actions/checkout@v2
 
