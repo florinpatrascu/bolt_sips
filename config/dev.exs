@@ -20,14 +20,3 @@ config :logger, :console,
 
 config :tzdata, :autoupdate, :disabled
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
-
-config :eye_drops,
-  tasks: [
-    %{
-      id: :docs,
-      name: "docs",
-      run_on_start: true,
-      cmd: "mix docs",
-      paths: ["lib/*", "README.md", "examples/*", "mix.exs"]
-    }
-  ]
