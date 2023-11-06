@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - v3
+
+jobs:
+  test:
+    name: BoltVersion ${{ matrix.boltVersion }}, DB ${{matrix.db}}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        boltVersion:
+          - '1.0'
+          - '2.0'
+          - '3.0'
+        include:
+          - boltVersion: '1.0'
+            db: neo4j:3.4.0
+          - boltVersion: '2.0'
+            db: neo4j:3.4.0
+          - boltVersion: '3.0'
+            db: neo4j:4.4.27-community
+    env:
+      MIX_ENV: test
+      BOLT_VERSIONS: ${{matrix.boltVersion}}
+      BOLT_TCP_PORT: 7687
+    steps:
+      - run: docker run -p 7687:7687 -e NEO4J_AUTH=neo4j/BoltSipsPassword -e NEO4J_dbms_connector_bolt_listen__address=:7687 --detach ${{matrix.db}}
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: '25.1.2'
+          elixir-version: '1.14.0'
+      
+      - uses: actions/cache@v2
+        with:
+          path: |
+            deps
+            _build
+          key: ${{ runner.os }}-mix-'1.14.0'-'25.1.2'-${{ hashFiles('**/mix.lock') }}
+      
+      - run: mix deps.get
+      - run: mix deps.compile
+      - name: Run Test Script
+        run: |
+          mix test --only bolt_version:${{matrix.boltVersion}}
+        working-directory: .

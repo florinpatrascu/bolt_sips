@@ -118,8 +118,6 @@ defmodule BoltSips.Mixfile do
       # Linting dependencies
       {:credo, "~> 1.6.7", only: [:dev]},
       {:dialyxir, "~> 1.2.0", only: [:dev], runtime: false},
-      # mix eye_drops
-      {:eye_drops, github: "florinpatrascu/eye_drops", only: [:dev, :test], runtime: false},
 
       # Documentation dependencies
       # Run me like this: `mix docs`

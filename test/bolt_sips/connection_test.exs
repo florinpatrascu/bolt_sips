@@ -69,7 +69,7 @@ defmodule Bolt.Sips.ConnectionTest do
   test "connect/1 successful with bolt version 3.0" do
     {:ok, %Connection{client: _, bolt_version: bolt_version, server_version: server_version} = conn_data} =
       Connection.connect(@opts)
-    assert server_version == "Neo4j/4.4.26"
+    assert server_version == "Neo4j/4.4.27"
     assert bolt_version == 3.0
 
     assert {:ok, %Connection{client: _, bolt_version: _} = conn_data} =

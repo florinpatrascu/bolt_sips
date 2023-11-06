@@ -15,7 +15,7 @@ services:
       - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
       - NEO4J_dbms_connector_bolt_listen__address=:7687
   neo4j-4.4:
-    image: neo4j:4.4-community
+    image: neo4j:4.4.27-community
     labels:
         - "boltVersions=3.0,4.0,4.1,4.2,4.3,4.4"
         - "database=neo4j"
