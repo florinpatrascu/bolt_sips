@@ -6,21 +6,21 @@ defmodule Bolt.Sips.Connection do
 
   defstruct [
     :client,
-    :bolt_version,
-    :server_version
+    :server_version,
+    :hints,
+    :patch_bolt
   ]
 
   @impl true
   def connect(opts) do
     config = Client.Config.new(opts)
     with {:ok, %Client{} = client} <- Client.connect(config),
-         {:ok, server_version} <- do_init(client, opts) do
-        state = %__MODULE__{
-          client: client,
-          server_version: server_version,
-          bolt_version: client.bolt_version
-        }
-        {:ok, state}
+         {:ok, response_server_metadata} <- do_init(client, opts) do
+          state = getServerMetadataState(response_server_metadata)
+          connection_id = getConnectionId(response_server_metadata)
+          client = %Client{client | connection_id: connection_id }
+          state = %__MODULE__{state | client: client}
+          {:ok, state}
       else
         {:error, reason} ->
           {:error, BoltError.exception(reason, nil, :connect)}
@@ -31,10 +31,20 @@ defmodule Bolt.Sips.Connection do
     do_init(client.bolt_version, client, opts)
   end
 
+  defp do_init(bolt_version, client, opts) when is_float(bolt_version) and bolt_version >= 5.1 do
+    with {:ok, response_hello} <- Client.message_hello(client, opts),
+         {:ok, _response_logon} <- Client.message_logon(client, opts) do
+          {:ok, response_hello}
+        else
+          {:error, reason} ->
+            {:error, BoltError.exception(reason, nil, :do_init)}
+    end
+  end
+
   defp do_init(bolt_version, client, opts) when is_float(bolt_version) and bolt_version >= 3.0 do
     case Client.message_hello(client, opts) do
       {:ok, response} ->
-        {:ok, response["server"]}
+        {:ok, response}
       {:error, response} ->
         {:error, response}
     end
@@ -43,10 +53,25 @@ defmodule Bolt.Sips.Connection do
   defp do_init(bolt_version, client, opts) when is_float(bolt_version) and bolt_version <= 2.0 do
     case Client.message_init(client, opts) do
       {:ok, response} ->
-        {:ok, response["server"]}
+        {:ok, response}
       {:error, response} ->
         {:error, response}
     end
+  end
+
+  defp getServerMetadataState(response_metadata) do
+    patch_bolt = get_in(response_metadata, ["patch_bolt"])
+    hints = get_in(response_metadata, ["hints"])
+    %__MODULE__{
+      client: nil,
+      server_version: response_metadata["server"],
+      patch_bolt: patch_bolt,
+      hints: hints
+    }
+  end
+
+  defp getConnectionId(response_metadata) do
+    get_in(response_metadata, ["connection_id"])
   end
 
   @impl true

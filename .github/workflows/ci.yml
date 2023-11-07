@@ -16,6 +16,16 @@ jobs:
           - '1.0'
           - '2.0'
           - '3.0'
+          - '4.0'
+          - '4.1'
+          - '4.2'
+          - '4.3'
+          - '4.4'
+          - '5.0'
+          - '5.1'
+          - '5.2'
+          - '5.3'
+          - '5.4'
         include:
           - boltVersion: '1.0'
             db: neo4j:3.4.0
@@ -23,6 +33,26 @@ jobs:
             db: neo4j:3.4.0
           - boltVersion: '3.0'
             db: neo4j:4.4.27-community
+          - boltVersion: '4.0'
+            db: neo4j:4.4.27-community
+          - boltVersion: '4.1'
+            db: neo4j:4.4.27-community
+          - boltVersion: '4.2'
+            db: neo4j:4.4.27-community
+          - boltVersion: '4.3'
+            db: neo4j:4.4.27-community
+          - boltVersion: '4.4'
+            db: neo4j:4.4.27-community
+          - boltVersion: '5.0'
+            db: neo4j:5.13.0-community
+          - boltVersion: '5.1'
+            db: neo4j:5.13.0-community
+          - boltVersion: '5.2'
+            db: neo4j:5.13.0-community
+          - boltVersion: '5.3'
+            db: neo4j:5.13.0-community
+          - boltVersion: '5.4'
+            db: neo4j:5.13.0-community
     env:
       MIX_ENV: test
       BOLT_VERSIONS: ${{matrix.boltVersion}}

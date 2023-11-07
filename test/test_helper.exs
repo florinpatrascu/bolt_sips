@@ -9,6 +9,7 @@ defmodule Bolt.Sips.TestHelper do
     [
       address: "127.0.0.1",
       auth: [username: "neo4j", password: "BoltSipsPassword"],
+      bolt_agent: [product: "boltSipsTest/1"],
       pool_size: 15,
       max_overflow: 3,
       prefix: :default
