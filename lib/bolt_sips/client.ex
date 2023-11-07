@@ -4,7 +4,7 @@ defmodule Bolt.Sips.Client do
 
   alias Bolt.Sips.BoltProtocol.Versions
   alias Bolt.Sips.Utils.Converters
-  alias Bolt.Sips.BoltProtocol.Message.{HelloMessage, InitMessage}
+  alias Bolt.Sips.BoltProtocol.Message.{HelloMessage, InitMessage, LogonMessage}
 
   defstruct [:sock, :connection_id, :bolt_version]
 
@@ -129,6 +129,13 @@ defmodule Bolt.Sips.Client do
     payload = HelloMessage.encode(client.bolt_version, fields)
     with :ok <- send_packet(client, payload) do
       recv_packets(client, &HelloMessage.decode/1, :infinity)
+    end
+  end
+
+  def message_logon(client, fields) do
+    payload = LogonMessage.encode(client.bolt_version, fields)
+    with :ok <- send_packet(client, payload) do
+      recv_packets(client, &LogonMessage.decode/1, :infinity)
     end
   end
 

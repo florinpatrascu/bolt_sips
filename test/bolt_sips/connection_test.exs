@@ -4,7 +4,6 @@ defmodule Bolt.Sips.ConnectionTest do
   alias Bolt.Sips.Connection
 
   @opts Bolt.Sips.TestHelper.opts()
-  @versions4x [4.0, 4.1, 4.2, 4.3]
 
   @tag core: true
   test "connect/1 - disconnect/1 successful" do
@@ -148,8 +147,60 @@ defmodule Bolt.Sips.ConnectionTest do
   test "connect/1 successful with bolt version 5.0" do
     {:ok, %Connection{client: client, server_version: server_version} = conn_data} =
       Connection.connect(@opts)
-    assert server_version == "Neo4j/5.12.0"
+    assert server_version == "Neo4j/5.13.0"
     assert client.bolt_version == 5.0
+
+    assert {:ok, %Connection{client: _, } = conn_data} =
+      Connection.checkin(conn_data)
+
+    :ok = Connection.disconnect(:stop, conn_data)
+  end
+
+  @tag bolt_version: "5.1"
+  test "connect/1 successful with bolt version 5.1" do
+    {:ok, %Connection{client: client, server_version: server_version} = conn_data} =
+      Connection.connect(@opts)
+    assert server_version == "Neo4j/5.13.0"
+    assert client.bolt_version == 5.1
+
+    assert {:ok, %Connection{client: _, } = conn_data} =
+      Connection.checkin(conn_data)
+
+    :ok = Connection.disconnect(:stop, conn_data)
+  end
+
+  @tag bolt_version: "5.2"
+  test "connect/1 successful with bolt version 5.2" do
+    {:ok, %Connection{client: client, server_version: server_version} = conn_data} =
+      Connection.connect(@opts)
+    assert server_version == "Neo4j/5.13.0"
+    assert client.bolt_version == 5.2
+
+    assert {:ok, %Connection{client: _, } = conn_data} =
+      Connection.checkin(conn_data)
+
+    :ok = Connection.disconnect(:stop, conn_data)
+  end
+
+  @tag bolt_version: "5.3"
+  test "connect/1 successful with bolt version 5.3" do
+    {:ok, %Connection{client: client, server_version: server_version} = conn_data} =
+      Connection.connect(@opts)
+    assert server_version == "Neo4j/5.13.0"
+    assert client.bolt_version == 5.3
+
+    assert {:ok, %Connection{client: _, } = conn_data} =
+      Connection.checkin(conn_data)
+
+    :ok = Connection.disconnect(:stop, conn_data)
+  end
+
+  @tag bolt_version: "5.4"
+  test "connect/1 successful with bolt version 5.4" do
+    {:ok, %Connection{client: client, server_version: server_version} = conn_data} =
+      Connection.connect(@opts)
+    assert server_version == "Neo4j/5.13.0"
+    assert client.bolt_version == 5.4
 
     assert {:ok, %Connection{client: _, } = conn_data} =
       Connection.checkin(conn_data)
