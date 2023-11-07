@@ -31,6 +31,16 @@ defmodule Bolt.Sips.Connection do
     do_init(client.bolt_version, client, opts)
   end
 
+  defp do_init(bolt_version, client, opts) when is_float(bolt_version) and bolt_version >= 5.1 do
+    with {:ok, response_hello} <- Client.message_hello(client, opts),
+         {:ok, _response_logon} <- Client.message_logon(client, opts) do
+          {:ok, response_hello}
+        else
+          {:error, reason} ->
+            {:error, BoltError.exception(reason, nil, :do_init)}
+    end
+  end
+
   defp do_init(bolt_version, client, opts) when is_float(bolt_version) and bolt_version >= 3.0 do
     case Client.message_hello(client, opts) do
       {:ok, response} ->

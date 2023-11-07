@@ -44,6 +44,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   @reset_signature 0x0F
   @rollback_signature 0x13
   @run_signature 0x10
+  @logon_signature 0x6A
 
   # OUT Signature
 
@@ -58,7 +59,8 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     @pull_all_signature,
     @reset_signature,
     @rollback_signature,
-    @run_signature
+    @run_signature,
+    @logon_signature
   ]
 
   @valid_v1_signatures [
@@ -80,7 +82,8 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
     :rollback,
     :pull_all,
     :reset,
-    :run
+    :run,
+    :logon
   ]
 
   @valid_v1_message_types [
@@ -106,6 +109,7 @@ defmodule Bolt.Sips.Internals.PackStream.Message.Encoder do
   defp signature(:rollback), do: @rollback_signature
   defp signature(:run), do: @run_signature
   defp signature(:init), do: @init_signature
+  defp signature(:logon), do: @logon_signature
 
   @doc """
   Return client name (based on bolt_sips version)

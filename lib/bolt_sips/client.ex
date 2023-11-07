@@ -1,10 +1,10 @@
 defmodule Bolt.Sips.Client do
-  @hs_magic <<0x60, 0x60, 0xB0, 0x17>>
+  @handshake_bytes_identifier <<0x60, 0x60, 0xB0, 0x17>>
   @noop_chunk <<0x00, 0x00>>
 
   alias Bolt.Sips.BoltProtocol.Versions
   alias Bolt.Sips.Utils.Converters
-  alias Bolt.Sips.BoltProtocol.Message.{HelloMessage, InitMessage}
+  alias Bolt.Sips.BoltProtocol.Message.{HelloMessage, InitMessage, LogonMessage}
 
   defstruct [:sock, :connection_id, :bolt_version]
 
@@ -111,7 +111,7 @@ defmodule Bolt.Sips.Client do
   end
 
   defp do_handshake(client, config) do
-    data = @hs_magic <> (config.versions |>  Enum.sort(&>=/2) |> Enum.reduce(<<>>, fn version, acc -> acc <> Versions.to_bytes(version) end))
+    data = @handshake_bytes_identifier <> (config.versions |>  Enum.sort(&>=/2) |> Enum.reduce(<<>>, fn version, acc -> acc <> Versions.to_bytes(version) end))
     with :ok <- send_packet(client, data),
     encode_version <- recv_packets(client, config.connect_timeout),
     version <- decode_version(encode_version) do
@@ -129,6 +129,13 @@ defmodule Bolt.Sips.Client do
     payload = HelloMessage.encode(client.bolt_version, fields)
     with :ok <- send_packet(client, payload) do
       recv_packets(client, &HelloMessage.decode/1, :infinity)
+    end
+  end
+
+  def message_logon(client, fields) do
+    payload = LogonMessage.encode(client.bolt_version, fields)
+    with :ok <- send_packet(client, payload) do
+      recv_packets(client, &LogonMessage.decode/1, :infinity)
     end
   end
 

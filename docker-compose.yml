@@ -23,10 +23,10 @@ services:
       - 7689:7687
     environment:
       - NEO4J_AUTH=neo4j/BoltSipsPassword
-  neo4j-5.12.0:
-    image: neo4j:5.12.0-community
+  neo4j-5.13.0:
+    image: neo4j:5.13.0-community
     labels:
-        - "boltVersions=5.0,5.1,5.2,5.3"
+        - "boltVersions=5.0,5.1,5.2,5.3,5.4"
         - "database=neo4j"
     ports:
       - 7690:7687
