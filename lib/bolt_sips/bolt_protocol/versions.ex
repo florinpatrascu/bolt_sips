@@ -1,29 +1,12 @@
 defmodule Bolt.Sips.BoltProtocol.Versions do
-  alias Bolt.Sips.Utils.ModuleInspector
+  @available_bolt_versions [1.0, 2.0, 3.0, 4.0, 4.1, 4.2, 4.3, 4.4, 5.0, 5.1, 5.2, 5.3, 5.4]
 
-  @spec available_versions() :: [float]
   def available_versions() do
-    # Obtén la lista de módulos en el namespace BoltProtocol.
-    module_names = ModuleInspector.match_modules("Elixir.Bolt.Sips.BoltProtocol.RequestMessage")
-
-    available_versions =
-      module_names
-      |> Enum.map(&String.split(&1, "."))
-      |> Enum.map(fn [_,_, _, _, _, version | _] -> version end)
-      |> Enum.map(&String.replace(&1, ~r/^V/, ""))
-      |> Enum.map(&String.replace(&1, "_", "."))
-      |> Enum.map(&Float.parse/1)
-      |> Enum.map(fn {number, _} -> number end)
-      |> Enum.sort(fn a, b -> a >= b end)
-
-    case available_versions do
-      [] -> [0.0]
-      _ -> available_versions
-    end
+    @available_bolt_versions
   end
 
   def latest_versions() do
-    ((available_versions() |> Enum.into([])) ++ [0, 0, 0]) |> Enum.take(4) |> Enum.sort(&>=/2)
+    ((available_versions() |> Enum.sort(&>=/2) |> Enum.into([])) ++ [0, 0, 0]) |> Enum.take(4)
   end
 
   def to_bytes(version) when is_float(version) do
