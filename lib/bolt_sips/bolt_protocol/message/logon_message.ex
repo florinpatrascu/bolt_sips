@@ -16,7 +16,7 @@ defmodule Bolt.Sips.BoltProtocol.Message.LogonMessage do
   def decode(response_message) do
     case Decoder.decode(response_message, 3) do
       {:success, response} ->
-        response
+        {:ok, response}
       {:failure, response} ->
         {:error, response}
     end

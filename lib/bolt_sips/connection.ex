@@ -23,7 +23,9 @@ defmodule Bolt.Sips.Connection do
           {:ok, state}
       else
         {:error, reason} ->
-          {:error, BoltError.exception(reason, nil, :connect)}
+          # TODO: Evaluate how to return errors
+          #{:error, BoltError.exception(reason, nil, :connect)}
+          {:error, reason}
     end
   end
 
@@ -37,26 +39,18 @@ defmodule Bolt.Sips.Connection do
           {:ok, response_hello}
         else
           {:error, reason} ->
-            {:error, BoltError.exception(reason, nil, :do_init)}
+            # TODO: Evaluate how to return errors
+            #{:error, BoltError.exception(reason, nil, :do_init)}
+            {:error, reason}
     end
   end
 
   defp do_init(bolt_version, client, opts) when is_float(bolt_version) and bolt_version >= 3.0 do
-    case Client.message_hello(client, opts) do
-      {:ok, response} ->
-        {:ok, response}
-      {:error, response} ->
-        {:error, response}
-    end
+    Client.message_hello(client, opts)
   end
 
   defp do_init(bolt_version, client, opts) when is_float(bolt_version) and bolt_version <= 2.0 do
-    case Client.message_init(client, opts) do
-      {:ok, response} ->
-        {:ok, response}
-      {:error, response} ->
-        {:error, response}
-    end
+    Client.message_init(client, opts)
   end
 
   defp getServerMetadataState(response_metadata) do

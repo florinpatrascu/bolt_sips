@@ -55,7 +55,7 @@ defmodule Bolt.Sips.ClientTest do
       chunk2 = <<0,5,107,108,0,0>>
       pid = Bolt.Sips.Mocks.SockMock.start_link([@noop_chunk, sizeMock <> chunk1, sizeMock <> chunk2])
       client = %{sock: {Bolt.Sips.Mocks.SockMock, pid}}
-      {:ok, message} = Client.recv_packets(client, fn data -> data end, 0)
+      {:ok, message} = Client.recv_packets(client, fn data -> {:ok, data} end, 0)
       assert message == chunk1 <> chunk2
     end
 
@@ -65,7 +65,7 @@ defmodule Bolt.Sips.ClientTest do
       chunk1 = <<0,14,103,106,0,0>>
       pid = Bolt.Sips.Mocks.SockMock.start_link([@noop_chunk, sizeMock <> chunk1])
       client = %{sock: {Bolt.Sips.Mocks.SockMock, pid}}
-      {:ok, message} = Client.recv_packets(client, fn data -> data end, 0)
+      {:ok, message} = Client.recv_packets(client, fn data -> {:ok, data} end, 0)
       assert message == chunk1
     end
 
@@ -76,7 +76,7 @@ defmodule Bolt.Sips.ClientTest do
       chunk2 = <<0,5,107,108,0,0>>
       pid = Bolt.Sips.Mocks.SockMock.start_link([@noop_chunk, sizeMock <> chunk1, @noop_chunk, sizeMock <> chunk2, @noop_chunk])
       client = %{sock: {Bolt.Sips.Mocks.SockMock, pid}}
-      {:ok, message} = Client.recv_packets(client, fn data -> data end, 0)
+      {:ok, message} = Client.recv_packets(client, fn data -> {:ok, data} end, 0)
       assert message == chunk1 <> chunk2
     end
   end

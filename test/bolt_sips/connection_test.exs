@@ -4,6 +4,7 @@ defmodule Bolt.Sips.ConnectionTest do
   alias Bolt.Sips.Connection
 
   @opts Bolt.Sips.TestHelper.opts()
+  @opts_without_auth Bolt.Sips.TestHelper.opts_without_auth()
 
   @tag core: true
   test "connect/1 - disconnect/1 successful" do
@@ -12,6 +13,13 @@ defmodule Bolt.Sips.ConnectionTest do
     assert is_bitstring(server_version)
     assert is_float(client.bolt_version)
     assert :ok = Connection.disconnect(:stop, conn_data)
+  end
+
+  @tag core: true
+  test "connect/1 - not successful with incorrect credentials" do
+    opts = @opts_without_auth ++ [auth: [username: "baduser", password: "badsecret"]]
+    {:error, %Bolt.Sips.Error{code: "Neo.ClientError.Security.Unauthorized"}} =
+      Connection.connect(opts)
   end
 
   @tag core: true

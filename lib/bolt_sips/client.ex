@@ -190,7 +190,10 @@ defmodule Bolt.Sips.Client do
         case decode_messages(response, chunks) do
           {:complete_chunks, binary_message} ->
             message = binary_message |> decoder.()
-            {:ok, message}
+            case message do
+              {:ok, decoded_message} ->  {:ok, decoded_message}
+              {:error, error_message} -> {:error, %Bolt.Sips.Error{code: error_message["code"], message: error_message["message"]}}
+            end
           {:remaining_chunks, binary_message} -> recv_packets(client, decoder, timeout, binary_message)
         end
       {:error, _} = error ->

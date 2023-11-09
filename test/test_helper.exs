@@ -15,6 +15,16 @@ defmodule Bolt.Sips.TestHelper do
       prefix: :default
     ]
   end
+
+  def opts_without_auth() do
+    [
+      address: "127.0.0.1",
+      bolt_agent: [product: "boltSipsTest/1"],
+      pool_size: 15,
+      max_overflow: 3,
+      prefix: :default
+    ]
+  end
   @doc """
    Read an entire file into a string.
    Return a tuple of success and data.
