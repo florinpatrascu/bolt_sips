@@ -15,8 +15,11 @@
 - Multi-tenancy
 - Supports Neo4j versions: 3.0.x/3.1.x/3.2.x/3.4.x/3.5.x/4.0.x/4.1.x/4.2.x
 
-Note:
-Regarding Neo4j 4, stream capabilities are not yet supported.
+Notes:
+
+- Regarding Neo4j 4, stream capabilities are not yet supported.
+- If you're seeking a substitute driver, here's a compilation of repositories:
+  - https://github.com/sagastume/boltx
 
 ## Table of Contents
 
